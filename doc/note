@@ -1,0 +1,7 @@
+MYSQL  函数
+	FROM_UNIXTIME();// 将unix timestamp 转换为mysql时间类型
+	UNIX_TIMESTAMP(); // 将mysql 的时间类型转换为unix timestamp类型
+
+PHP func
+	date(); // 将unix时间戳转换为日期
+	strtotime(); // 将日期转换为Unix时间戳

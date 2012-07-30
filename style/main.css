@@ -1,0 +1,66 @@
+* {
+	outline: blue 1px dotted;
+}
+
+body {
+	width: 80%;
+	margin: auto;
+	background-color: #abc;
+	position: relative;
+}
+
+ul.block li{
+	margin: 8px;
+	display: inline;
+}
+
+ul.nodec li{
+	list-style: none;
+}
+
+span.hint {
+	font-size: .8em;
+	color: #234;
+}
+
+.err_msg {
+	color: red;
+}
+
+#navi_header {
+	font-size: 1.8em;
+}
+
+#footer {
+	font-size: .8em;
+	color: #432;
+}
+
+hr.clear {
+	clear: both;
+}
+
+#func_column {
+	width: 20%;
+	position: relative;
+	float: left;
+}
+
+#main_content {
+	width: 56%;
+	position: relative;
+	margin: 0 2%;
+	float: left;
+}
+
+#message_column {
+	width: 20%;
+	position: relative;
+	float: right;
+}
+
+#loginout {
+	width: 30%;
+	position: relative;
+	float: right;
+}
