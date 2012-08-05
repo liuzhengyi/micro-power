@@ -1,0 +1,6 @@
+SESSION 名值对应关系
+
+uid	用户在本站的id
+name	用户在本站的昵称
+sid	用户在sina的id
+stoken	用户的weibo授权token

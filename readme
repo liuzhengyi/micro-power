@@ -1,0 +1,27 @@
+// 2012-08-04
+// gipsa
+
+0. 代码和文档可能写的比较混乱，有待进一步整理。请多批评，多指导。
+
+1. 系统基于LAMP开发，在本地测试时可能需要修改根目录下config.php中
+相关内容如服务器上网站根目录$webRoot，网站的http根路径$siteRoot，
+数据库配置文件位置$dbConfFile等。
+   也有些信息不便修改，如APP的KEY和回调地址。这三者是互相对应的，
+另外回调地址是在新浪网站上登记过的，需要同步修改，也比较困难。所以
+可能需要修改本地的文件路径。如将网站放在web服务根目录下的a/vdongli/下。
+   另外，数据库配置文件dbConf.php一般需要修改，相应的，主配置文件
+config.php中的数据库配置文件路径$dbConfFile也要修改。
+
+2. 创建数据库后，可以在数据库中source doc/create_table.sql来创建数据
+表，然后source doc/testdata.sql来插入一些测试数据。
+   数据库和测试数据都还比较粗糙，有很多需要改进的地方。
+
+3. 系统有七个测试用户，登录名为textx@vdongli.com，密码为test。其中x为1-7
+。也可以用新浪微博登录，或注册微动力用户。
+
+4. 系统主要有四个页面：首页index.php 任务页task.php 个人页my.php 帮助页help.php
+页面的文档头docheader 导航头naviheader 登录框log 和页脚 footer被封装，放在uiparts
+目录下。所有负责处理action的页面放在action目录下。有一个例外是reg.php，这个文件既
+负责显示注册页面，又负责处理注册信息。它被暂时放到了根目录下，这个问题也许需要改进。
+另外每个文件的开头有注释解释本文件的作用。
+
