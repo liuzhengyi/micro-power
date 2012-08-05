@@ -1,4 +1,8 @@
 <?php
+/* dbo.class.php
+ * 数据库类封装文件
+ * 分页功能尚未实现
+ */
 class dbex {
 	
 	private $dbc;
@@ -17,6 +21,11 @@ class dbex {
 		return $this->dbc;
 	}
 
+	public function query($sql)
+	{
+		return $this->dbc->query($sql);
+	}
+
 	public function checkExist($value, $field="email", $table="user")
 	{
 		// check 
@@ -24,6 +33,17 @@ class dbex {
 			return 0;
 		} else {
 			$sql = "select 1 from `$table` where `$field` = '$value' limit 1";
+			$res = $this->dbc->query($sql);
+			return $res->num_rows;
+		}
+	}
+
+	public function checkPass($e, $p)
+	{
+		if(empty($e) || empty($p)) {
+			return 0;
+		} else {
+			$sql = "select 1 from user where email = '$e' and pass = sha1('$p')";
 			$res = $this->dbc->query($sql);
 			return $res->num_rows;
 		}
@@ -42,6 +62,21 @@ class dbex {
 		$result=$this->dbc->query($sql) or die('<script type="text/javascript">location.href="servtools/error.php?error_type=dberr";</script>');
 		}
 		return $result->fetch_array();
+	}
+
+	public function getRs($sql) {
+		$result = $this->dbc->query($sql);
+		$rows = array();
+		while($rsRow = $result->fetch_array()) {
+			$rows[] = $rsRow;
+		}
+		return $rows;
+	}
+	
+	public function getPage($sql, $start, $items) {
+	}
+
+	public function getCount($sql) {
 	}
 
 	public function close()

@@ -1,10 +1,15 @@
 <?php
 session_start();
+/* reg.php
+ * 负责显示和处理注册微动力的页面和请求
+ * 其中涉及一些检测函数，都还没有具体完成
+ * 还缺少验证码和发送验证邮件等功能
+ */
 require_once("config.php");
 require_once("foundation/check.func.php");
 require_once("lib/dbo.class.php");	// init $dbo
 // 判断是否登录，这个功能应该用一个函数来完成
-if(isset($_SESSION['id'])) {
+if(isset($_SESSION['uid'])) {
 	header("Location:my.php");
 	exit();
 }
@@ -47,7 +52,7 @@ require_once("$dbConfFile"); // init $dbServs
 			} else {
 				$sql = "select user_id from user where email = '$e' limit 1";
 				$res = $dbo->getRow($sql);
-				$_SESSION['id'] = $res['user_id'];
+				$_SESSION['uid'] = $res['user_id'];
 				$_SESSION['name'] = $n;
 				echo "注册成功...";
 				header("Location:my.php");

@@ -1,5 +1,9 @@
 <?php
 session_start();
+/* help.php
+ * 帮助文件，
+ * 具体放那些内容我还没考虑好
+ */
 include_once("config.php");	// init $authURL
 include_once("lib/saetv2.ex.class.php");
 

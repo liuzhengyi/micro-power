@@ -1,5 +1,9 @@
 <?php
 session_start();
+/* index.php
+ * 系统主页，具体放什么以及怎么设计
+ * 我都还没有主意
+ */
 include_once("config.php");	// init $authURL
 include_once("lib/saetv2.ex.class.php");
 
