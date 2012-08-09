@@ -18,6 +18,8 @@ if(!isset($_SESSION['uid'])) {
 	header("Location:".$siteRoot."index.php");
 	exit();
 }
+include_once("foundation/debug.php");
+include_once("foundation/page.php");
 
 $title = "欢迎来到微动力";
 $csfile = array("style/main.css", "style/solo.css");
@@ -40,8 +42,19 @@ if(isset($_GET['type'])) {
 include_once("lib/dbo.class.php");
 include_once($dbConfFile);
 $dbo = new dbex($dbServs);
-$sql = "select task_id, owner_id, publisher_id, task_info, task_amount, task_finish_amount from task where task_type = '$type'";
-$res = $dbo->getRs($sql);
+$sql_count = "select count(1) from task where task_type='$type' and task_status='normal'";
+$count = $dbo->getCount($sql_count);
+global $task_per_page;	// init in config.php
+$per_page = $task_per_page;
+$total_page = ceil($count/$per_page);
+if(isset($_GET['page']) && $_GET['page'] >= 1 && $_GET['page'] <= $total_page) {
+	$page = $_GET['page'];
+} else {
+	$page = 1;
+}
+$sql = "select task_id, owner_id, publisher_id, task_info, task_offer, task_amount, task_finish_amount from task where task_type = '$type'";
+$start = ($page-1)*$per_page;
+$res = $dbo->getPage($sql, $start, $per_page);
 
 //$show = array();
 ?>
@@ -59,6 +72,7 @@ $res = $dbo->getRs($sql);
  				当type为follow,forward,review时，参考信息为
 				相应资源的id，当type为create时，参考信息为一
 				段文字，描述任务的具体内容。
+ *	['task_offer'] --tinyint-- 任务原始佣金，非用户最终佣金
  *	['task_amount'] --int-- 任务总容量，即该任务最多可以被做多少次
  *	['task_finish_amount'] --int-- 任务完成数，已经完成的数量
  * $task_rest_amount --int-- 任务剩余量
@@ -83,7 +97,7 @@ require_once("uiparts/docheader.php");
 	<div id="main_content">
 		<table>
 		<thead> <tr>
-				<th>任务id</th> <th>任务类型</th> <th>任务信息</th> <th>任务余额</th> <th>任务发布者</th><th>状态</th>
+				<th>任务id</th> <th>任务类型</th> <th>任务信息</th> <th>任务总量</th><th>任务余额</th> <th>任务发布者</th><th>单价</th><th>状态</th>
 			</tr>
 		</thead>
 		<tbody> 
@@ -94,25 +108,30 @@ require_once("uiparts/docheader.php");
 				<td><?php echo $row['task_id'];?></td>
 				<td><?php echo $type;?></td>
 				<td><?php echo $row['task_info'];?></td>
+				<td><?php echo $row['task_amount'];?></td>
 				<td><?php echo $task_rest_amount;?></td>
 				<td><?php echo $row['publisher_id'];?></td>
+				<td><?php echo $row['task_offer'];?></td>
 				<?php
 				switch($type){
-				case 'follow':
+				case 'follow':	// 关注任务
 					// 获取已关注列表
-					$res = $c->friends_by_id($_SESSION['sid']);
-					foreach($res['users'] as $user) {
-						$followed[] = $user['id'];
+					/*
+					$friends_id = $c->friends_by_id($_SESSION['sid']);
+					if_weiboapi_fail($friends_id, __FILE__, __LINE__);
+					foreach($friends_id['users'] as $friend) {
+						$followed[] = $friend['id'];
 					}
 					if(in_array($row['task_info'], $followed, false)) {
 						echo '<td>已关注</td>';
 					} else {
 						echo '<td><a href="action/follow.php?id='.$row['task_info'].'">关注</a></td>';
 					}
+					*/
 					break;
 				case 'forward':
 					// 微博可以重复转发，所以不必验证用户之前是否已经转发
-					// 但是，是否应该允许用户重复转发呢？转发之后如何验证呢？
+					// 但是，是否应该允许用户重复转发呢？转发之后如何验证如何提示用户呢？
 					echo '<td><a href="action/forward.php?id='.$row['task_info'].'">转发</a></td>';
 					break;
 				}
@@ -121,6 +140,14 @@ require_once("uiparts/docheader.php");
 		<?php }?>
 		</tbody>
 		</table>
+		<div id="page_bar">
+		<ul>
+		<?php	
+		$url = 'http://'.$hostName.$_SERVER['SCRIPT_NAME']."?type=$type&page=";
+		page_bar($url, $total_page, $page, FALSE);
+		?>
+		</ul>
+		</div>
 	</div><!-- end of DIV main_content -->
 	<?php include("uiparts/messcol.php");?>
 	<?php include("uiparts/footer.php");?>

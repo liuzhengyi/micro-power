@@ -2,20 +2,36 @@
 /**
  * 错误处理函数
  *
- * @param bool $debug 判断当前是否处于DEBUG模式
  * @param string $debug_msg DEBUG信息
  * @param bool $to_user 当不处于DEBUG模式时，是否要向用户提示出错，默认为TURE
- * @param string $level 错误级别，记录日志时使用，默认为
+ * @param string $level 错误级别，记录日志时使用，默认为'error'('fatal', 'notice')
  * @return 
  */
 
-function debug($debug, $debug_msg, $to_user=TRUE, $level="fatal")
-{	if($debug) {
-		echo 'debug: '.$debug_msg;
+function debug($debug_msg, $file, $line, $to_user=TRUE, $level="error")
+{	if(DEBUG) {
+		echo 'debug: '.'file:'.$file .' line: ' . $line .$debug_msg;
+		exit();
 	} else if($to_user) {
 		echo "something wrong, please wait for a moment.";
 	} else {
 		echo "";
+	}
+}
+
+/**
+ * 处理api调用失败函数
+ *
+ *
+ */
+
+function if_weiboapi_fail($res, $file, $line)
+{	if(!$res) {
+		$debug_msg = 'weibo服务暂时出了问题，请尝试使用其他方式';
+		debug($debug_msg, $file, $line, true);
+	}else if(isset($res['error_code'])) {
+		$debug_msg = 'call api failed, error: '.$res['error'].'<br />error code('.$res['error_code'].')';
+		debug($debug_msg, $file, $line, false);
 	}
 }
 ?>

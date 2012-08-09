@@ -38,7 +38,7 @@ if ($token) {
 	$sid_get = $c->get_uid();
 	if(isset($sid_get['error_code'])) {
 		$msg = "weibo api 使用出错，错误码：{$sid_get['error_code']}，file:".__FILE__.";line:".__LINE__;
-		debug(DEBUG, $msg);
+		debug($msg);
 	}
 	$sid = $sid_get['uid'];
 	// 判断是否首次授权，首次授权则登记sina uid
@@ -50,7 +50,7 @@ if ($token) {
 			$num = $dbo->exeUpdate($sql);
 			if(1 != $num) {
 				$msg = "向数据库插入数据出错。file:".__FILE__.";line:".__LINE__."sql:".$sql;
-				debug(DEBUG, $msg);
+				debug($msg);
 			}
 			//写session，跳转
 			$_SESSION['sid'] = $sid;
@@ -64,7 +64,7 @@ if ($token) {
 			$num = $dbo->exeUpdate($sql);
 			if(1 != $num) {
 				$msg = "向数据库插入数据出错。file:".__FILE__.";line:".__LINE__."sql:".$sql;
-				debug(DEBUG, $msg);
+				debug($msg);
 			}	// 注册完成，session在后面写。
 		}
 	} else {	// 老用户，非首次授权。在用微博帐号登录
@@ -91,6 +91,6 @@ if ($token) {
 } else {
 	
 	$msg = '授权失败。请稍候重试'.'<a href="index.php">点此</a>返回主页';
-	debug(DEBUG, $msg);
+	debug($msg);
 }
 ?>

@@ -6,6 +6,12 @@ session_start();
  */
 include_once("config.php");	// init $authURL
 include_once("lib/saetv2.ex.class.php");
+/*
+include_once("foundation/debug.php");
+$res['error_code'] = '123';
+$res['error'] = 'error...kjlkj?????';
+if_weiboapi_fail($res);
+*/
 
 $title = "欢迎来到微动力";
 $csfile = array("style/main.css", "style/solo.css");

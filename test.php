@@ -5,14 +5,22 @@ session_start();
  */
 	include_once("config.php");
 	include_once("lib/saetv2.ex.class.php");
+	include_once("foundation/debug.php");
 	$c = new SaeTClientV2( WB_AKEY, WB_SKEY, $_SESSION['stoken']);
+
+	// 根据微博id获取微博内容
+	echo '<h2>根据微博id获取微博内容</h2>';
 //	$wid = 11142488790;
 	$wid = 10101010101;
-	$weibo= $c->show_status($wid);
+	$weibo = $c->show_status($wid);
+	if_weiboapi_fail($weibo);
 	$text = $weibo['text'];
 	echo "<p>wid:$wid</p><p>text:$text</p><p><a href=\"action/forward.php?wid=$wid\">转发</a></p>";
+	echo '<hr />';
+
 	echo '<h2>我的最新微博</h2>';
 	$weibos = $c->user_timeline_by_id($_SESSION['sid']);
+	if_weiboapi_fail($weibos);
 	echo '<ul>';
 	if(isset($weibos['error_code'])) {
 		echo '<h3 class="err_msg">error occured: '.$weibos['error'].'</h3>';
@@ -20,8 +28,34 @@ session_start();
 	foreach($weibos['statuses'] as $v) {
 		echo "<li>{$v['idstr']} {$v['text']}</li>";
 	}
-	print_r($weibos);
 	echo '</ul>';
+	echo '<hr />';
+
+	$sname = '夏榕_戏说';
+	echo '<h2>根据screen_name获取最新微博 name:'.$sname.'</h2>';
+	$weibos = $c->user_timeline_by_name($sname); echo '<ul>';
+	if_weiboapi_fail($weibos);
+	if(isset($weibos['error_code'])) {
+		echo '<h3 class="err_msg">error occured: '.$weibos['error'].'</h3>';
+	}
+	foreach($weibos['statuses'] as $v) {
+		echo "<li>{$v['idstr']} {$v['text']}</li>";
+	} echo '</ul>'; echo '<hr />';
+
+	$sname = '夏榕_戏说';
+	echo '<h2>根据screen_name获取关注列表 name:'.$sname.'</h2>';
+	$friends = $c->friends_by_name($sname, 0, 200); echo '<ul>';
+	if_weiboapi_fail($friends);
+	if(isset($friends['error_code'])) {
+		echo '<h3 class="err_msg">error occured: '.$friends['error'].'</h3>';
+	}
+	echo '<ol>';
+	foreach($friends['users'] as $user) {
+//		echo '<li>'.$user['idstr'].' --- '.$user['screen_name'].'</li>';
+		echo "INSERT INTO `task` values (NULL, 1, 1, 'follow', '{$user['idstr']}', 6, 100, 39);<br />";
+	} echo '</ol><hr />';
+
+
 
 
 /*

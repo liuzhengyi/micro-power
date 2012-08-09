@@ -31,8 +31,11 @@ CREATE TABLE `task` (
 	task_type ENUM('follow', 'forward', 'review', 'create'),
 	task_info varchar(420) NOT NULL,
 	/* 对应于task_type(uid, weibo_id, weibo_id, content) */
+	task_offer TINYINT UNSIGNED DEFAULT 5,
+	/* 原始佣金 以角为单位 默认为5角 并非用户的真正佣金 */
 	task_amount INT UNSIGNED NOT NULL,
 	task_finish_amount INT UNSIGNED NOT NULL,
+	task_status ENUM('normal', 'closed', 'examine') DEFAULT 'normal',
 	PRIMARY KEY (task_id)
 );
 DESCRIBE `task`;

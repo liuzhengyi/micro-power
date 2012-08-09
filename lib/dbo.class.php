@@ -66,6 +66,10 @@ class dbex {
 
 	public function getRs($sql) {
 		$result = $this->dbc->query($sql);
+		if(!$result && DEBUG) {
+			echo $sql;
+			exit();
+		}
 		$rows = array();
 		while($rsRow = $result->fetch_array()) {
 			$rows[] = $rsRow;
@@ -74,9 +78,16 @@ class dbex {
 	}
 	
 	public function getPage($sql, $start, $items) {
+		$sql = $sql." limit $start, $items";
+		return $this->getRs($sql);
 	}
 
+	/*
+	 * $sql 应为形如select count(1) ....
+	 */
 	public function getCount($sql) {
+		$result = $this->getRow($sql);
+		return $result[0];
 	}
 
 	public function close()
