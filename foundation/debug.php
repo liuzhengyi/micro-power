@@ -26,7 +26,7 @@ function debug($debug_msg, $file, $line, $to_user=TRUE, $level="error")
  */
 
 function if_weiboapi_fail($res, $file, $line)
-{	if(!$res) {
+{	if(!$res) {	// 调用微博api没有任何返回
 		$debug_msg = 'weibo服务暂时出了问题，请尝试使用其他方式';
 		debug($debug_msg, $file, $line, true);
 	}else if(isset($res['error_code'])) {

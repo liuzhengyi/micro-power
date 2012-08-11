@@ -104,39 +104,39 @@ require_once("uiparts/docheader.php");
 		<?php foreach($res as $row) {
 			$task_rest_amount = $row['task_amount'] - $row['task_finish_amount'];
 		?>
-			<tr>
-				<td><?php echo $row['task_id'];?></td>
-				<td><?php echo $type;?></td>
-				<td><?php echo $row['task_info'];?></td>
-				<td><?php echo $row['task_amount'];?></td>
-				<td><?php echo $task_rest_amount;?></td>
-				<td><?php echo $row['publisher_id'];?></td>
-				<td><?php echo $row['task_offer'];?></td>
-				<?php
-				switch($type){
-				case 'follow':	// 关注任务
-					// 获取已关注列表
-					/*
-					$friends_id = $c->friends_by_id($_SESSION['sid']);
-					if_weiboapi_fail($friends_id, __FILE__, __LINE__);
-					foreach($friends_id['users'] as $friend) {
-						$followed[] = $friend['id'];
-					}
-					if(in_array($row['task_info'], $followed, false)) {
-						echo '<td>已关注</td>';
-					} else {
-						echo '<td><a href="action/follow.php?id='.$row['task_info'].'">关注</a></td>';
-					}
-					*/
-					break;
-				case 'forward':
-					// 微博可以重复转发，所以不必验证用户之前是否已经转发
-					// 但是，是否应该允许用户重复转发呢？转发之后如何验证如何提示用户呢？
-					echo '<td><a href="action/forward.php?id='.$row['task_info'].'">转发</a></td>';
-					break;
+		<tr>
+			<td><?php echo $row['task_id'];?></td>
+			<td><?php echo $type;?></td>
+			<td><?php echo $row['task_info'];?></td>
+			<td><?php echo $row['task_amount'];?></td>
+			<td><?php echo $task_rest_amount;?></td>
+			<td><?php echo $row['publisher_id'];?></td>
+			<td><?php echo $row['task_offer'];?></td>
+			<?php
+			switch($type){
+			case 'follow':	// 关注任务
+				// 获取已关注列表
+				///*
+				$friends_id = $c->friends_by_id($_SESSION['sid']);
+				if_weiboapi_fail($friends_id, __FILE__, __LINE__);
+				foreach($friends_id['users'] as $friend) {
+					$followed[] = $friend['id'];
 				}
-				?>
-			</tr>
+				if(in_array($row['task_info'], $followed, false)) {
+					echo '<td>已关注</td>';
+				} else {
+					echo '<td><a href="action/follow.php?id='.$row['task_id'].'">关注</a></td>';
+				}
+				//*/
+				break;
+			case 'forward':
+				// 微博可以重复转发，所以不必验证用户之前是否已经转发
+				// 但是，是否应该允许用户重复转发呢？转发之后如何验证如何提示用户呢？
+				echo '<td><a href="action/forward.php?id='.$row['task_info'].'">转发</a></td>';
+				break;
+			}
+			?>
+		</tr>
 		<?php }?>
 		</tbody>
 		</table>

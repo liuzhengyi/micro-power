@@ -19,7 +19,8 @@ CREATE TABLE `user` (
 	primary key(user_id),
 	unique (email),
 	unique (nick_name),
-	unique (sina_uid)
+	unique (sina_uid),
+	index (email(25))
 );
 DESCRIBE `user`;
 
@@ -36,7 +37,8 @@ CREATE TABLE `task` (
 	task_amount INT UNSIGNED NOT NULL,
 	task_finish_amount INT UNSIGNED NOT NULL,
 	task_status ENUM('normal', 'closed', 'examine') DEFAULT 'normal',
-	PRIMARY KEY (task_id)
+	PRIMARY KEY (task_id),
+	INDEX (task_type)
 );
 DESCRIBE `task`;
 
@@ -59,6 +61,8 @@ CREATE TABLE `do_task` (
 	task_id INT UNSIGNED NOT NULL,
 	user_id INT UNSIGNED NOT NULL,
 	status ENUM('unfinish', 'finish', 'fail', 'retract'),
-	PRIMARY KEY(do_id)
+	PRIMARY KEY(do_id),
+	INDEX (task_id),
+	INDEX (user_id)
 );
 DESCRIBE `do_task`;

@@ -5,3 +5,19 @@ MYSQL  函数
 PHP func
 	date(); // 将unix时间戳转换为日期
 	strtotime(); // 将日期转换为Unix时间戳
+
+MySQL MyISAM 表锁类型
+	READ [LOCAL] lock:
+	* 控锁的session可以读被锁表，不能写之；
+	* 多个session可以同时请求一个表的读锁；
+	* 其他session不用请求读锁，即可读被锁表(读锁)；
+
+	[LOW_PRIORITY] WRITE lock:
+	* 控锁的session可以读写被锁表；
+	* 在锁被释放前，除持有锁的session之外的所有session都无法接触被锁表；
+	* 在锁被释放前，其他session请求对被锁表进行锁表会被阻塞；
+
+	如果一条LOCK语句请求了多个锁，则其中任何一个都会导致整条语句阻塞。
+
+当查询结果为空时，mysqli->query()返回的资源标识符是否为空？
+如果是，则意味着不能通过返回结果是否为空来判断查询是否成功。

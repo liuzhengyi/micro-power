@@ -33,7 +33,7 @@ class dbex {
 			return 0;
 		} else {
 			$sql = "select 1 from `$table` where `$field` = '$value' limit 1";
-			$res = $this->dbc->query($sql);
+			$res = $this->query($sql);
 			return $res->num_rows;
 		}
 	}
@@ -44,30 +44,31 @@ class dbex {
 			return 0;
 		} else {
 			$sql = "select 1 from user where email = '$e' and pass = sha1('$p')";
-			$res = $this->dbc->query($sql);
+			$res = $this->query($sql);
 			return $res->num_rows;
 		}
 	}
 
 	public function exeUpdate( $sql )
 	{
-		$this->dbc->query($sql);
+		$this->query($sql);
 		return $this->dbc->affected_rows;
 	}
 	
 	public function getRow( $sql )
 	{ 	if( DEBUG ) {
-		$result=$this->dbc->query($sql); if(!$result) { echo "debug: cdbex, $sql. any error:". $this->dbc->error. "errorno: ".$this->dbc->errno."\$result = $result."; }
+		$result=$this->query($sql); if(!$result) { echo "debug: cdbex, $sql. any error:". $this->dbc->error. "errorno: ".$this->dbc->errno."\$result = $result."; }
 		} else {
-		$result=$this->dbc->query($sql) or die('<script type="text/javascript">location.href="servtools/error.php?error_type=dberr";</script>');
+		$result=$this->query($sql) or die('<script type="text/javascript">location.href="servtools/error.php?error_type=dberr";</script>');
 		}
 		return $result->fetch_array();
 	}
 
-	public function getRs($sql) {
+	public function getRs($sql)
+	{
 		$result = $this->dbc->query($sql);
 		if(!$result && DEBUG) {
-			echo $sql;
+			echo 'debug: getRs error, sql:'.$sql;
 			exit();
 		}
 		$rows = array();
@@ -77,7 +78,8 @@ class dbex {
 		return $rows;
 	}
 	
-	public function getPage($sql, $start, $items) {
+	public function getPage($sql, $start, $items)
+	{
 		$sql = $sql." limit $start, $items";
 		return $this->getRs($sql);
 	}
@@ -85,9 +87,37 @@ class dbex {
 	/*
 	 * $sql 应为形如select count(1) ....
 	 */
-	public function getCount($sql) {
+	public function getCount($sql)
+	{
 		$result = $this->getRow($sql);
 		return $result[0];
+	}
+
+	public function lockWrite($table)
+	{
+		$sql = 'LOCK TABLES '.$table.' WRITE';	
+		$this->query($sql);
+		/*
+		if(!...)
+		*/
+	}
+
+	public function lockRead($table)
+	{
+		$sql = 'LOCK TABLES '.$table.' READ';
+		$this->query($sql);
+		/*
+		if(!...)
+		*/
+	}
+
+	public function unlockTable()
+	{
+		$sql = 'UNLOCK TABLES';
+		$this->query($sql);
+		/*
+		if(!...)
+		*/
 	}
 
 	public function close()
