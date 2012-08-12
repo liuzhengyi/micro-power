@@ -77,7 +77,7 @@ $res = $dbo->getPage($sql, $start, $per_page);
  *	['task_finish_amount'] --int-- 任务完成数，已经完成的数量
  * $task_rest_amount --int-- 任务剩余量
  *
- * $followed[] --array-- 当前用户已经关注的人的id列表。
+ * $_SESSION[followed_id] --array-- 当前用户已经关注的人的id列表。
  */
 ?>
 
@@ -116,13 +116,13 @@ require_once("uiparts/docheader.php");
 			switch($type){
 			case 'follow':	// 关注任务
 				// 获取已关注列表
-				///*
+				/*
 				$friends_id = $c->friends_by_id($_SESSION['sid']);
 				if_weiboapi_fail($friends_id, __FILE__, __LINE__);
 				foreach($friends_id['users'] as $friend) {
 					$followed[] = $friend['id'];
-				}
-				if(in_array($row['task_info'], $followed, false)) {
+				}*/
+				if(in_array($row['task_info'], $_SESSION['followed_id'], false)) {
 					echo '<td>已关注</td>';
 				} else {
 					echo '<td><a href="action/follow.php?id='.$row['task_id'].'">关注</a></td>';

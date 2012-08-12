@@ -1,5 +1,5 @@
 	<?php
-	if(isset($_SESSION['uid'])) {
+	if(isset($_SESSION['uid'])) {	// 已经登录
 		$is_login = true;
 		echo "<p>{$_SESSION['name']}，您好，您已登录。</p>";
 		if(isset($_SESSION['sid'])) {
@@ -13,7 +13,7 @@
 			echo '<a href="'.$siteRoot.'action/evaluate.php">现在评级</a>';
 		}
 		echo "<p><a href=\"action/logout.php\">退出</a></p>";
-	} else {
+	} else {			// 尚未登录或登录失败
 		$is_login = false;
 		if(isset($_GET['login_error']) && 'wrong_format' == $_GET['login_error']) {
 			echo '<p class="err_msg">邮箱或密码的格式不对</p>'; 

@@ -56,6 +56,15 @@ if ($token) {
 			$_SESSION['sid'] = $sid;
 			$_SESSION['stoken'] = $token['access_token'];
 			header("Location:task.php");
+			// 后台获取用户的已关注用户列表，写入SESSION
+			$friends = $c->friends_by_id($_SESSION['sid']);
+			if_weiboapi_fail($friends, __FILE__, __LINE__);
+			foreach($friends['users'] as $friend) {
+				$followed_id[] = $friend['id'];
+				$followed_name[] = $friend['name'];
+			}
+			$_SESSION['followed_id'] = $followed_id;
+			$_SESSION['followed_name'] = $followed_name;
 			exit();
 		} else {			// 尚未注册。在用微博帐号注册
 			$user_info = $c->show_user_by_id($sid); // fetch user basic message according to sid
@@ -87,6 +96,15 @@ if ($token) {
 		$_SESSION['stoken'] = $token['access_token'];
 		$_SESSION['slevel'] = $res['sina_level'];
 		header("Location:my.php");
+		// 后台获取用户的已关注用户列表，写入SESSION
+		$friends = $c->friends_by_id($_SESSION['sid']);
+		if_weiboapi_fail($friends, __FILE__, __LINE__);
+		foreach($friends['users'] as $friend) {
+			$followed_id[] = $friend['id'];
+			$followed_name[] = $friend['name'];
+		}
+		$_SESSION['followed_id'] = $followed_id;
+		$_SESSION['followed_name'] = $followed_name;
 
 } else {
 	
