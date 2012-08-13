@@ -132,7 +132,7 @@ require_once("uiparts/docheader.php");
 			case 'forward':
 				// 微博可以重复转发，所以不必验证用户之前是否已经转发
 				// 但是，是否应该允许用户重复转发呢？转发之后如何验证如何提示用户呢？
-				echo '<td><a href="action/forward.php?id='.$row['task_info'].'">转发</a></td>';
+				echo '<td><a href="action/forward.php?id='.$row['task_id'].'">转发</a></td>';
 				break;
 			}
 			?>

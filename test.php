@@ -44,8 +44,8 @@ session_start();
 
 	$sname = '夏榕_戏说';
 	echo '<h2>根据screen_name获取关注列表 name:'.$sname.'</h2>';
-	$friends = $c->friends_by_name($sname, 0, 200); echo '<ul>';
-	if_weiboapi_fail($friends);
+	$friends = $c->friends_by_name($sname, 0, 100); echo '<ul>';
+	if_weiboapi_fail($friends,__FILE__, __LINE__);
 	if(isset($friends['error_code'])) {
 		echo '<h3 class="err_msg">error occured: '.$friends['error'].'</h3>';
 	}
