@@ -8,7 +8,7 @@
  * @return 
  */
 
-function debug($debug_msg, $file, $line, $to_user=TRUE, $level="error")
+function debug($debug_msg, $file=NULL, $line=NULL, $to_user=TRUE, $level="error")
 {	if(DEBUG) {
 		echo 'debug: '.'file:'.$file .' line: ' . $line .$debug_msg;
 		exit();

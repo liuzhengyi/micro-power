@@ -9,7 +9,8 @@
 // APP KEY & 回调地址
 define( "WB_AKEY" , '1520889573' );
 define( "WB_SKEY" , '38cbaa622f1968a162e2042dc21e4a64' );
-define( "WB_CALLBACK_URL" , 'http://localhost/a/vdongli/callback.php' );
+//define( "WB_CALLBACK_URL" , 'http://localhost/a/vdongli/callback.php' );
+define( "WB_CALLBACK_URL" , 'http://vdl.viivtech.com/callback.php' );
 
 // debug or not
 define( "DEBUG", TRUE);
@@ -21,17 +22,17 @@ if(DEBUG) {
 }
 
 // 本地主机名称
-$hostName = 'localhost';
+$hostName = 'vdl.viivtech.com';
 // 服务器上的网站根目录
-$webRoot = "/var/www/a/vdongli/";
+$webRoot = "/home/evan/vdongli/";
 // 网站的http根目录
-$siteRoot = "http://localhost/a/vdongli/";
+$siteRoot = "http://vdl.viivtech.com/";
 // 数据库配置文件位置
-$dbConfFile = "/var/wwwi/dbconf/vdl.conf";
+$dbConfFile = $webRoot."dbConf.php";
 
 
 // 授权地址，为了简化流程，硬编码在此处，当APP KEY 和 回调地址改变时，这里也需要修改。
-$authURL = "https://api.weibo.com/oauth2/authorize?client_id=1520889573&redirect_uri=http%3A%2F%2Flocalhost%2Fa%2Fvdongli%2Fcallback.php&response_type=code";
+$authURL = "https://api.weibo.com/oauth2/authorize?client_id=1520889573&redirect_uri=http%3A%2F%2Fvdl.viivtech.com%2Fcallback.php&response_type=code";
 
 // qq群状态，页脚里的一句话，根据实际情况修改
 $qqgroup_status = "122705365(满) 271037854(满) 260535300(满) 325451832 （加群时请注明“微动力会员”）";
