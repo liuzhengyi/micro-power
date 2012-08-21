@@ -20,6 +20,10 @@ class dbex {
 		}
 		return $this->dbc;
 	}
+    public function real_escape_string($sql)
+    {
+        return $this->dbc->real_escape_string($sql);
+    }
 
 	public function query($sql)
 	{

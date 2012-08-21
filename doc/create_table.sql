@@ -37,6 +37,15 @@ CREATE TABLE `task` (
 	task_amount INT UNSIGNED NOT NULL,
 	task_finish_amount INT UNSIGNED NOT NULL,
 	task_status ENUM('normal', 'closed', 'examine') DEFAULT 'normal',
+    task_screen_name varchar(60),
+    task_location varchar(60),
+    /* location是关注任务特有的 */
+    task_icon_url varchar(50) DEFAULT NULL,
+    /* 对于关注任务，task_icon是大图标， 对于转发任务task_icon是小图标*/
+    /* 下面三列是转发任务特有的 */
+    task_thumbnail_pic_url varchar(50),
+    task_bmiddle_pic_url varchar(50),
+    task_text varchar(420),
 	PRIMARY KEY (task_id),
 	INDEX (task_type)
 );
@@ -61,6 +70,7 @@ CREATE TABLE `do_task` (
 	task_id INT UNSIGNED NOT NULL,
 	user_id INT UNSIGNED NOT NULL,
 	status ENUM('unfinish', 'finish', 'fail', 'retract'),
+    /* 分别对应：尚未完成，成功完成，失败或屏蔽，审核中*/
 	PRIMARY KEY(do_id),
 	INDEX (task_id),
 	INDEX (user_id)

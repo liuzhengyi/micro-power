@@ -1,13 +1,48 @@
 <?php
 session_start();
+ini_set("display_errors", 1);
 /* test.php
  * 一些对API的随便测试
  */
 	include_once("config.php");
 	include_once("lib/saetv2.ex.class.php");
 	include_once("foundation/debug.php");
+    include_once($webRoot."lib/dbo.class.php");
+    include_once($dbConfFile);
+    $dbo = new dbex($dbServs);
 	$c = new SaeTClientV2( WB_AKEY, WB_SKEY, $_SESSION['stoken']);
+    /*
+    // 返回最新的公共微博
+    echo '<h2>最新的公共微博</h2>';
+    $api_res = $c->public_timeline();
+    if_weiboapi_fail($api_res);
+//    print_r($api_res);
+    foreach($api_res['statuses'] as $weibo) {
+//        echo "<p>id:{$weibo['idstr']}. text:{$weibo['text']}. by:{$weibo['user']['screen_name']}</p>";
+        $weibo_user_screen_name = $dbo->real_escape_string($weibo['user']['screen_name']);
+        $weibo_user_profile_image_url = $dbo->real_escape_string($weibo['user']['profile_image_url']);
+        $weibo_thumbnail_pic = $dbo->real_escape_string($weibo['thumbnail_pic']);
+        $weibo_bmiddle_pic_url = $dbo->real_escape_string($weibo['bmiddle_pic_url']);
+        $weibo_text = $dbo->real_escape_string($weibo['text']);
+        $sql = "<p>INSERT INTO `task` (task_id, owner_id, publisher_id, task_type, task_info, task_offer, task_amount, task_finish_amount, task_screen_name, task_icon_url, task_thumbnail_pic_url, task_bmiddle_pic_url, task_text) values(NULL, 1, 1, 'forward', '{$weibo['id']}', 6, 123, 121, '$weibo_user_screen_name', '$weibo_user_profile_image_url', '$weibo_thumbnail_pic', '$weibo_bmiddle_pic_url', '$weibo_text');</p>";
+        echo $sql;
+    }
+    // end of 返回最新的公共微博
+    */
+    
+    /*
+    // 根据uid获得所发微博的id
+    // 好像没有在saelib中找到对应这个api的封装啊 难道要直接使用api？
+    $uid = 1941007953;
+    echo '<h2>根据uid获取所发微博的id uid: '.$uid.'</h2>';
+    $params = array();
+    $params['uid'] = $uid;
+    $ids = $c->oauth->get('statuses/user_timeline/ids', $params);
+    print_r($ids['statuses']);
+    // end of 根据uid获得所发微博的id
+    */
 
+    /*
 	// 根据微博id获取微博内容
 	echo '<h2>根据微博id获取微博内容</h2>';
 //	$wid = 11142488790;
@@ -17,7 +52,11 @@ session_start();
 	$text = $weibo['text'];
 	echo "<p>wid:$wid</p><p>text:$text</p><p><a href=\"action/forward.php?wid=$wid\">转发</a></p>";
 	echo '<hr />';
+	// end of 根据微博id获取微博内容
+    */
 
+    /*
+    // 我的最新微博
 	echo '<h2>我的最新微博</h2>';
 	$weibos = $c->user_timeline_by_id($_SESSION['sid']);
 	if_weiboapi_fail($weibos);
@@ -30,10 +69,16 @@ session_start();
 	}
 	echo '</ul>';
 	echo '<hr />';
+    // 我的最新微博
+    */
 
+    /*
+    // 根据screen——name获得最新微博
 	$sname = '夏榕_戏说';
+    $sid = 2172508334;
 	echo '<h2>根据screen_name获取最新微博 name:'.$sname.'</h2>';
 	$weibos = $c->user_timeline_by_name($sname); echo '<ul>';
+//	$weibos = $c->user_timeline_by_id($sid); echo '<ul>';
 	if_weiboapi_fail($weibos);
 	if(isset($weibos['error_code'])) {
 		echo '<h3 class="err_msg">error occured: '.$weibos['error'].'</h3>';
@@ -41,10 +86,15 @@ session_start();
 	foreach($weibos['statuses'] as $v) {
 		echo "<li>{$v['idstr']} {$v['text']}</li>";
 	} echo '</ul>'; echo '<hr />';
+    // 根据screen——name获得最新微博
+    */
 
+    // 根据screen name获取关注列表
 	$sname = '夏榕_戏说';
+    $sid = 2172508334;
 	echo '<h2>根据screen_name获取关注列表 name:'.$sname.'</h2>';
-	$friends = $c->friends_by_name($sname, 0, 100); echo '<ul>';
+//	$friends = $c->friends_by_name($sname, 0, 50); echo '<ul>';
+	$friends = $c->friends_by_id($sid, 0, 20); echo '<ul>';
 	if_weiboapi_fail($friends,__FILE__, __LINE__);
 	if(isset($friends['error_code'])) {
 		echo '<h3 class="err_msg">error occured: '.$friends['error'].'</h3>';
@@ -52,8 +102,18 @@ session_start();
 	echo '<ol>';
 	foreach($friends['users'] as $user) {
 //		echo '<li>'.$user['idstr'].' --- '.$user['screen_name'].'</li>';
-		echo "INSERT INTO `task` values (NULL, 1, 1, 'follow', '{$user['idstr']}', 6, 100, 39);<br />";
+        $user_idstr = $dbo->real_escape_string($user['idstr']);
+        $user_screen_name = $dbo->real_escape_string($user['screen_name']);
+        $user_location = $dbo->real_escape_string($user['location']);
+        $user_icon_url = $dbo->real_escape_string($user['avatar_large']);
+		$sql = "INSERT INTO `task` (task_id, owner_id, publisher_id, task_type, task_info, task_offer, task_amount, task_finish_amount, task_screen_name, task_location, task_icon_url)values (NULL, 1, 1, 'follow', '$user_idstr', 6, 100, 39, '$user_screen_name', '$user_location', '$user_icon_url');";
+        echo "<p>$sql</p>";
 	} echo '</ol><hr />';
+    // 根据screen name获取关注列表
+
+
+
+
 
 
 

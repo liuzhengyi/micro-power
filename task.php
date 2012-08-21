@@ -9,7 +9,7 @@ session_start();
  *	转发某条微博
  *	评论某条微博（接口未完成）
  *	创作一条微博（接口未完成）
- * 这样处理当然很不完善，有待改进
+ * 这样处理不完善，有待改进
 */
 include_once("config.php");	// init $authURL
 include_once("lib/saetv2.ex.class.php");
@@ -20,6 +20,7 @@ if(!isset($_SESSION['uid'])) {
 }
 include_once("foundation/debug.php");
 include_once("foundation/page.php");
+include_once("foundation/price.php");
 
 $title = "欢迎来到微动力";
 $csfile = array("style/main.css", "style/solo.css");
@@ -28,6 +29,7 @@ $csfile = array("style/main.css", "style/solo.css");
 //$code_url = $o->getAuthorizeURL( WB_CALLBACK_URL );
 $c = new SaeTClientV2( WB_AKEY, WB_SKEY, $_SESSION['stoken']);
 
+// 确定请求任务类型
 $default_type = 'follow';
 if(isset($_GET['type'])) {
 	$type = $_GET['type'];
@@ -38,7 +40,7 @@ if(isset($_GET['type'])) {
 	$type = $default_type;
 }
 
-// read database
+// 读取相关任务数据
 include_once("lib/dbo.class.php");
 include_once($dbConfFile);
 $dbo = new dbex($dbServs);
@@ -52,7 +54,8 @@ if(isset($_GET['page']) && $_GET['page'] >= 1 && $_GET['page'] <= $total_page) {
 } else {
 	$page = 1;
 }
-$sql = "select task_id, owner_id, publisher_id, task_info, task_offer, task_amount, task_finish_amount from task where task_type = '$type'";
+//$sql = "select task_id, owner_id, publisher_id, task_info, task_icon_url, task_screen_name, task_location, task_offer, task_amount, task_finish_amount from task where task_type = '$type' and task_id not in (select task_id from do_task where user_id = {$_SESSION['uid']} and (status='finish' or status='fail'))";
+$sql = "select task_id, owner_id, publisher_id, task_info, task_offer, task_amount, task_finish_amount, task_screen_name, task_location, task_icon_url, task_thumbnail_pic_url, task_bmiddle_pic_url, task_text from task where task_type = '$type' and task_id not in (select task_id from do_task where user_id = {$_SESSION['uid']})";
 $start = ($page-1)*$per_page;
 $res = $dbo->getPage($sql, $start, $per_page);
 
@@ -95,51 +98,66 @@ require_once("uiparts/docheader.php");
 		</ul>
 	</div> <!-- end of DIV func_column -->
 	<div id="main_content">
-		<table>
-		<thead> <tr>
-				<th>任务id</th> <th>任务类型</th> <th>任务信息</th> <th>任务总量</th><th>任务余额</th> <th>任务发布者</th><th>单价</th><th>状态</th>
-			</tr>
-		</thead>
-		<tbody> 
-		<?php foreach($res as $row) {
-			$task_rest_amount = $row['task_amount'] - $row['task_finish_amount'];
-		?>
-		<tr>
-			<td><?php echo $row['task_id'];?></td>
-			<td><?php echo $type;?></td>
-			<td><?php echo $row['task_info'];?></td>
-			<td><?php echo $row['task_amount'];?></td>
-			<td><?php echo $task_rest_amount;?></td>
-			<td><?php echo $row['publisher_id'];?></td>
-			<td><?php echo $row['task_offer'];?></td>
-			<?php
-			switch($type){
-			case 'follow':	// 关注任务
-				// 获取已关注列表
-				/*
-				$friends_id = $c->friends_by_id($_SESSION['sid']);
-				if_weiboapi_fail($friends_id, __FILE__, __LINE__);
-				foreach($friends_id['users'] as $friend) {
-					$followed[] = $friend['id'];
-				}*/
-				if(in_array($row['task_info'], $_SESSION['followed_id'], false)) {
-					echo '<td>已关注</td>';
-				} else {
-					echo '<td><a href="action/follow.php?id='.$row['task_id'].'">关注</a></td>';
-				}
-				//*/
-				break;
-			case 'forward':
-				// 微博可以重复转发，所以不必验证用户之前是否已经转发
-				// 但是，是否应该允许用户重复转发呢？转发之后如何验证如何提示用户呢？
-				echo '<td><a href="action/forward.php?id='.$row['task_id'].'">转发</a></td>';
-				break;
-			}
-			?>
-		</tr>
+    <?php if(!$_SESSION['is_bind_weibo']) { ?>
+    <p class="hint"> 绑定微博后您就可以做任务赚钱了。<a href="<?php echo $authURL; ?>">现在绑定</a></p>
+    <?php } ?>
+        <?php switch ($type) { case 'follow': ?>
+                <div id="task_show">
+                <?php foreach($res as $row) {
+                    $real_price = $row['task_offer']*$_SESSION['slevel']/40;
+                    $top_price = $row['task_offer']*10/40;
+                    $real_price = real_price($row['task_offer'], $_SESSION['slevel']);
+                    $top_price = top_price($row['task_offer']);
+                ?>
+                    <div id="task_block">
+                    <img src="<?php echo $row['task_icon_url']; ?>" />
+                    <p class="task_describe">
+                        <?php echo $row['task_screen_name']; ?><br />
+                        <?php echo $row['task_location']; ?><br />
+                        关注ta您可获得<?php echo $real_price; ?>元，
+                        最高可获得<?php echo $top_price; ?>元<a href="help.php#price"><sup>?</sup></a>。
+                        <?php
+                        if(isset($_SESSION['is_bind_weibo']) && $_SESSION['is_bind_weibo']) {
+                            if(in_array($row['task_info'], $_SESSION['followed_id'], false)) {
+                                echo '已关注';
+                            } else {
+                                echo '<a href="action/follow.php?id='.$row['task_id'].'">关注</a>';
+                            }
+                        } else {
+                               echo '<a href="action/follow.php?id='.$row['task_id'].'">不可用</a>';
+                        }
+                        ?>
+                        。<a href="action/follow.php?id=<?php echo $row['task_id']; ?>&type=hide">屏蔽</a>
+                    </p>
+                    </div><!-- end of DIV task_block -->
+                <?php } ?>
+                </div><!-- end of DIV task_show -->
+            <?php break; ?>
+            <?php case 'forward': ?>
+                <div id="task_show">
+                    <?php foreach($res as $row) {
+                        $real_price = $row['task_offer']*$_SESSION['slevel']/40;
+                        $top_price = $row['task_offer']*10/40;
+                        $real_price = real_price($row['task_offer'], $_SESSION['slevel']);
+                        $top_price = top_price($row['task_offer']);
+                    ?>
+                    <div class="task_block">
+                        <p><?php
+                            echo 'wid:'.$row['task_info'].'<br />weibo:'.$row['task_text'].'<br />';
+                            echo 'by:'.$row['task_screen_name'].'. image:<img src="'.$row['task_icon_url'].'">'
+                            ?>
+                        </p>
+                    </div>
+                    <?php } ?>
+                </div><!-- end of DIV tash_show -->
+                <ul>
+                    <li>milk</li>
+                    <li>coffee</li>
+                </ul>
+            <?php break; ?>
+
 		<?php }?>
-		</tbody>
-		</table>
+        <hr class="clear" />
 		<div id="page_bar">
 		<ul>
 		<?php	
@@ -147,7 +165,7 @@ require_once("uiparts/docheader.php");
 		page_bar($url, $total_page, $page, FALSE);
 		?>
 		</ul>
-		</div>
+		</div><!-- end of DIV page_bar -->
 	</div><!-- end of DIV main_content -->
 	<?php include("uiparts/messcol.php");?>
 	<?php include("uiparts/footer.php");?>

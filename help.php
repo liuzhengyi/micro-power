@@ -32,6 +32,75 @@ require_once("uiparts/docheader.php");
 		<p>this part goes the main content, this area may be put in the middle of page.</p>
 		<p>this part goes the main content, this area may be put in the middle of page.</p>
 		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<h2 id="price">佣金计算规则.</h2>
+        <p>佣金以任务基本出价为基础，与用户的微博等级向结合（该等级由本站评定），同一个任务，不同等级的微动力来做，等级越高的微动力可以获得的佣金越高。等级跟用户的微博帐号质量相关。。。</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
+		<p>this part goes the main content, this area may be put in the middle of page.</p>
 	</div><!-- end of DIV main_content -->
 	<?php include("uiparts/messcol.php");?>
 	<?php include("uiparts/footer.php");?>

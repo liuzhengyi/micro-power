@@ -7,10 +7,12 @@
 		} else {
 			echo "<p>您需要绑定新浪微博才能做任务赚钱</p><a href=\"$authURL\">现在就绑定</a>";
 		}
-		echo '<p>您的微博等级为'.$_SESSION['slevel'].'</p>';
-		if($_SESSION['slevel'] < 4) {
+        if(isset($_SESSION['is_bind_weibo']) && $_SESSION['is_bind_weibo']) {
+		    echo '<p>您的微博等级为'.$_SESSION['slevel'].'</p>';
+            if($_SESSION['slevel'] < 4) {
 			echo '<p>建议您对微博进行评级，评级能够增加您的佣金</p>';
 			echo '<a href="'.$siteRoot.'action/evaluate.php">现在评级</a>';
+            }
 		}
 		echo "<p><a href=\"action/logout.php\">退出</a></p>";
 	} else {			// 尚未登录或登录失败
