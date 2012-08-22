@@ -124,7 +124,7 @@ require_once("uiparts/docheader.php");
                                 echo '<a href="action/follow.php?id='.$row['task_id'].'">关注</a>';
                             }
                         } else {
-                               echo '<a href="action/follow.php?id='.$row['task_id'].'">不可用</a>';
+                               echo '不可用<a href="help.php#task_invalid">?</a>';
                         }
                         ?>
                         。<a href="action/follow.php?id=<?php echo $row['task_id']; ?>&type=hide">屏蔽</a>
@@ -143,17 +143,19 @@ require_once("uiparts/docheader.php");
                     ?>
                     <div class="task_block">
                         <p><?php
-                            echo 'wid:'.$row['task_info'].'<br />weibo:'.$row['task_text'].'<br />';
-                            echo 'by:'.$row['task_screen_name'].'. image:<img src="'.$row['task_icon_url'].'">'
+                           echo '<p class="forward_task_text">'.$row['task_text'].'</p>';
+                           echo '<p class="forward_task_comment">by:'.$row['task_screen_name'].'。<br />转发此微博，您可以获利'.$real_price.'元，最高可获利'.$top_price.'元<sup><a href="help.php#price">?</a></sup>。';
+                            if(isset($_SESSION['is_bind_weibo']) && $_SESSION['is_bind_weibo']) {
+                                echo '<a href="action/forward.php?id='.$row['task_id'].'">转发</a>';
+                            } else {
+                                echo '转发(不可用)<a href="help.php#task_invalid"><sup>?</sup></a>';
+                            }
+                                echo '</p><hr />';
                             ?>
                         </p>
                     </div>
                     <?php } ?>
                 </div><!-- end of DIV tash_show -->
-                <ul>
-                    <li>milk</li>
-                    <li>coffee</li>
-                </ul>
             <?php break; ?>
 
 		<?php }?>

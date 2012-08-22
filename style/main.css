@@ -34,8 +34,17 @@ span.hint {
 .hide { display: none; }
 .block { display: block; }
 .inline { display: inline; }
-p.task_describe {
-    font-size: 0.6em;
+p.task_describe { font-size: 0.6em; }
+
+p.forward_task_comment {
+    font-size: 0.9em;
+    margin: 0 auto;
+    padding: 0;
+}
+p.forward_task_text {
+    font-size: 1.2em;
+    color: purple;
+    margin-bottom: 0;
 }
 
 #navi_header {
