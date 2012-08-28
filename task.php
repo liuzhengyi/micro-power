@@ -54,15 +54,14 @@ if(isset($_GET['page']) && $_GET['page'] >= 1 && $_GET['page'] <= $total_page) {
 } else {
 	$page = 1;
 }
-//$sql = "select task_id, owner_id, publisher_id, task_info, task_icon_url, task_screen_name, task_location, task_offer, task_amount, task_finish_amount from task where task_type = '$type' and task_id not in (select task_id from do_task where user_id = {$_SESSION['uid']} and (status='finish' or status='fail'))";
-$sql = "select task_id, owner_id, publisher_id, task_info, task_offer, task_amount, task_finish_amount, task_screen_name, task_location, task_icon_url, task_thumbnail_pic_url, task_bmiddle_pic_url, task_text from task where task_type = '$type' and task_id not in (select task_id from do_task where user_id = {$_SESSION['uid']})";
+$sql = "select task_id, owner_id, publisher_id, task_sina_uid, task_sina_wid, task_offer, task_amount, task_finish_amount, task_screen_name, task_location, task_icon_url, task_thumbnail_pic_url, task_bmiddle_pic_url, task_text from task where task_type = '$type' and task_id not in (select task_id from do_task where user_id = {$_SESSION['uid']})";
 $start = ($page-1)*$per_page;
 $res = $dbo->getPage($sql, $start, $per_page);
 
 //$show = array();
 ?>
 <?php
-/* 变量说明
+/* 变量说明 未完待续
  *
  * $type --string-- 请求的任务类型，通过GET方式传递
  * $default --string-- 默认的请求任务类型，url中没有类型值或类型值不正确时使用
@@ -71,10 +70,6 @@ $res = $dbo->getPage($sql, $start, $per_page);
  *	['task_id'] --int-- 任务id
  *	['owner_id'] --int-- 任务提供着id，即广告主id
  *	['publisher_id'] --int-- 任务发布者id，一般为管理员
- *	['task_info'] --string or bigint-- 任务的参考信息，与task_type向对应，
- 				当type为follow,forward,review时，参考信息为
-				相应资源的id，当type为create时，参考信息为一
-				段文字，描述任务的具体内容。
  *	['task_offer'] --tinyint-- 任务原始佣金，非用户最终佣金
  *	['task_amount'] --int-- 任务总容量，即该任务最多可以被做多少次
  *	['task_finish_amount'] --int-- 任务完成数，已经完成的数量
@@ -93,8 +88,8 @@ require_once("uiparts/docheader.php");
 		<ul >
 			<li><a href="task.php?type=follow">关注任务</a></li>
 			<li><a href="task.php?type=forward">转发任务</a></li>
-			<li><a href="task.php?type=review">评论任务</a></li>
-			<li><a href="task.php?type=create">原创任务</a></li>
+			<li><a alt="task.php?type=review">评论任务(暂不可用)</a></li>
+			<li><a alt="task.php?type=create">原创任务(暂不可用)</a></li>
 		</ul>
 	</div> <!-- end of DIV func_column -->
 	<div id="main_content">
@@ -112,13 +107,13 @@ require_once("uiparts/docheader.php");
                     <div id="task_block">
                     <img src="<?php echo $row['task_icon_url']; ?>" />
                     <p class="task_describe">
-                        <?php echo $row['task_screen_name']; ?><br />
-                        <?php echo $row['task_location']; ?><br />
+                        <a href="http://weibo.com/u/<?php echo $row['task_sina_uid']?>" target="_blank"><?php echo $row['task_screen_name']; ?></a><br />
+                        来自：<?php echo $row['task_location']; ?><br />
                         关注ta您可获得<?php echo $real_price; ?>元，
                         最高可获得<?php echo $top_price; ?>元<a href="help.php#price"><sup>?</sup></a>。
                         <?php
                         if(isset($_SESSION['is_bind_weibo']) && $_SESSION['is_bind_weibo']) {
-                            if(in_array($row['task_info'], $_SESSION['followed_id'], false)) {
+                            if(in_array($row['task_sina_uid'], $_SESSION['followed_id'], false)) {
                                 echo '已关注';
                             } else {
                                 echo '<a href="action/follow.php?id='.$row['task_id'].'">关注</a>';
@@ -144,14 +139,14 @@ require_once("uiparts/docheader.php");
                     <div class="task_block">
                         <p><?php
                            echo '<p class="forward_task_text">'.$row['task_text'].'</p>';
-                           echo '<p class="forward_task_comment">by:'.$row['task_screen_name'].'。<br />转发此微博，您可以获利'.$real_price.'元，最高可获利'.$top_price.'元<sup><a href="help.php#price">?</a></sup>。';
+                           echo '<p class="forward_task_comment">by:<a href="http://weibo.com/u/'.$row['task_sina_uid'].'" target="_blank">'.$row['task_screen_name'].'</a>。<br />转发此微博，您可以获利'.$real_price.'元，最高可获利'.$top_price.'元<sup><a href="help.php#price">?</a></sup>。';
                             if(isset($_SESSION['is_bind_weibo']) && $_SESSION['is_bind_weibo']) {
                                 echo '<a href="action/forward.php?id='.$row['task_id'].'">转发</a>';
                             } else {
                                 echo '转发(不可用)<a href="help.php#task_invalid"><sup>?</sup></a>';
                             }
-                                echo '</p><hr />';
                             ?>
+                        。<a href="action/forward.php?id=<?php echo $row['task_id']; ?>&type=hide">屏蔽</a></p><hr />
                         </p>
                     </div>
                     <?php } ?>

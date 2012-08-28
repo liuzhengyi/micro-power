@@ -11,7 +11,6 @@ ini_set("display_errors", 1);
     include_once($dbConfFile);
     $dbo = new dbex($dbServs);
 	$c = new SaeTClientV2( WB_AKEY, WB_SKEY, $_SESSION['stoken']);
-    /*
     // 返回最新的公共微博
     echo '<h2>最新的公共微博</h2>';
     $api_res = $c->public_timeline();
@@ -20,15 +19,16 @@ ini_set("display_errors", 1);
     foreach($api_res['statuses'] as $weibo) {
 //        echo "<p>id:{$weibo['idstr']}. text:{$weibo['text']}. by:{$weibo['user']['screen_name']}</p>";
         $weibo_user_screen_name = $dbo->real_escape_string($weibo['user']['screen_name']);
+        $weibo_user_id = $dbo->real_escape_string($weibo['user']['id']);
         $weibo_user_profile_image_url = $dbo->real_escape_string($weibo['user']['profile_image_url']);
+        $weibo_id = $dbo->real_escape_string($weibo['id']);
         $weibo_thumbnail_pic = $dbo->real_escape_string($weibo['thumbnail_pic']);
         $weibo_bmiddle_pic_url = $dbo->real_escape_string($weibo['bmiddle_pic_url']);
         $weibo_text = $dbo->real_escape_string($weibo['text']);
-        $sql = "<p>INSERT INTO `task` (task_id, owner_id, publisher_id, task_type, task_info, task_offer, task_amount, task_finish_amount, task_screen_name, task_icon_url, task_thumbnail_pic_url, task_bmiddle_pic_url, task_text) values(NULL, 1, 1, 'forward', '{$weibo['id']}', 6, 123, 121, '$weibo_user_screen_name', '$weibo_user_profile_image_url', '$weibo_thumbnail_pic', '$weibo_bmiddle_pic_url', '$weibo_text');</p>";
+        $sql = "<p>INSERT INTO `task` (task_id, owner_id, publisher_id, task_type, task_sina_uid, task_sina_wid, task_offer, task_amount, task_finish_amount, task_screen_name, task_icon_url, task_thumbnail_pic_url, task_bmiddle_pic_url, task_text) values(NULL, 1, 1, 'forward', $weibo_user_id, $weibo_id, 60, 123, 121, '$weibo_user_screen_name', '$weibo_user_profile_image_url', '$weibo_thumbnail_pic', '$weibo_bmiddle_pic_url', '$weibo_text');</p>";
         echo $sql;
     }
     // end of 返回最新的公共微博
-    */
     
     /*
     // 根据uid获得所发微博的id
@@ -89,12 +89,13 @@ ini_set("display_errors", 1);
     // 根据screen——name获得最新微博
     */
 
+    /*
     // 根据screen name获取关注列表
 	$sname = '夏榕_戏说';
     $sid = 2172508334;
 	echo '<h2>根据screen_name获取关注列表 name:'.$sname.'</h2>';
 //	$friends = $c->friends_by_name($sname, 0, 50); echo '<ul>';
-	$friends = $c->friends_by_id($sid, 0, 20); echo '<ul>';
+	$friends = $c->friends_by_id($sid, 0, 200); echo '<ul>';
 	if_weiboapi_fail($friends,__FILE__, __LINE__);
 	if(isset($friends['error_code'])) {
 		echo '<h3 class="err_msg">error occured: '.$friends['error'].'</h3>';
@@ -106,10 +107,11 @@ ini_set("display_errors", 1);
         $user_screen_name = $dbo->real_escape_string($user['screen_name']);
         $user_location = $dbo->real_escape_string($user['location']);
         $user_icon_url = $dbo->real_escape_string($user['avatar_large']);
-		$sql = "INSERT INTO `task` (task_id, owner_id, publisher_id, task_type, task_info, task_offer, task_amount, task_finish_amount, task_screen_name, task_location, task_icon_url)values (NULL, 1, 1, 'follow', '$user_idstr', 6, 100, 39, '$user_screen_name', '$user_location', '$user_icon_url');";
+		$sql = "INSERT INTO `task` (task_id, owner_id, publisher_id, task_type, task_sina_uid, task_offer, task_amount, task_finish_amount, task_screen_name, task_location, task_icon_url)VALUES (NULL, 1, 1, 'follow', '$user_idstr', 70, 100, 39, '$user_screen_name', '$user_location', '$user_icon_url');";
         echo "<p>$sql</p>";
 	} echo '</ol><hr />';
     // 根据screen name获取关注列表
+    */
 
 
 

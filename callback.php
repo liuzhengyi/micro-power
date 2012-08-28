@@ -44,7 +44,7 @@ if ($token) {
 	// 判断是否首次授权，首次授权则登记sina uid
 	$dbo = new dbex($dbServs);
 	if(!$dbo->checkExist($sid, 'sina_uid')) {	// 首次授权 
-		if(isset($_SESSION['uid'])) {	//已注册微动力，刚绑定微博，完善信息
+		if(isset($_SESSION['uid'])) {	//已注册微动力，在绑定微博，完善信息
 			$id = $_SESSION['uid'];
 			$sql = "update user set sina_uid =$sid, sina_token = '{$token['access_token']}' where user_id = $id limit 1";
 			$num = $dbo->exeUpdate($sql);
@@ -66,6 +66,7 @@ if ($token) {
 			$_SESSION['followed_id'] = $followed_id;
 			$_SESSION['followed_name'] = $followed_name;
             $_SESSION['is_bind_weibo'] = TRUE;
+            $_SESSION['slevel'] = $weibo_init_level;
 			exit();
 		} else {			// 尚未注册。在用微博帐号注册
 			$user_info = $c->show_user_by_id($sid); // fetch user basic message according to sid
@@ -96,7 +97,6 @@ if ($token) {
 		$_SESSION['name'] = $name;
 		$_SESSION['stoken'] = $token['access_token'];
 		$_SESSION['slevel'] = $res['sina_level'];
-        $_SESSION['is_login'] = TRUE;
         $_SESSION['is_bind_weibo'] = TRUE;
 		header("Location:my.php");
 		// 后台获取用户的已关注用户列表，写入SESSION

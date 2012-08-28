@@ -27,13 +27,13 @@ include_once($webRoot."foundation/check.func.php");
 		if(1 != $res->num_rows) {	// 邮箱与密码不匹配
 			header('Location:'.$siteRoot.'index.php?login_error=mismatch');
 			exit();
-		}	// 登录成功
-        $_SESSION['is_login'] = TRUE;
+		}	
+        // 登录成功
 		$row = $res->fetch_array();
 		$_SESSION['uid'] = $row['user_id'];
 		$_SESSION['name'] = $row['nick_name'];
 		$_SESSION['sid']  = empty($row['sina_uid'])? NULL : $row['sina_uid'];
-		$_SESSION['slevel']  = $row['slevel'];
+		$_SESSION['slevel']  = $row['sina_level'];
 		$dbo->close();
 		header('Location:'.$siteRoot.'my.php');
 		// 后台继续运行，获取用户的已关注用户列表，写入SESSION

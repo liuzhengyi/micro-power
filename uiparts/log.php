@@ -1,6 +1,5 @@
 	<?php
 	if(isset($_SESSION['uid'])) {	// 已经登录
-		$is_login = true;
 		echo "<p>{$_SESSION['name']}，您好，您已登录。</p>";
 		if(isset($_SESSION['sid'])) {
 			echo "<p>您已绑定新浪微博。</p>";
@@ -16,7 +15,6 @@
 		}
 		echo "<p><a href=\"action/logout.php\">退出</a></p>";
 	} else {			// 尚未登录或登录失败
-		$is_login = false;
 		if(isset($_GET['login_error']) && 'wrong_format' == $_GET['login_error']) {
 			echo '<p class="err_msg">邮箱或密码的格式不对</p>'; 
 		} else if(isset($_GET['login_error']) && 'mismatch' == $_GET['login_error']){

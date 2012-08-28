@@ -5,25 +5,43 @@ session_start();
  * 其中涉及一些检测函数，都还没有具体完成
  * 还缺少验证码和发送验证邮件等功能
  */
-require_once("config.php");
-require_once("foundation/check.func.php");
-require_once("lib/dbo.class.php");	// init $dbo
-// 判断是否登录，这个功能应该用一个函数来完成
-if(isset($_SESSION['uid'])) {
-	header("Location:my.php");
-	exit();
+require_once($webRoot."config.php");
+require_once($webRoot."foundation/check.func.php");
+require_once($webRoot."lib/dbo.class.php");	// init $dbo
+require_once($webRoot."foundation/status.php");
+require_once($dbConfFile); // init $dbServs
+// 判断是否登录
+if(is_login()) {
+    header('Location:'.$siteRoot.'my.php');
+    exit();
 }
-require_once("$dbConfFile"); // init $dbServs
+// 判断是否带着token和email来的
+if(isset($_GET['token']) && isset($_GET['email'])) {
+    $token = $_GET['token'];
+    $email = $_GET['email'];
+    $salt = $token_salt;   // initial in config.php
+	$dbo = new dbex($dbServs);
+    if(check_token_fail($token, $email, $salt) || $dbo->checkExist($email)) {
+        echo '对不起，该注册链接已经失效。<a href="'.$siteRoot.'pre_reg.php">点此重新获取</a>注册链接，或<a href="'.$siteRoot.'index.php">点此登录</a>。';
+        exit();
+    }
+} else {
+    header('Location:'.$siteRoot.'pre_reg.php');
+    exit();
+}
 	if(isset($_POST['submitted'])) {
 		$dbo = new dbex($dbServs);
 		$err_msg = array();
 
+/*
 		$e = trim($_POST['email']);
 		if(check_email_fail($e)) {
 			$err_msg[] = "请填写正确的邮箱地址";
 		} else if ($dbo->checkExist($e)) {
 			$err_msg[] = "对不起，该邮箱已经被使用了";
 		}
+        */
+        $e = $email;
 
 		$n = trim($_POST['name']);
 		if(check_nickname_fail($n)) {
@@ -85,8 +103,7 @@ require_once("$dbConfFile"); // init $dbServs
 	</ul>
 	<form action="#" method="post">
 	<ul class="nodec">
-		<li><label for="user_email">邮箱：<input type="text" name="email" id="user_email" value="<?php if(isset($e)) {echo $e;}?>" /></label><span class="hint">请输入常用邮箱作为登录名称，还可用来找回密码</span></li>
-		<li><label for="nick_name">昵称：<input type="text" name="name" id="nick_name" value="<?php if(isset($n)) {echo $n;}?>" /></label><span class="hint">给自己起个名字吧，用于在页面上显示，4-10个汉字或12到30个字母</span></li>
+		<li><label for="nick_name">昵称：<input type="text" name="name" id="nick_name" value="<?php if(isset($n)) {echo $n;}?>" /></label><span class="hint">给自己起个名字吧，用于在页面上显示，2-5个汉字或6到15个字母</span></li>
 		<li><label for="password1">密码：<input type="password" name="pass1" id="password1" value="<?php if(isset($p1)){echo $p1;} ?>" /></label><span class="hint">6到16位，要有一定强度哦</span></li>
 		<li><label for="password2">确认密码：<input type="password" name="pass2" id="password2"/></label></li>
 		<li><input type="submit" name="submit" value="注册帐号" ></li>

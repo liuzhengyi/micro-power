@@ -41,6 +41,11 @@ p.forward_task_comment {
     margin: 0 auto;
     padding: 0;
 }
+.no_vertical_margin{
+    font-size: 0.9em;
+    margin: 0 auto;
+    padding: 0;
+}
 p.forward_task_text {
     font-size: 1.2em;
     color: purple;

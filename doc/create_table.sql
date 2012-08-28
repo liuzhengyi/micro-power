@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
 	user_id int unsigned auto_increment not null,
 	email varchar(50) ,
-	nick_name varchar(30) not null,
+	nick_name varchar(50) not null,
 	pass char(40) ,
 	sina_uid BIGINT UNSIGNED,
 	sina_token varchar(50),
@@ -11,8 +11,9 @@ CREATE TABLE `user` (
 	con tinyint unsigned default 0,
 	task_taken int unsigned default 0,
 	task_finished int unsigned default 0,
-	total_income double(10,2) unsigned default 0.0,
-	realtime_income double(10,2) unsigned default 0.0,
+    /* 注意：金钱在数据库内部以 厘 为单位存储 */
+    total_income INT UNSIGNED DEFAULT 0,
+    realtime_income INT UNSIGNED DEFAULT 0,
 	alipay_id varchar(50),
 	alipay_code varchar(50),
 	reg_time datetime not null,
@@ -30,22 +31,23 @@ CREATE TABLE `task` (
 	owner_id INT UNSIGNED NOT NULL,
 	publisher_id INT UNSIGNED NOT NULL DEFAULT 1,
 	task_type ENUM('follow', 'forward', 'review', 'create'),
-	task_info varchar(420) NOT NULL,
-	/* 对应于task_type(uid, weibo_id, weibo_id, content) */
-	task_offer TINYINT UNSIGNED DEFAULT 5,
-	/* 原始佣金 以角为单位 默认为5角 并非用户的真正佣金 */
+    task_sina_uid BIGINT UNSIGNED NOT NULL,
+    task_screen_name varchar(60),
+	task_offer INT UNSIGNED DEFAULT 500,
+	/* 原始佣金 以 厘 为单位 默认为500厘 并非用户的真正佣金 */
 	task_amount INT UNSIGNED NOT NULL,
 	task_finish_amount INT UNSIGNED NOT NULL,
 	task_status ENUM('normal', 'closed', 'examine') DEFAULT 'normal',
-    task_screen_name varchar(60),
-    task_location varchar(60),
-    /* location是关注任务特有的 */
     task_icon_url varchar(50) DEFAULT NULL,
+    /* task_location是关注任务特有的 */
+    task_location varchar(60),
     /* 对于关注任务，task_icon是大图标， 对于转发任务task_icon是小图标*/
-    /* 下面三列是转发任务特有的 */
+    /* 下面 4 列是转发任务特有的 */
+	task_sina_wid BIGINT UNSIGNED,
     task_thumbnail_pic_url varchar(50),
     task_bmiddle_pic_url varchar(50),
     task_text varchar(420),
+
 	PRIMARY KEY (task_id),
 	INDEX (task_type)
 );
@@ -69,8 +71,9 @@ CREATE TABLE `do_task` (
 	do_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	task_id INT UNSIGNED NOT NULL,
 	user_id INT UNSIGNED NOT NULL,
-	status ENUM('unfinish', 'finish', 'fail', 'retract'),
-    /* 分别对应：尚未完成，成功完成，失败或屏蔽，审核中*/
+	status ENUM('unfinish', 'finish', 'fail', 'retract', 'hide'),
+    /* 分别对应：尚未完成，成功完成，失败或屏蔽，审核中，屏蔽*/
+    time DATETIME NOT NULL,
 	PRIMARY KEY(do_id),
 	INDEX (task_id),
 	INDEX (user_id)

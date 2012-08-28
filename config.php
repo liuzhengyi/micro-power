@@ -35,8 +35,12 @@ $dbConfFile = $webRoot."dbConf.php";
 $authURL = "https://api.weibo.com/oauth2/authorize?client_id=1520889573&redirect_uri=http%3A%2F%2Fvdl.viivtech.com%2Fcallback.php&response_type=code";
 
 // qq群状态，页脚里的一句话，根据实际情况修改
-$qqgroup_status = "122705365(满) 271037854(满) 260535300(满) 325451832 （加群时请注明“微动力会员”）";
+$qqgroup_status = "123456789(满) 234567890(满) 345678901(满) 456789012 （加群时请注明“微动力会员”）";
 // 页头的文档类型声明
 $doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
 $task_per_page = 6;
+$weibo_init_level = 3;
+$reg_check = TRUE;
+
+$token_salt = 'catanddog';
 ?>
