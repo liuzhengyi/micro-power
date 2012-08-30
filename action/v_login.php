@@ -21,7 +21,9 @@ include_once($webRoot."foundation/check.func.php");
 		include_once($webRoot."lib/dbo.class.php");
 		include_once($dbConfFile);
 		$dbo = new dbex($dbServs);
-		$sql = "select user_id, nick_name, sina_uid, sina_level from user where email = '$e' and pass = sha1('$p') limit 1";
+        $e = $dbo->real_escape_string($e);
+        $ency_p = md5($p);
+		$sql = "select user_id, nick_name, sina_uid, sina_level from user where email = '$e' and pass = sha1('$ency_p') limit 1";
 		$res = $dbo->query($sql);
 		echo $sql;
 		if(1 != $res->num_rows) {	// 邮箱与密码不匹配

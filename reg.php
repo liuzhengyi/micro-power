@@ -23,10 +23,12 @@ if(isset($_GET['token']) && isset($_GET['email'])) {
 	$dbo = new dbex($dbServs);
     if(check_token_fail($token, $email, $salt) || $dbo->checkExist($email)) {
         echo '对不起，该注册链接已经失效。<a href="'.$siteRoot.'pre_reg.php">点此重新获取</a>注册链接，或<a href="'.$siteRoot.'index.php">点此登录</a>。';
+        $dbo->close();
         exit();
     }
 } else {
     header('Location:'.$siteRoot.'pre_reg.php');
+    $dbo->close();
     exit();
 }
 	if(isset($_POST['submitted'])) {
@@ -41,7 +43,7 @@ if(isset($_GET['token']) && isset($_GET['email'])) {
 			$err_msg[] = "对不起，该邮箱已经被使用了";
 		}
         */
-        $e = $email;
+        $e = $dbo->real_escape_string($email);
 
 		$n = trim($_POST['name']);
 		if(check_nickname_fail($n)) {
@@ -49,6 +51,7 @@ if(isset($_GET['token']) && isset($_GET['email'])) {
 		} else if ($dbo->checkExist($n, 'nick_name')) {
 			$err_msg[] = "这个昵称太热门，已经被使用了，您换一个试试";
 		}
+        $n = $dbo->real_escape_string($n);
 
 		$p1 = trim($_POST['pass1']);
 		$p2 = trim($_POST['pass2']);
@@ -56,10 +59,12 @@ if(isset($_GET['token']) && isset($_GET['email'])) {
 			$err_msg[] = "请设置符合规定的密码";
 		} else if($p1 !== $p2) {
 			$err_msg[] = "两次密码输入不一致";
-		}
+		} else {
+            $ency_p = md5($p1);
+        }
 
 		if(empty($err_msg)) {
-			$sql = "insert into user (email, nick_name, pass, reg_time) values('$e', '$n', sha1('$p1'), now())";
+			$sql = "insert into user (email, nick_name, pass, reg_time) values('$e', '$n', sha1('$ency_p'), now())";
 			$num = $dbo->exeUpdate($sql);
 			if(1 != $num) {
 				if(DEBUG) {

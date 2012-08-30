@@ -132,7 +132,7 @@ include("uiparts/docheader.php");
 			<li>注册时间：<?php echo $reg_time; ?></li>
 
 		</ul>
-	<?php } else {?>
+	<?php } else { // 我的动态，默认 ?>
     <?php
             foreach($sql_res as $row) {
                 $real_price = real_price($row['task_offer'], $_SESSION['slevel']);

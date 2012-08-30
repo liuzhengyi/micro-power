@@ -11,7 +11,10 @@ ini_set("display_errors", 1);
     include_once($dbConfFile);
     $dbo = new dbex($dbServs);
 	$c = new SaeTClientV2( WB_AKEY, WB_SKEY, $_SESSION['stoken']);
+
+
     // 返回最新的公共微博
+    /*
     echo '<h2>最新的公共微博</h2>';
     $api_res = $c->public_timeline();
     if_weiboapi_fail($api_res);
@@ -25,9 +28,17 @@ ini_set("display_errors", 1);
         $weibo_thumbnail_pic = $dbo->real_escape_string($weibo['thumbnail_pic']);
         $weibo_bmiddle_pic_url = $dbo->real_escape_string($weibo['bmiddle_pic_url']);
         $weibo_text = $dbo->real_escape_string($weibo['text']);
-        $sql = "<p>INSERT INTO `task` (task_id, owner_id, publisher_id, task_type, task_sina_uid, task_sina_wid, task_offer, task_amount, task_finish_amount, task_screen_name, task_icon_url, task_thumbnail_pic_url, task_bmiddle_pic_url, task_text) values(NULL, 1, 1, 'forward', $weibo_user_id, $weibo_id, 60, 123, 121, '$weibo_user_screen_name', '$weibo_user_profile_image_url', '$weibo_thumbnail_pic', '$weibo_bmiddle_pic_url', '$weibo_text');</p>";
-        echo $sql;
+        // 输出相应sql语句
+        //$sql = "<p>INSERT INTO `task` (task_id, owner_id, publisher_id, task_type, task_sina_uid, task_sina_wid, task_offer, task_amount, task_finish_amount, task_screen_name, task_icon_url, task_thumbnail_pic_url, task_bmiddle_pic_url, task_text) values(NULL, 1, 1, 'forward', $weibo_user_id, $weibo_id, 60, 123, 121, '$weibo_user_screen_name', '$weibo_user_profile_image_url', '$weibo_thumbnail_pic', '$weibo_bmiddle_pic_url', '$weibo_text');</p>";
+        //echo $sql;
+        // 输出简单信息
+        $line = $weibo_text.' by: '.$weibo_user_screen_name;
+        echo $line.'</p>';
+        // 填充weiboid
+        $ids .= $weibo_id.',';
+
     }
+    */
     // end of 返回最新的公共微博
     
     /*
@@ -72,22 +83,54 @@ ini_set("display_errors", 1);
     // 我的最新微博
     */
 
-    /*
-    // 根据screen——name获得最新微博
-	$sname = '夏榕_戏说';
-    $sid = 2172508334;
-	echo '<h2>根据screen_name获取最新微博 name:'.$sname.'</h2>';
-	$weibos = $c->user_timeline_by_name($sname); echo '<ul>';
-//	$weibos = $c->user_timeline_by_id($sid); echo '<ul>';
-	if_weiboapi_fail($weibos);
-	if(isset($weibos['error_code'])) {
-		echo '<h3 class="err_msg">error occured: '.$weibos['error'].'</h3>';
-	}
-	foreach($weibos['statuses'] as $v) {
-		echo "<li>{$v['idstr']} {$v['text']}</li>";
-	} echo '</ul>'; echo '<hr />';
-    // 根据screen——name获得最新微博
-    */
+    // 根据screen——name 或 sina——uid获得最新微博和微博的转发评论情况
+    function print_latest_weibo_by_id($sid, $c)
+    {
+//	echo '<h2>根据sina_uid获取最新微博 及转发评论情况 sina_uid:'.$sid.'</h2>';
+        unset($weibos);
+        unset($weibo_shows);
+	    $weibos = $c->user_timeline_by_id($sid);
+	    if_weiboapi_fail($weibos);
+        $weibo_amount = count($weibos['statuses']);
+//        echo 'weibo_amount: '.$weibo_amount.'</p>';
+        unset($ids);
+        $weibo_shows = array();
+        foreach($weibos['statuses'] as $v) {
+            $weibo_show['idstr'] = $v['idstr'];
+            $weibo_show['text'] = $v['text'];
+            $ids .= $v['idstr'].',';
+            $weibo_shows[] = $weibo_show;
+        };
+        $params = array();
+        $params['ids'] = $ids;
+        $weibo_counts = $c->oauth->get('statuses/count', $params);
+        if_weiboapi_fail($weibo_counts);
+        unset($total_reposts);
+        unset($total_comments);
+        $weibo_count_shows = array();
+        foreach($weibo_counts as $weibo_count) {
+            $weibo_count_show['comments'] = $weibo_count['comments'];
+            $weibo_count_show['reposts'] = $weibo_count['reposts'];
+            $weibo_count_shows[] = $weibo_count_show;
+            $total_reposts += $weibo_count['reposts'];
+            $total_comments += $weibo_count['comments'];
+        }
+        $aver_reposts = $total_reposts/$weibo_amount;
+        $aver_comments = $total_comments/$weibo_amount;
+//        echo '<h3>average reposts: '.$aver_reposts.'</h3>';
+//        echo '<h3>average comments: '.$aver_comments.'</h3>';
+        // 输出格式化数据：
+        echo "<tr><td> $sid </td><td> $weibo_amount </td><td> $aver_reposts </td><td> $aver_comments </td></tr>";
+        /*
+        echo '<ol>';
+        for($i=0; $i<$weibo_amount; $i++) {
+            echo '<li>wid:'.$weibo_shows[$i]['idstr'].'<br />text:'.$weibo_shows[$i]['text'].'<br />comments:'.$weibo_count_shows[$i]['comments'].' reposts:'.$weibo_count_shows[$i]['reposts'].'</li>';
+        } echo '</ol>';
+        */
+    }
+
+//	$weibos = $c->user_timeline_by_name($sname); echo '<ol>';
+    // 获取weibo转发/评论数
 
     /*
     // 根据screen name获取关注列表
@@ -165,5 +208,23 @@ ini_set("display_errors", 1);
 		}
 	}
 */
+
+	$sname = '夏榕_戏说';
+    $sid = 2172508334;
+    // 根据screen——name 或 sina——uid获得最新微博和微博的转发评论情况
+    print_latest_weibo_by_id($sid, $c);
+
+// 测试50个用户的最新50条微博的平均转发/评论数
+// 好费API啊！！！
+/*
+$sql = 'select task_sina_uid from task where task_type="follow" limit 50';
+$uids = $dbo->getRs($sql);
+echo '<table><tr><th>微博id</th><th>最新微博数量</th><th>每条微博平均被转发数</th><th>每条微博平均被评论数</th></tr>';
+foreach($uids as $uid) {
+    print_latest_weibo_by_id($uid['task_sina_uid'], $c);
+}
+echo '</table>';
+*/
+
 
 ?>

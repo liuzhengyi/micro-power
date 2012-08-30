@@ -43,4 +43,7 @@ $weibo_init_level = 3;
 $reg_check = TRUE;
 
 $token_salt = 'catanddog';
+
+// smtp  设置
+// 除了文件pre_reg.php外，别的地方好像也用不到扫描图片信息，暂时就先放在pre_reg.php中吧。
 ?>

@@ -7,6 +7,8 @@ CREATE TABLE `user` (
 	sina_uid BIGINT UNSIGNED,
 	sina_token varchar(50),
 	sina_level tinyint default 3,
+    sina_location VARCHAR(30),
+    sina_description VARCHAR(220),
 	pro tinyint unsigned default 0,
 	con tinyint unsigned default 0,
 	task_taken int unsigned default 0,
