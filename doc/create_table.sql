@@ -38,16 +38,17 @@ CREATE TABLE `task` (
 	task_offer INT UNSIGNED DEFAULT 500,
 	/* 原始佣金 以 厘 为单位 默认为500厘 并非用户的真正佣金 */
 	task_amount INT UNSIGNED NOT NULL,
-	task_finish_amount INT UNSIGNED NOT NULL,
+	task_finish_amount INT UNSIGNED NOT NULL DEFAULT 0,
 	task_status ENUM('normal', 'closed', 'examine') DEFAULT 'normal',
-    task_icon_url varchar(50) DEFAULT NULL,
+    /* task_icon_url 其实是user的小头像*/
+    task_icon_url varchar(80) DEFAULT NULL,
     /* task_location是关注任务特有的 */
     task_location varchar(60),
     /* 对于关注任务，task_icon是大图标， 对于转发任务task_icon是小图标*/
     /* 下面 4 列是转发任务特有的 */
 	task_sina_wid BIGINT UNSIGNED,
-    task_thumbnail_pic_url varchar(50),
-    task_bmiddle_pic_url varchar(50),
+    task_thumbnail_pic_url varchar(80), /* 微博配图 */
+    task_bmiddle_pic_url varchar(80),
     task_text varchar(420),
 
 	PRIMARY KEY (task_id),
@@ -75,6 +76,8 @@ CREATE TABLE `do_task` (
 	user_id INT UNSIGNED NOT NULL,
 	status ENUM('unfinish', 'finish', 'fail', 'retract', 'hide'),
     /* 分别对应：尚未完成，成功完成，失败或屏蔽，审核中，屏蔽*/
+    /* repost_mid 仅针对转发任务，为转发产生的微博的mid，十进制 */
+    repost_mid BIGINT UNSIGNED DEFAULT NULL,
     time DATETIME NOT NULL,
 	PRIMARY KEY(do_id),
 	INDEX (task_id),

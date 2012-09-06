@@ -2,7 +2,7 @@
 session_start();
 ini_set("display_errors", 1);
 /* test.php
- * 一些对API的随便测试
+ * 对API的一些包装测试
  */
 	include_once("config.php");
 	include_once("lib/saetv2.ex.class.php");
@@ -12,6 +12,86 @@ ini_set("display_errors", 1);
     $dbo = new dbex($dbServs);
 	$c = new SaeTClientV2( WB_AKEY, WB_SKEY, $_SESSION['stoken']);
 
+    // 查询当前用户最新转发的微博列表
+    function get_repost_by_me($c)
+    {
+//        $repost_weibos = $c->repost_by_me(1,50,3482583004513831,3482583004642586);
+        $repost_weibos = $c->repost_by_me(1,200);
+        foreach($repost_weibos['reposts'] as $weibo ) {
+//        foreach($repost_weibos as $weibo ) {
+            var_dump($weibo['retweeted_status']['id']);
+            var_dump($weibo['retweeted_status']['text']);
+            echo '<hr />';
+        }
+
+    }
+
+    // 根据uid获得所发微博的ids
+    // 好像没有在saelib中找到对应这个api的封装啊 难道要直接使用api？
+    function get_user_timeline_ids($uid, $c)
+    {
+        echo '<h2>根据uid获取所发微博的id uid: '.$uid.'</h2>';
+        $params = array();
+        $params['uid'] = $uid;
+        $params['base_app'] = 0;
+        $ids = $c->oauth->get('statuses/user_timeline/ids', $params);
+        print_r($ids['statuses']);
+    }
+
+    // 根据uid获得用户最新发布的微博
+    // 可以限定原创，或通过本应用发布等条件
+    function get_user_timeline($sid, $c, $dbo)
+    {
+        echo '<h2>获取用户最新微博</h2>';
+        //$weibos = $c->user_timeline_by_id($sid);      // 无限制
+	    $weibos = $c->user_timeline_by_id($sid, 1, 50, 0, 0, 1, 0, 0);  // 限定原创
+        if_weiboapi_fail($weibos);
+        echo '<ul>';
+        if(isset($weibos['error_code'])) {
+            echo '<h3 class="err_msg">error occured: '.$weibos['error'].'</h3>';
+        }
+        foreach($weibos['statuses'] as $v) {
+            // 输出适合阅读的微博数据
+            // echo "<li>{$v['idstr']} {$v['text']} by: {$v['user']['screen_name']}</li>";
+            // 输出适合输入数据库do_task表的SQL数据
+            $screen_name = $dbo->real_escape_string($v['user']['screen_name']);
+            $profile_image = $dbo->real_escape_string($v['user']['profile_image_url']);
+            $wid = $v['id'];
+            $thumb_pic = $dbo->real_escape_string($v['thumbnail_pic']);
+            $middle_pic = $dbo->real_escape_string($v['bmiddle_pic']);
+            $text = $dbo->real_escape_string($v['text']);
+            echo "insert into task (owner_id, publisher_id, task_type, task_sina_uid, task_screen_name, task_offer, task_amount, task_finish_amount, task_icon_url, task_sina_wid, task_thumbnail_pic_url, task_bmiddle_pic_url, task_text) values (2, 3, 'forward', $sid, '$screen_name', 50, 30, 10, '$profile_image', $wid, '$thumb_pic', '$middle_pic', '$text');</p>";
+        }
+        echo '</ul>'; echo '<hr />';
+    }
+
+    // 批量获取多个用户的最新微博，sae中封装有此接口，但api文档中没有
+    function get_user_timeline_batch_by_id()
+    {}
+
+    // 返回一条原创微博的最新转发微博的id
+    // sae中木有这个接口，自己写吧
+    function get_repost_timeline_ids($wid, $c, $since_id = 0, $max_id = 0, $count = 200, $page = 1, $filter_by_author = 0)
+    {
+//        $c->id_format($wid);
+
+        $params = array();
+        $params['id'] = $wid;
+        if($since_id) {
+//            $c->id_format($since_id);
+            $params['since_id'] = $since_id;
+        }
+        if($max_id) {
+//            $c->id_format($max_id);
+            $params['max_id'] = $max_id;
+        }
+        $params['count'] = $count;
+        $params['page'] = $page;
+        $params['filter_by_author'] = intval($filter_by_author);
+//        $ids = $c->request_with_pager('statuses/repost_timeline/ids', $page, $count, $params);
+        $ids = $c->oauth->get('statuses/repost_timeline/ids', $params);
+        var_dump($ids);
+    }
 
     // 返回最新的公共微博
     /*
@@ -41,17 +121,6 @@ ini_set("display_errors", 1);
     */
     // end of 返回最新的公共微博
     
-    /*
-    // 根据uid获得所发微博的id
-    // 好像没有在saelib中找到对应这个api的封装啊 难道要直接使用api？
-    $uid = 1941007953;
-    echo '<h2>根据uid获取所发微博的id uid: '.$uid.'</h2>';
-    $params = array();
-    $params['uid'] = $uid;
-    $ids = $c->oauth->get('statuses/user_timeline/ids', $params);
-    print_r($ids['statuses']);
-    // end of 根据uid获得所发微博的id
-    */
 
     /*
 	// 根据微博id获取微博内容
@@ -66,22 +135,6 @@ ini_set("display_errors", 1);
 	// end of 根据微博id获取微博内容
     */
 
-    /*
-    // 我的最新微博
-	echo '<h2>我的最新微博</h2>';
-	$weibos = $c->user_timeline_by_id($_SESSION['sid']);
-	if_weiboapi_fail($weibos);
-	echo '<ul>';
-	if(isset($weibos['error_code'])) {
-		echo '<h3 class="err_msg">error occured: '.$weibos['error'].'</h3>';
-	}
-	foreach($weibos['statuses'] as $v) {
-		echo "<li>{$v['idstr']} {$v['text']}</li>";
-	}
-	echo '</ul>';
-	echo '<hr />';
-    // 我的最新微博
-    */
 
     // 根据screen——name 或 sina——uid获得最新微博和微博的转发评论情况
     function print_latest_weibo_by_id($sid, $c)
@@ -157,34 +210,7 @@ ini_set("display_errors", 1);
     */
 
 
-
-
-
-
-
-
 /*
-//	$uid = 1941007953;
-	$uid = 2300716454; // 微小说
-//	$uid = 2881802930;
-	echo '<hr /><h1>show_user_by_id('.$uid.')</h1>';
-	$res = $c->show_user_by_id($uid);
-	foreach($res as $k => $v) {
-		echo "<br />$k -- $v";
-	}
-	echo '<hr />';
-
-//	$id = 11488058256;
-//	$id = 11884058256;
-//	$id = 11011011011; // 汗 汗 汗 
-	$wid = 12312312312; // 为啥那么多人自杀
-	echo '<hr /><h1>show_status('.$wid.')</h1>';
-	$res = $c->show_status($wid);
-	foreach($res as $k => $v) {
-		echo "<br />$k -- $v";
-	}
-
-
 	$uid2 = 1941007953;
 //	$uid2 = 2300716454; // 微小说
 	echo '<hr /><h1>friends_by_id('.$uid2.')</h1>';
@@ -209,11 +235,6 @@ ini_set("display_errors", 1);
 	}
 */
 
-	$sname = '夏榕_戏说';
-    $sid = 2172508334;
-    // 根据screen——name 或 sina——uid获得最新微博和微博的转发评论情况
-    print_latest_weibo_by_id($sid, $c);
-
 // 测试50个用户的最新50条微博的平均转发/评论数
 // 好费API啊！！！
 /*
@@ -226,5 +247,32 @@ foreach($uids as $uid) {
 echo '</table>';
 */
 
+// 获取当前用户最新转发的微博
+get_repost_by_me($c);
 
+// 根据uid获得用户最新发布的微博的ids
+$uid = 1941007953;  // me
+//get_user_timeline_ids($uid, $c);
+
+// 根据uid获得用户最新发布的微博
+$uid = 1193111400;  // 周国平
+$uid = 1974204995;  // 如洗
+//get_user_timeline($uid, $c, $dbo);
+
+// 获取一条原创微博的最新转发微博的id
+$wid = 3485497084616798;    // by 周国平
+$wid = 3483238506588417;    // by ruxi
+//get_repost_timeline_ids($wid, $c);
+
+// 根据screen_name 或 sina_uid获得最新微博和微博的转发评论情况
+$sname = '夏榕_戏说';
+$sid = 2172508334;
+//print_latest_weibo_by_id($sid, $c);
+
+?>
+<?php
+// 一些数据：
+/// 鲁国平先生 -- 1142648704
+//  周国平  --  1193111400
+//  如洗ruxi    --  1974204995
 ?>

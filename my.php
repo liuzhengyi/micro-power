@@ -105,7 +105,7 @@ include("uiparts/docheader.php");
 			<li>账户总收益：<?php echo $total_income.' 元。'; ?></li>
 			<li>承接任务数：<?php echo $task_taken; ?> </li>
 			<li>完成任务数：<?php echo $task_finished; ?></li>
-			<li>微博等级：<?php echo $_SESSION['slevel'];echo '<a href="action/evaluate.php">申请评级</a>'?></li>
+			<li>微博等级：<?php echo $_SESSION['slevel'];echo '<a href="action/evaluate.php" >申请评级</a>'?></li>
 		</ul>
 	<?php } else if ('change' == $data){ ?>
 		<h1>修改信息</h1>
@@ -126,7 +126,7 @@ include("uiparts/docheader.php");
 			<li>登录邮箱：<?php if(empty($email)) { echo '尚未设定 <a href="my.php?data=change">现在设定</a>';} else {echo $email;} ?></li>
 			<li>昵称：<?php echo $_SESSION['name']; ?></li>
 			<li>新浪微博状态：<?php if(empty($_SESSION['sid'])) {echo '尚未绑定';} else {echo '已绑定';} ?></li>
-			<li>新浪微博等级：<?php echo $_SESSION['slevel'].' ';echo '<a href="action/evaluate.php">申请评级</a>'?></li>
+			<li>新浪微博等级：<?php echo $_SESSION['slevel'].' ';echo '<a href="action/evaluate.php" >申请评级</a>'?></li>
 			<li>好评数：<?php echo $pro; ?></li>
 			<li>差评数：<?php echo $con; ?></li>
 			<li>注册时间：<?php echo $reg_time; ?></li>
@@ -152,6 +152,10 @@ include("uiparts/docheader.php");
 		?>
 		</ul>
 		</div><!-- end of DIV page_bar -->
+        <a href="tool/check_forward_draft1.php" target="_blank">检测转发任务方案1(unfinish)</a><br />
+        <a href="tool/check_forward_draft2.php" target="_blank">检测转发任务方案2</a><br />
+        <a href="tool/check_forward_draft3.php" target="_blank">检测转发任务方案3</a><br />
+        <a href="tool/check_forward_draft4.php" target="_blank">检测转发任务方案4</a><br />
 	<?php } ?>
 
 	</div><!-- end of DIV main_content -->

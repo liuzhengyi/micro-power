@@ -11,14 +11,14 @@ session_start();
  *	常规用户绑定weibo帐号
  *		完善信息
  */
-ini_set("error_display", E_ALL&E_STRICT);
+ini_set("error_display", E_ALL&E_STRICT);   // debug
 
 include_once( 'config.php' );
-include_once( 'lib/saetv2.ex.class.php' );
-require_once( 'lib/dbo.class.php' );	// init class dbo
-require_once( "$dbConfFile" );		// init $dbServs
+include_once( $webRoot.'lib/saetv2.ex.class.php' );
+require_once( $webRoot.'lib/dbo.class.php' );	// init class dbo
+require_once( $dbConfFile );		// init $dbServs
 
-require_once( "foundation/debug.php");
+require_once( $webRoot.'foundation/debug.php');
 
 // 用授权者的code换取token
 $o = new SaeTOAuthV2( WB_AKEY , WB_SKEY );

@@ -11,15 +11,19 @@ include_once($dbConfFile);
 include_once($webRoot."foundation/debug.php");
 include_once($webRoot."foundation/price.php");
 include_once($webRoot."foundation/status.php");
-if(!is_login()) {
+if(!is_login() || !isset($_GET['id'])) {
 header("Location:".$siteRoot."index.php");
 exit();
 }
 
-$c = new SaeTClientV2( WB_AKEY, WB_SKEY, $_SESSION['stoken']);
 if(isset($_GET['id'])) {
-	$task_id = $_GET['id'];
-	// 此处缺少安全检查，不应直接将$task_id 用于sql语句。
+	$task_id = intval($_GET['id']);
+    if(empty($task_id)) {
+        header("Location:".$siteRoot."index.php");
+        exit();
+    }
+
+    $c = new SaeTClientV2( WB_AKEY, WB_SKEY, $_SESSION['stoken']);
 	// 先尝试更新task表中task_finish_amount值，若更新成功则做任务，若任务失败，再回滚数据。未使用事务。
 	$dbo = new dbex($dbServs);
     if(isset($_GET['type']) && 'hide'==$_GET['type']) { // 屏蔽此任务
@@ -69,7 +73,7 @@ if(isset($_GET['id'])) {
 	// 做成功了，写数据库，写SESSION
 	// 写do_task表
     $money = sql_price($task_offer, $_SESSION['slevel']);
-	$sql = "insert into do_task values(NULL, $task_id, {$_SESSION['uid']}, 'finish', now())";
+	$sql = "insert into do_task values(NULL, $task_id, {$_SESSION['uid']}, 'finish', NULL, now())";
 	$sql_num = $dbo->exeUpdate($sql);
 	if(1 != $sql_num) {
 		echo 'debug. 写数据库失败。file: '.__FILE__.'; line: '.__LINE__;

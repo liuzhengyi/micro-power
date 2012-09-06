@@ -45,7 +45,7 @@ $params = array();
 $params['ids'] = $ids;
 $weibo_counts = $c->oauth->get('statuses/count', $params);
 if_weiboapi_fail($weibo_counts);
-if(0 != $weibo_counts) {    // 发过微博
+if(0 != $weibo_amount) {    // 发过微博
     $max_reposts = 0;
     $max_comments = 0;
     foreach($weibo_counts as $weibo_count) {
@@ -56,8 +56,8 @@ if(0 != $weibo_counts) {    // 发过微博
     }
     $user['max_reposts'] = $max_reposts;
     $user['max_comments'] = $max_comments;
-    $user['aver_reposts'] = 0 == $total_reposts ? 0 : ($total_reposts / $weibo_counts);
-    $user['aver_comments'] = 0 == $total_comments ? 0 : ($total_comments / $weibo_counts);
+    $user['aver_reposts'] = 0 == $total_reposts ? 0 : ($total_reposts / $weibo_amount);
+    $user['aver_comments'] = 0 == $total_comments ? 0 : ($total_comments / $weibo_amount);
  //   echo 'total reposts: '.$total_reposts.'</p>';
   //  echo 'total comments: '.$total_comments.'</p>';
     /*  
