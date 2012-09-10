@@ -156,6 +156,8 @@ include("uiparts/docheader.php");
         <a href="tool/check_forward_draft2.php" target="_blank">检测转发任务方案2</a><br />
         <a href="tool/check_forward_draft3.php" target="_blank">检测转发任务方案3</a><br />
         <a href="tool/check_forward_draft4.php" target="_blank">检测转发任务方案4</a><br />
+        <hr />
+        <a href="tool/check_follow_draft1.php" target="_blank">检测关注任务方案1</a><br />
 	<?php } ?>
 
 	</div><!-- end of DIV main_content -->

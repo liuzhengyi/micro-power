@@ -66,11 +66,16 @@ ini_set("display_errors", 1);
     }
 
     // 批量获取多个用户的最新微博，sae中封装有此接口，但api文档中没有
-    function get_user_timeline_batch_by_id()
-    {}
+    // sae 接口 timeline_batch_by_id($uid, $page=1, $count=50, $feature=0, $base_app=0)
+    function get_user_timeline_batch_by_id($sids, $c)
+    {
+        $timeline_batch = $c->timeline_batch_by_id($sids, 1, 50, 0, 1);
+//        $timeline_batch = $c->timeline_batch_by_id();
+        var_dump($timeline_batch);
+    }
 
     // 返回一条原创微博的最新转发微博的id
-    // sae中木有这个接口，自己写吧
+    // sae中没有这个接口，自己写吧
     function get_repost_timeline_ids($wid, $c, $since_id = 0, $max_id = 0, $count = 200, $page = 1, $filter_by_author = 0)
     {
 //        $c->id_format($wid);
@@ -90,6 +95,16 @@ ini_set("display_errors", 1);
         $params['filter_by_author'] = intval($filter_by_author);
 //        $ids = $c->request_with_pager('statuses/repost_timeline/ids', $page, $count, $params);
         $ids = $c->oauth->get('statuses/repost_timeline/ids', $params);
+        var_dump($ids);
+    }
+
+    // 获取用户的粉丝列表uid
+    // api friendships/followers/ids
+    // sae 接口 followers_ids_by_id($uid, $cursor=0, $count=50);
+    // $count 一次返回的数据条数，最多为5000 总的返回数据最多也是5000，最近五千，越晚越靠前
+    function get_followers_ids_by_id($sid, $c)
+    {
+        $ids = $c->followers_ids_by_id($sid, 0, 50);
         var_dump($ids);
     }
 
@@ -187,7 +202,7 @@ ini_set("display_errors", 1);
 
     /*
     // 根据screen name获取关注列表
-	$sname = '夏榕_戏说';
+	$sname = '森女风';
     $sid = 2172508334;
 	echo '<h2>根据screen_name获取关注列表 name:'.$sname.'</h2>';
 //	$friends = $c->friends_by_name($sname, 0, 50); echo '<ul>';
@@ -248,7 +263,7 @@ echo '</table>';
 */
 
 // 获取当前用户最新转发的微博
-get_repost_by_me($c);
+//get_repost_by_me($c);
 
 // 根据uid获得用户最新发布的微博的ids
 $uid = 1941007953;  // me
@@ -269,10 +284,25 @@ $sname = '夏榕_戏说';
 $sid = 2172508334;
 //print_latest_weibo_by_id($sid, $c);
 
+// 批量获取多个用户的最新微博，sae中封装有此接口，但api文档中没有
+//  注意：这是一个高级接口，需要申请才能使用
+//function get_user_timeline_batch_by_id($sids, $c) {}
+//$sids = '1941007953,2878046960';
+//get_user_timeline_batch_by_id($sids, $c);
+
+// 获取用户的粉丝列表uid
+// api friendships/followers/ids
+// sae 接口 followers_ids_by_id($uid, $cursor=0, $count=50);
+$sid = 2172508334;
+get_followers_ids_by_id($sid, $c);
+
 ?>
 <?php
 // 一些数据：
+//  gipsa   --  1941007953;
+//  lisa    --  2878046960;
 /// 鲁国平先生 -- 1142648704
 //  周国平  --  1193111400
 //  如洗ruxi    --  1974204995
+//  森女风    --  2172508334
 ?>

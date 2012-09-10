@@ -27,10 +27,17 @@ if(isset($_GET['id'])) {
 	// 先尝试更新task表中task_finish_amount值，若更新成功则做任务，若任务失败，再回滚数据。未使用事务。
 	$dbo = new dbex($dbServs);
     if(isset($_GET['type']) && 'hide'==$_GET['type']) { // 屏蔽此任务
-        $sql = "insert into do_task values(NULL, $task_id, {$_SESSION['uid']}, 'hide', now())";
+        $sql = "insert into do_task(task_id, user_id, status, time) values($task_id, {$_SESSION['uid']}, 'hide', now())";
         $sql_res = $dbo->exeUpdate($sql);
-        /*  这样提示好像不管用
-        echo '<p>already hide it. return to task page in 3 sec.</p>';
+        if(1 !== $sql_res) {
+            $msg = '屏蔽失败，sql:['.$sql.']</p>';
+        } else {
+            $msg = '屏蔽成功';
+        }
+        $to_url = $_SERVER['HTTP_REFERER'];
+        $to_name = '任务列表';
+        delay_jump(3, $msg, $to_url, $to_name);
+        /*  这样好像不管用. but why?
         sleep(1);
         echo 'already hide it. return to task page in 2 sec.';
         sleep(1);
@@ -38,16 +45,16 @@ if(isset($_GET['id'])) {
         sleep(1);
         echo 'already hide it. return to task page in 0 sec.';
         */
-    	header("Location:".$_SERVER['HTTP_REFERER']);
-        exit();
     }
     // 尝试完成此任务
 	$sql = "update task set task_finish_amount=task_finish_amount+1 where task_id=$task_id and task_finish_amount < task_amount limit 1";
 	$sql_num = $dbo->exeUpdate($sql);
 	if(1 != $sql_num) {	// 更新task表中task_finish_amount失败，尝试其他任务
-		echo "对不起，此任务已经被做完了，请<a href=\"{$_SERVER['HTTP_REFERER']}\">点此返回</a>选择其他任务";
 		$dbo->close();
-		exit();
+		$msg = "对不起，此任务已经被做完了请选择其他任务。";
+        $to_url = $_SERVER['HTTP_REFERER'];
+        $to_name = '任务列表';
+        delay_jump(3, $msg, $to_url, $to_name);
 	}
 	// 已经更新了task中的数据，现在做任务
 	// 先获取任务信息
@@ -61,14 +68,21 @@ if(isset($_GET['id'])) {
 	$task_sina_uid = $sql_res['task_sina_uid'];
 	$task_offer = $sql_res['task_offer'];
 	$task_res = $c->follow_by_id($task_sina_uid);
-	if_weiboapi_fail($task_res, __FILE__, __LINE__);
+//	if_weiboapi_fail($task_res, __FILE__, __LINE__);
+//  此处不应使用if_weiboapi_fail(),因为它对调用失败的处理只是简单的输出提示，不满足此处处理的需要。
 	if(isset($task_res['error_code'])) { // 没做成功，回滚task表中task_finish_amount数据
-		echo	'某处出了错误：'.$task_res['error']
-			."。您未能完成任务，请<a href=\"{$_SERVER['HTTP_REFERER']}\">点此返回</a>";
 		$sql = "update task set task_finish_amount = task_finish_amount - 1 where task_id = $task_id limit 1";
 		$dbo->exeUpdate($sql);
 		$dbo->close();
-		exit();
+        if(21327 === $task_res['error_code']) {
+            if_weiboapi_fail($task_res);  // token expired
+        } else {
+            $msg = 'api调用某处出了错误：'.$task_res['error']
+                ."。您未能完成任务。";
+            $to_url = $_SERVER['HTTP_REFERER'];
+            $to_name = '任务列表';
+            delay_jump(3, $msg, $to_url, $to_name);
+        }
 	}
 	// 做成功了，写数据库，写SESSION
 	// 写do_task表
@@ -76,8 +90,9 @@ if(isset($_GET['id'])) {
 	$sql = "insert into do_task values(NULL, $task_id, {$_SESSION['uid']}, 'finish', NULL, now())";
 	$sql_num = $dbo->exeUpdate($sql);
 	if(1 != $sql_num) {
-		echo 'debug. 写数据库失败。file: '.__FILE__.'; line: '.__LINE__;
 		$dbo->close();
+		$debug_msg = '写数据库失败。SQL statement: '.$sql;
+        debug($debug_msg, __FILE__, __LINE__, TRUE, 'error');
 		exit();
 	}
 	// 写user表
@@ -86,14 +101,17 @@ if(isset($_GET['id'])) {
 		." where user_id = {$_SESSION['uid']} limit 1";
 	$sql_num = $dbo->exeUpdate($sql);
 	if(1 != $sql_num) {
-		echo 'debug. 写数据库出现错误。file: '.__FILE__.'; line: '.__LINE__.'. sql:'.$sql;
 		$dbo->close();
+		$debug_msg = '写数据库失败。SQL statement: '.$sql;
+        debug($debug_msg, __FILE__, __LINE__, TRUE, 'error');
 		exit();
 	}
 	// 写数据成功，释放数据库连接
 	$dbo->close();
 	$_SESSION['followed_id'][] = $task_sina_uid;
-	header("Location:".$_SERVER['HTTP_REFERER']);
-	exit();
+    $msg = '恭喜！您成功完成了XX任务，获利XX元。';
+    $to_url = $_SERVER['HTTP_REFERER'];
+    $to_name = '任务列表';
+    delay_jump(3, $msg, $to_url, $to_name);
 }
 ?>

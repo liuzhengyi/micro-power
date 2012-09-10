@@ -77,12 +77,16 @@ about check_task
                 一次检查一个任务。
                 随时可以检查，无需用户在线。
                 
-    注意 sae中的批量获取user_timeline的接口！ 这个批量接口在api文档中没有出现，它是否能节约api？？
+    注意sae中的批量获取user_timeline的接口！ 这个批量接口在api文档中没有出现，它是否能节约api？？
+    经测试，这是一个高级接口，需要申请才能使用。所以目前并不清楚它的效果。
+
+    目前方案：
+        draft 4;
 
     检测关注任务： 
         批量检查：（按任务检查）
         draft 1:
-            获取做任务用户的followers列表 http://open.weibo.com/wiki/2/friendships/followers
+            获取任务用户的followers列表 http://open.weibo.com/wiki/2/friendships/followers
             然后比对数据库中存储的数据。
             note:
                 一次检查一个任务（包括所有做了该任务的人）
@@ -91,7 +95,13 @@ about check_task
             根据用户uid和任务uid，判断两者关系。 http://open.weibo.com/wiki/2/friendships/show
             note:
                 缺点：一次api调用只能检查一个用户
+        互补检查：
+        draft3:
+            先对任务使用draft1获取五千个最新粉丝，检测出问题的用户再用draft2进行精确检查。
+
+    目前方案：
+        draft3;
 
     关于检测时机：
         检测的目的是看看用户有没有私自删粉删博，所以应该按照一定的周期检测，过了一定的时限之后，可以不再检测。
-*/
+        使用cron

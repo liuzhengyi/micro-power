@@ -29,31 +29,34 @@ if(isset($_GET['id'])) {
     if(isset($_GET['type']) && 'hide'==$_GET['type']) { // 屏蔽此任务
         $sql = "insert into do_task (task_id, user_id, status, time) values ($task_id, {$_SESSION['uid']}, 'hide', now())";
         $sql_res = $dbo->exeUpdate($sql);
-    	header("Location:".$_SERVER['HTTP_REFERER']);
         $dbo->close();
-        exit();
+        if(1 !== $sql_res) {
+            $msg = '屏蔽失败，sql:['.$sql.']</p>';
+        } else {
+            $msg = '屏蔽成功';
+        }
+        $to_url = $_SERVER['HTTP_REFERER'];
+        $to_name = '任务列表';
+        delay_jump(3, $msg, $to_url, $to_name);
     }
 	$sql = "update task set task_finish_amount=task_finish_amount+1 where task_id=$task_id and task_finish_amount < task_amount limit 1";
 	$sql_num = $dbo->exeUpdate($sql);
 // 更新task表中task_finish_amount失败，尝试其他任务
 	if(1 != $sql_num) {
-		echo "对不起，此任务已经被做完了，请<a href=\"{$_SERVER['HTTP_REFERER']}\">点此返回</a>选择其他任务";
 		$dbo->close();
-		exit();
+		$msg = "对不起，此任务已经被做完了请选择其他任务。";
+        $to_url = $_SERVER['HTTP_REFERER'];
+        $to_name = '任务列表';
+        delay_jump(3, $msg, $to_url, $to_name);
 	}
 // 已经更新了task中的数据，现在做任务
 // 先获取任务信息
 	$sql = "select task_sina_wid, task_offer from task where task_id = $task_id";
 	$sql_res = $dbo->getRow($sql);
 	if(!$sql_res) {
-        if(DEBUG) {
-            $err_msg = '读数据库出错，FILE: '.__FILE__.'; LINE: '.__LINE__.';SQL: '.$sql;
-        } else {
-            $err_msg = '对不起，出了一些错误，请稍候';
-        }
-		echo $err_msg;
 		$dbo->close();
-		exit();
+        $err_msg = '读数据库出错，FILE: '.__FILE__.'; LINE: '.__LINE__.';SQL: '.$sql;
+        debug($err_msg, __FILE__, __LINE__, TRUE, 'fatal');
 	}
 	$task_sina_wid = $sql_res['task_sina_wid'];
 	$task_offer = $sql_res['task_offer'];
