@@ -1,4 +1,17 @@
 <?php
+
+/**
+ * 写日志函数
+ *
+ * @param string $msg   要写入日志的信息
+ * @param string log_file     日志文件路径，相对于根目录$siteRoot
+ * 尚未完成
+ */
+
+function write_log($msg, $log_file='doc/log_file')
+{
+    echo 'error message:'.$msg.".\n<br />".'logged in file:'.$log_file."\n<br /> this is not real. this function is not complete.";
+}
 /**
  * 错误处理函数
  *
@@ -9,11 +22,14 @@
  *          error:  错误，程序可以继续执行下去
  *          fatal:  严重错误，程序不能继续执行，需要退出或跳转
  * @return 
- * 注意：正式运行时，这些错误信息应该发送到管理员邮箱
+ * 注意：正式运行时，有些错误信息应该发送到管理员邮箱和/或写入日志
  */
 function debug($debug_msg, $file=NULL, $line=NULL, $to_user=TRUE, $level="error")
-{	if(DEBUG) {
-		echo 'debug: '.'file:'.$file .' line: ' . $line .$debug_msg;
+{	
+    $debug_msg = 'debug: '.'file:'.$file .' line: ' . $line .$debug_msg;
+    write_log($debug_msg);
+    if(DEBUG) {
+		echo $debug_msg;
 		exit();
 	} else if($to_user) {
 		echo "<p>something wrong, please wait for a moment.</p>";

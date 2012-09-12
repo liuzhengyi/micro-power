@@ -43,8 +43,10 @@ if ($token) {
 	$sid = $sid_get['uid'];
 	// 判断是否首次授权，首次授权则登记sina uid
 	$dbo = new dbex($dbServs);
-	if(!$dbo->checkExist($sid, 'sina_uid')) {	// 首次授权 
-		if(isset($_SESSION['uid'])) {	//已注册微动力，在绑定微博，完善信息
+	if(!$dbo->checkExist($sid, 'sina_uid')) {
+        // 首次授权 在绑定微博或用微博帐号注册
+		if(isset($_SESSION['uid'])) {	
+            //已注册微动力，在绑定微博，完善信息
 			$id = $_SESSION['uid'];
 			$sql = "update user set sina_uid =$sid, sina_token = '{$token['access_token']}' where user_id = $id limit 1";
 			$num = $dbo->exeUpdate($sql);
@@ -68,7 +70,8 @@ if ($token) {
             $_SESSION['is_bind_weibo'] = TRUE;
             $_SESSION['slevel'] = $weibo_init_level;
 			exit();
-		} else {			// 尚未注册。在用微博帐号注册
+		} else {			
+            // 尚未注册。在用微博帐号注册
 			$user_info = $c->show_user_by_id($sid); // fetch user basic message according to sid
 			$name = $user_info['screen_name'].'@sina';
 			$sql = "insert into user (nick_name, sina_uid, sina_token, reg_time) values('$name', $sid, '{$token['access_token']}', now())";
@@ -78,36 +81,49 @@ if ($token) {
 				debug($msg);
 			}	// 注册完成，session在后面写。
 		}
-	} else {	// 老用户，非首次授权。在用微博帐号登录
-	/* 此处或许存在一个问题，如果用户先用微博登录创建了一个账户，又以常规途径创建了一个微动力账户，
-	   然后用新注册的微动力账户绑定先前的微博帐号。
-	   此时，如果授权成功会导致用户以微博帐号的身份登录，向新账户绑定微博的操作无法完成。
-	   这意味着一个微博帐号只能对应一个微动力帐号。 这不是一个bug。
-	   */
-		$sql = "select nick_name as n from user where sina_uid = $sid limit 1";
+	} else {	
+        // 非首次授权。老用户，在用微博帐号登录 或者刷新sina_token
+        /* 此处存在一个问题，但这不是一个bug
+           如果用户先用微博登录创建了一个账户，又以常规途径创建了一个微动力账户，
+           然后用新注册的微动力账户绑定先前的微博帐号。
+           此时，如果授权成功会导致用户以微博帐号的身份登录，向新账户绑定微博的操作无法完成。
+           这意味着一个微博帐号只能对应一个微动力帐号。 这不是一个bug。
+           */
+		$sql = "select nick_name as n, sina_token as st from user where sina_uid = $sid limit 1";
 		$row = $dbo->getRow($sql);
 		// missing error control
 		$name = $row['n'];
+        $stoken = $row['st'];
+        if($token['access_token'] !== $stoken) {
+            // 数据库中该用户的sina_token更新了，写入数据库
+            $sql = "update user set sina_token = '{$token['access_token']}' where sina_uid = $sid limit 1";
+            $sql_res = $dbo->exeUpdate($sql);
+            if(1 !== $sql_res) {
+                // 此处并不影响微博登录的用户继续操作，因为该类用户使用的token不是数据库中获得
+                // 受影响的是使用微动力帐号登录的用户，和我们的检测程序（如果我们的帐号出错的话）
+                debug('更新数据库中用户token时，updte操作出错。', __FILE__, __LINE__, FALSE, 'fatal');
+            }
+        }
 	}
-		// 写session
-		$sql = "select user_id, sina_level from user where sina_uid = $sid limit 1";
-		$res = $dbo->getRow($sql);
-		$_SESSION['uid'] = $res['user_id'];
-		$_SESSION['sid'] = $sid;
-		$_SESSION['name'] = $name;
-		$_SESSION['stoken'] = $token['access_token'];
-		$_SESSION['slevel'] = $res['sina_level'];
-        $_SESSION['is_bind_weibo'] = TRUE;
-		header("Location:my.php");
-		// 后台获取用户的已关注用户列表，写入SESSION
-		$friends = $c->friends_by_id($_SESSION['sid']);
-		if_weiboapi_fail($friends, __FILE__, __LINE__);
-		foreach($friends['users'] as $friend) {
-			$followed_id[] = $friend['id'];
-			$followed_name[] = $friend['name'];
-		}
-		$_SESSION['followed_id'] = $followed_id;
-		$_SESSION['followed_name'] = $followed_name;
+	// 写session
+	$sql = "select user_id, sina_level from user where sina_uid = $sid limit 1";
+	$res = $dbo->getRow($sql);
+	$_SESSION['uid'] = $res['user_id'];
+	$_SESSION['sid'] = $sid;
+	$_SESSION['name'] = $name;
+	$_SESSION['stoken'] = $token['access_token'];
+	$_SESSION['slevel'] = $res['sina_level'];
+    $_SESSION['is_bind_weibo'] = TRUE;
+	header("Location:my.php");
+	// 后台获取用户的已关注用户列表，写入SESSION
+	$friends = $c->friends_by_id($_SESSION['sid']);
+	if_weiboapi_fail($friends, __FILE__, __LINE__);
+	foreach($friends['users'] as $friend) {
+	$followed_id[] = $friend['id'];
+	$followed_name[] = $friend['name'];
+	}
+	$_SESSION['followed_id'] = $followed_id;
+	$_SESSION['followed_name'] = $followed_name;
 
 } else {
 	
