@@ -110,7 +110,7 @@ if(0 != count($unpass_tasks)) {
         foreach($failed as $k => $v) {  // $k -- user_id, $v -- mid
             $sql = "select nick_name from user where user_id = $k limit 1";
             $sql_res = $dbo->getRow($sql);
-            echo 'user_id:'.$k.';  weibo_mid: '.$v.'; 用户名:'.$sql_res['nick_name'].'</p>';
+            echo 'user_id:'.$k.';  sina_uid: '.$v.'; 用户名:'.$sql_res['nick_name'].'</p>';
         }
     }
 } else {

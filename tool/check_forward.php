@@ -1,5 +1,10 @@
 <?php
 /*
+    注意！！
+    此文件不应该放在用户可以访问的web目录下。
+    应该有服务器自动定时运行。
+*/
+/*
 检查转发任务
 draft 4:
             选取一个任务，将检验所有做过该任务的人的情况。
@@ -22,12 +27,6 @@ require_once($webRoot."foundation/status.php");
 require_once( $dbConfFile );		// init $dbServs
 require_once( $webRoot.'foundation/debug.php');
 
-/*
-if(!is_login()) {
-    header($siteRoot.'index.php');
-    exit();
-}
-*/
 if(isset($_GET['id'])) {
     $task_id = intval($_GET['id']);
     if(empty($task_id)) {
@@ -40,18 +39,17 @@ if(isset($_GET['id'])) {
 // 按照任务检查转发任务，测试版
 // 从数据库中取出task_id标识的转发任务的mid（同id）
 $dbo = new dbex($dbServs);
-echo '<h2>任务 '.$task_id.' 的完成情况</h3>';
+echo 'task_id: '.$task_id.'(forward)';
 $sql = "select task_sina_wid, task_text from task where task_id = $task_id and task_type = 'forward' limit 1";
 $sql_res = $dbo->getRow($sql);
 if(!$sql_res || 0 === count($sql_res)) {
-    echo '<p>不存在该任务或该任务不是转发任务，对于非转发任务，请使用其专用接口。</p>';
+    echo "不存在该任务或该任务不是转发任务，对于非转发任务，请使用其专用接口。\n";
     exit();
 }
 $task_wid = $sql_res['task_sina_wid'];
 $task_text = $sql_res['task_text'];
-echo '<h3>任务mid： '.$task_wid.' </h3>';
-echo '<h3>任务text： '.$task_text.' </h3>';
-echo '<hr />';
+echo '任务mid： '.$task_wid."\n";
+echo '任务text： '.$task_text."\n";
 
 // 从数据库do_task表中检索出一定时间之内做过该任务的人和他们做任务时产生的mid
 $sql = "select user_id, repost_mid from do_task where task_id = $task_id";  // and time ... // attention
@@ -65,18 +63,20 @@ foreach($sql_res as $k) {
 $sql_res = $dbo->getRow('select sina_token from user where user_id = 9 limit 1');
 //$c = new SaeTClientV2( WB_AKEY, WB_SKEY, $_SESSION['stoken'] );
 $c = new SaeTClientV2( WB_AKEY, WB_SKEY, $sql_res['sina_token'] );
-echo '<h3>该任务微博目前的转发微博的mid:</h3>';
+/*
+echo "\n该任务微博目前的转发微博的mid:\n";
+echo "--------------------------\n";
+*/
 $repost_weibos = $c->repost_timeline($task_wid);
 if_weiboapi_fail($repost_weibos, __FILE__, __LINE__);
 foreach($repost_weibos['reposts'] as $weibo ) {
-echo $weibo['mid'].' -- '.$weibo['text'].' (<sub>'.$weibo['retweeted_status']['text'].'</sub>)<br />';
+//echo $weibo['mid'].' -- '.$weibo['text'].' ('.$weibo['retweeted_status']['text'].")\n";
     $real_weibo_mids[] = $weibo['mid'];
 }
-
-echo '<hr />';
-echo '<h3>在该任务上出问题的用户</h3>';
+echo "\n".'在该任务上出问题的用户'."\n";
+echo "--------------------------\n";
 if(0 === count($do_tasks)) {
-    echo '<p>该任务目前没有人做</p>';
+    echo 'no body did the task'."\n";
     exit();
 }
 if(0 === count($real_weibo_mids)) {
@@ -88,10 +88,10 @@ if(0 != count($fail_tasks)) {
     foreach($fail_tasks as $k => $v) {  // $k -- user_id, $v -- mid
         $sql = "select nick_name from user where user_id = $k limit 1";
         $sql_res = $dbo->getRow($sql);
-        echo 'user_id:'.$k.';  weibo_mid: '.$v.'; 用户名:'.$sql_res['nick_name'].'</p>';
+        echo 'user_id:'.$k.';  weibo_mid: '.$v.'; 用户名:'.$sql_res['nick_name']."\n";
     }
 } else {
-    echo '<p>NONE</p>';
+    echo "NONE\n";
 }
 
 ?>
