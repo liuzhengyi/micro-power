@@ -30,6 +30,14 @@ if (isset($_REQUEST['code'])) {
 		$token = $o->getAccessToken( 'code', $keys ) ;
 	} catch (OAuthException $e) {
 	}
+} else if(isset($_REQUEST['error_code'])) {
+    $error_code = intval($_REQUEST['error_code']);
+    if(21330 === $error_code) {
+        header("Location:".$siteRoot."cancel.php");
+        exit();
+    } else {
+        $msg = '授权出现错误，错误码：'.$error_code;
+    }
 }
 
 if ($token) {
@@ -48,7 +56,7 @@ if ($token) {
 		if(isset($_SESSION['uid'])) {	
             //已注册微动力，在绑定微博，完善信息
 			$id = $_SESSION['uid'];
-			$sql = "update user set sina_uid =$sid, sina_token = '{$token['access_token']}' where user_id = $id limit 1";
+			$sql = "update user set sina_uid =$sid, sina_token = '{$token['access_token']}', token_update_at=now(), token_expire_in={$token['expires_in']} where user_id = $id limit 1";
 			$num = $dbo->exeUpdate($sql);
 			if(1 != $num) {
 				$msg = "向数据库插入数据出错。file:".__FILE__.";line:".__LINE__."sql:".$sql;
@@ -74,7 +82,7 @@ if ($token) {
             // 尚未注册。在用微博帐号注册
 			$user_info = $c->show_user_by_id($sid); // fetch user basic message according to sid
 			$name = $user_info['screen_name'].'@sina';
-			$sql = "insert into user (nick_name, sina_uid, sina_token, reg_time) values('$name', $sid, '{$token['access_token']}', now())";
+			$sql = "insert into user (nick_name, sina_uid, sina_token, token_update_at, token_expire_in, reg_time) values('$name', $sid, '{$token['access_token']}', now(), {$token['expires_in']}, now())";
 			$num = $dbo->exeUpdate($sql);
 			if(1 != $num) {
 				$msg = "向数据库插入数据出错。file:".__FILE__.";line:".__LINE__."sql:".$sql;
@@ -96,12 +104,12 @@ if ($token) {
         $stoken = $row['st'];
         if($token['access_token'] !== $stoken) {
             // 数据库中该用户的sina_token更新了，写入数据库
-            $sql = "update user set sina_token = '{$token['access_token']}' where sina_uid = $sid limit 1";
+            $sql = "update user set sina_token = '{$token['access_token']}', token_update_at=now(), token_expire_in='{$token['expires_in']}' where sina_uid = '$sid' limit 1";
             $sql_res = $dbo->exeUpdate($sql);
             if(1 !== $sql_res) {
                 // 此处并不影响微博登录的用户继续操作，因为该类用户使用的token不是数据库中获得
                 // 受影响的是使用微动力帐号登录的用户，和我们的检测程序（如果我们的帐号出错的话）
-                debug('更新数据库中用户token时，updte操作出错。', __FILE__, __LINE__, FALSE, 'fatal');
+                debug('更新数据库中用户token时，updte操作出错，SQL['.$sql.']。', __FILE__, __LINE__, FALSE, 'fatal');
             }
         }
 	}

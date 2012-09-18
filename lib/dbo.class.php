@@ -63,6 +63,7 @@ class dbex {
 	{ 	if( DEBUG ) {
 		$result=$this->query($sql); if(!$result) { echo "debug: cdbex, $sql. any error:". $this->dbc->error. "errorno: ".$this->dbc->errno."\$result = $result."; }
 		} else {
+//		$result=$this->query($sql) or die('<script type="text/javascript">location.href="servtools/error.php?error_type=dberr";</script>'); // 这种错误处理方式可以参考，用error.php统一处理错误，这样所有的错误都可以跳转到这个文件。
 		$result=$this->query($sql) or die('<script type="text/javascript">location.href="servtools/error.php?error_type=dberr";</script>');
 		}
 		return $result->fetch_array();

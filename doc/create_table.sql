@@ -6,6 +6,8 @@ CREATE TABLE `user` (
 	pass char(40) ,
 	sina_uid BIGINT UNSIGNED,
 	sina_token varchar(50),
+    token_update_at DATETIME,
+    token_expire_in INT UNSIGNED,
 	sina_level tinyint default 3,
     sina_location VARCHAR(30),
     sina_description VARCHAR(220),

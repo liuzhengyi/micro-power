@@ -10,13 +10,22 @@ ini_set("display_errors", 1);
     include_once($webRoot."lib/dbo.class.php");
     include_once($dbConfFile);
     $dbo = new dbex($dbServs);
-	$c = new SaeTClientV2( WB_AKEY, WB_SKEY, $_SESSION['stoken']);
+    $stoken = $dbo->getRow('select sina_token as st from user where user_id = 8 limit 1');
+	$c = new SaeTClientV2( WB_AKEY, WB_SKEY, $stoken['st']);
+
+    // 发布一条微博
+    function post_message($c, $msg)
+    {
+        $res = $c->update($msg);
+        var_dump($res);
+    }
 
     // 查询当前用户最新转发的微博列表
     function get_repost_by_me($c)
     {
 //        $repost_weibos = $c->repost_by_me(1,50,3482583004513831,3482583004642586);
         $repost_weibos = $c->repost_by_me(1,200);
+        var_dump($repost_weibos);
         foreach($repost_weibos['reposts'] as $weibo ) {
 //        foreach($repost_weibos as $weibo ) {
             var_dump($weibo['retweeted_status']['id']);
@@ -106,6 +115,16 @@ ini_set("display_errors", 1);
     {
         $ids = $c->followers_ids_by_id($sid, 0, 50);
         var_dump($ids);
+    }
+
+    /*
+     *  查询当前登录用户的API访问频率限制情况
+    */
+    function my_api_limit($c)
+    {
+        $status = $c->rate_limit_status();
+        if_weiboapi_fail($status);
+        var_dump($status);
     }
 
     // 返回最新的公共微博
@@ -294,8 +313,14 @@ $sid = 2172508334;
 // api friendships/followers/ids
 // sae 接口 followers_ids_by_id($uid, $cursor=0, $count=50);
 $sid = 2172508334;
-get_followers_ids_by_id($sid, $c);
+//get_followers_ids_by_id($sid, $c);
 
+// 查询当前登录用户的API访问频率限制情况
+//my_api_limit($c);
+
+// 发布一条微博
+$msg = '风真大！';
+post_message($c, $msg);
 ?>
 <?php
 // 一些数据：
@@ -305,4 +330,5 @@ get_followers_ids_by_id($sid, $c);
 //  周国平  --  1193111400
 //  如洗ruxi    --  1974204995
 //  森女风    --  2172508334
+//  孙燕姿  --  1937439635
 ?>

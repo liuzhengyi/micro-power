@@ -60,7 +60,7 @@ foreach($sql_res as $k) {
 // 此时 $do_task 中存放的是 user_id 和 repost_mid 的键值对。
 
 // 使用api查询任务微博的转发微博 statuses/repost_timeline/ids
-$sql_res = $dbo->getRow('select sina_token from user where user_id = 9 limit 1');
+$sql_res = $dbo->getRow('select sina_token from user where user_id = 10 limit 1');
 //$c = new SaeTClientV2( WB_AKEY, WB_SKEY, $_SESSION['stoken'] );
 $c = new SaeTClientV2( WB_AKEY, WB_SKEY, $sql_res['sina_token'] );
 /*

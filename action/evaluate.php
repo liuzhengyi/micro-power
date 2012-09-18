@@ -39,7 +39,8 @@ if_weiboapi_fail($weibos);
 $weibo_amount = count($weibos['statuses']);
 unset($ids);
 foreach($weibos['statuses'] as $weibo) {
-    $ids .= $weibo['id'].',';
+    $ids .= $weibo['id'].',';   // 注意，如果系统字长不够，此处有可能无法处理这个数字型的id
+    echo $weibo['id'].'<br />';
 }
 $params = array();
 $params['ids'] = $ids;

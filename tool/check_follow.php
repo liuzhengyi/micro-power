@@ -11,6 +11,7 @@ draft 1:
 
 注意：
     目前测试版，让用户自己点击检测接口来检测。
+
 */
 require_once('../config.php');
 require_once($webRoot.'lib/saetv2.ex.class.php');
@@ -66,7 +67,7 @@ if(!$sql_res || 0 === count($sql_res)) {
 // 此时 $do_task 中存放的是 user_id 和 sina_uid 的键值对。
 
 // 使用api查询任务微博的转发微博 statuses/repost_timeline/ids
-$sql = 'select sina_token from user where user_id = 8 limit 1';
+$sql = 'select sina_token from user where user_id = 10 limit 1';
 $sql_res = $dbo->getRow($sql);
 $c = new SaeTClientV2( WB_AKEY, WB_SKEY, $sql_res['sina_token'] );
 //echo "data from sina api, uid:\n";
