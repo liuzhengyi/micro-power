@@ -23,7 +23,7 @@
 	?>
 	<form action="action/v_login.php" method="post">
 		<label for="user_email">注册邮箱：<input type="text" name="email" id="user_email" size="10"/></label>
-		<label for="user_pass"><br />登录密码：<input type="password" name="pass" id="user_email" size="10"/></label>
+		<label for="user_pass"><br />登录密码：<input type="password" name="pass" id="user_email" size="10"/></label><br />
 		<input type="submit" name="submit" value="用微动力帐号登录" />
 		<input type="hidden" name="submitted" value="true">
 	</form>

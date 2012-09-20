@@ -6,4 +6,11 @@ function is_login()
     }
     return FALSE;
 }
+function is_bound_sina()
+{
+    if(!empty($_SESSION['stoken'])) {
+        return TRUE;
+    }
+    return FALSE;
+}
 ?>

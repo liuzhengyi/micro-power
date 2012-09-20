@@ -12,15 +12,14 @@ session_start();
  * 这样处理不完善，有待改进
 */
 include_once("config.php");	// init $authURL
-include_once("lib/saetv2.ex.class.php");
-// 判断登录状态
-if(!isset($_SESSION['uid'])) {
-	header("Location:".$siteRoot."index.php");
-	exit();
+include_once($webRoot."foundation/status.php");
+if(!is_login()) {
+    header('Location:'.$siteRoot.'index.php');
 }
 include_once("foundation/debug.php");
 include_once("foundation/page.php");
 include_once("foundation/price.php");
+include_once("lib/saetv2.ex.class.php");
 
 $title = "欢迎来到微动力";
 $csfile = array("style/main.css", "style/solo.css");
@@ -50,7 +49,7 @@ global $task_per_page;	// init in config.php
 $per_page = $task_per_page;
 $total_page = ceil($count/$per_page);
 if(isset($_GET['page']) && $_GET['page'] >= 1 && $_GET['page'] <= $total_page) {
-	$page = $_GET['page'];
+	$page = intval($_GET['page']);
 } else {
 	$page = 1;
 }

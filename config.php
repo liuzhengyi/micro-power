@@ -44,6 +44,9 @@ $reg_check = TRUE;
 
 $token_salt = 'catanddog';
 
+// lengths
+$sina_weibo_id_length = 16;
+
 // smtp  设置
 // 除了文件pre_reg.php外，别的地方好像也用不到扫描图片信息，暂时就先放在pre_reg.php中吧。
 ?>

@@ -593,6 +593,26 @@ class SaeTClientV2
 
 		return $this->oauth->get( 'statuses/user_timeline', $params );
 	}
+
+	function user_timeline_ids_by_id( $uid = NULL , $page = 1 , $count = 50 , $since_id = 0, $max_id = 0, $feature = 0, $base_app = 0)
+    {
+        $params = array();
+        $params['uid'] = $uid;
+		if ($since_id) {
+			$this->id_format($since_id);
+			$params['since_id'] = $since_id;
+		}
+		if ($max_id) {
+			$this->id_format($max_id);
+			$params['max_id'] = $max_id;
+		}
+		$params['base_app'] = intval($base_app);
+		$params['feature'] = intval($feature);
+		$params['count'] = intval($count);
+		$params['page'] = intval($page);
+
+        return $this->oauth->get('statuses/user_timeline/ids', $params);
+    }
 	
 	
 	/**
