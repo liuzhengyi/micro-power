@@ -32,7 +32,7 @@ DESCRIBE `user`;
 DROP TABLE IF EXISTS `task`;
 CREATE TABLE `task` (
 	task_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-	owner_id INT UNSIGNED NOT NULL,
+	owner_id INT UNSIGNED NOT NULL, /* ader_id */
 	publisher_id INT UNSIGNED NOT NULL DEFAULT 1,
 	task_type ENUM('follow', 'forward', 'review', 'create'),
     task_sina_uid BIGINT UNSIGNED NOT NULL,
