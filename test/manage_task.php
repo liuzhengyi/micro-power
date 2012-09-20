@@ -17,5 +17,5 @@ require_once($webRoot.'lib/saetv2.ex.class.php');
 // ...
 
 // 选择发布任务方式
-echo "<p><a href=\"choose_weibo.php\">从自己的微博上选择一条微博。</a><br /><a href=\"create_weibo\">编写一条微博作为任务并发布到微博上。</a></p>";
+echo "<p><a href=\"choose_weibo.php\">从自己的微博上选择一条微博。</a><br /><a href=\"create_weibo.php\">编写一条微博作为任务并发布到微博上。</a></p>";
 ?>

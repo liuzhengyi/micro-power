@@ -29,13 +29,14 @@ if(isset($_POST['weibo_id']) && is_numeric($_POST['weibo_id']) && $sina_weibo_id
         exit();
     }
 ?>
-<form action="action/post_task.php" method="post" ><legend>第二步：请设置要发布的任务数量和任务原始佣金。</legend>
+<form action="<?php echo $siteRoot?>action/post_task.php" method="post" ><legend>第二步：请设置要发布的任务数量和任务原始佣金。</legend>
 <!-- 数量， 原始佣金，-->
 <p>任务微博</p>
 <h3><?php echo $text;?></h3>
 <hr />
 <label for="task_amount">任务数量：<input type="text" name="task_amount" id="task_amount"></label><br />
-<label for="task_base_price">任务基本价：<input type="text" name="task_base_price" id="task_base_price"></label><br />
+<label for="base_price">任务基本价：<input type="text" name="base_price" id="base_price"></label><br />
+<input type="hidden" name="weibo_id" id="weibo_id" value="<?php echo $real_wid;?>" />
 <input type="submit" name="submit" value="发布任务" />
 </form>
 <?php
