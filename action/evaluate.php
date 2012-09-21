@@ -86,7 +86,7 @@ $slevel = 4;
 include_once($webRoot.'lib/dbo.class.php');
 include_once($dbConfFile);
 $dbo = new dbex($dbServs);
-$sql = "update user set sina_level = $slevel where user_id = {$_SESSION['uid']} limit 1";
+$sql = "update user set level = $slevel where user_id = {$_SESSION['uid']} limit 1";
 $res = $dbo->exeUpdate($sql);
 $_SESSION['slevel'] = $slevel;
 header("Location:".$_SERVER['HTTP_REFERER']);

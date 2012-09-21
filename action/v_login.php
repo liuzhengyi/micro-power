@@ -23,7 +23,7 @@ include_once($webRoot."foundation/check.func.php");
 		$dbo = new dbex($dbServs);
         $e = $dbo->real_escape_string($e);
         $ency_p = md5($p);
-		$sql = "select user_id, nick_name, sina_uid, sina_level from user where email = '$e' and pass = sha1('$ency_p') limit 1";
+		$sql = "select user_id, nick_name, sina_uid, level from user where email = '$e' and pass = sha1('$ency_p') limit 1";
 		$res = $dbo->query($sql);
 		echo $sql;
 		if(1 != $res->num_rows) {	// 邮箱与密码不匹配
@@ -35,7 +35,7 @@ include_once($webRoot."foundation/check.func.php");
 		$_SESSION['uid'] = $row['user_id'];
 		$_SESSION['name'] = $row['nick_name'];
 		$_SESSION['sid']  = empty($row['sina_uid'])? NULL : $row['sina_uid'];
-		$_SESSION['slevel']  = $row['sina_level'];
+		$_SESSION['slevel']  = $row['level'];
 		$dbo->close();
 		header('Location:'.$siteRoot.'my.php');
 		// 后台继续运行，获取用户的已关注用户列表，写入SESSION

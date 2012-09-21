@@ -114,13 +114,13 @@ if ($token) {
         }
 	}
 	// 写session
-	$sql = "select user_id, sina_level from user where sina_uid = $sid limit 1";
+	$sql = "select user_id, level from user where sina_uid = $sid limit 1";
 	$res = $dbo->getRow($sql);
 	$_SESSION['uid'] = $res['user_id'];
 	$_SESSION['sid'] = $sid;
 	$_SESSION['name'] = $name;
 	$_SESSION['stoken'] = $token['access_token'];
-	$_SESSION['slevel'] = $res['sina_level'];
+	$_SESSION['slevel'] = $res['level'];
     $_SESSION['is_bind_weibo'] = TRUE;
 	header("Location:my.php");
 	// 后台获取用户的已关注用户列表，写入SESSION
