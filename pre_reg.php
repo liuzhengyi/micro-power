@@ -2,8 +2,7 @@
 session_start();
 /* reg.php
  * 负责显示和处理注册微动力的页面和请求
- * 其中涉及一些检测函数，都还没有具体完成
- * 还缺少验证码和发送验证邮件等功能
+ * 其中涉及一些检测函数，还需要进一步完善
  */
 require_once($webRoot."config.php");
 require_once($webRoot."foundation/check.func.php");

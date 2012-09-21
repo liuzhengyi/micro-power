@@ -103,7 +103,7 @@ if ($token) {
 		$name = $row['n'];
         $stoken = $row['st'];
         if($token['access_token'] !== $stoken) {
-            // 数据库中该用户的sina_token更新了，写入数据库
+            // 数据库中该用户的sina_token过期了，更新数据库
             $sql = "update user set sina_token = '{$token['access_token']}', token_update_at=now(), token_expire_in='{$token['expires_in']}' where sina_uid = '$sid' limit 1";
             $sql_res = $dbo->exeUpdate($sql);
             if(1 !== $sql_res) {

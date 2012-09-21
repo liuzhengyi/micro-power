@@ -107,7 +107,7 @@ ini_set("display_errors", 1);
         var_dump($ids);
     }
 
-    // 获取用户的粉丝列表uid
+    // 获取用户的粉丝uid列表
     // api friendships/followers/ids
     // sae 接口 followers_ids_by_id($uid, $cursor=0, $count=50);
     // $count 一次返回的数据条数，最多为5000 总的返回数据最多也是5000，最近五千，越晚越靠前
@@ -281,6 +281,10 @@ foreach($uids as $uid) {
 echo '</table>';
 */
 
+// ========================================
+// 从这里开始调用上面封装的函数
+// ========================================
+
 // 获取当前用户最新转发的微博
 //get_repost_by_me($c);
 
@@ -319,8 +323,8 @@ $sid = 2172508334;
 //my_api_limit($c);
 
 // 发布一条微博
-$msg = '风真大！';
-post_message($c, $msg);
+//$msg = '风真大！';
+//post_message($c, $msg);
 ?>
 <?php
 // 一些数据：
