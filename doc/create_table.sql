@@ -147,14 +147,18 @@ CREATE TABLE `do_task` (
 	user_id INT UNSIGNED NOT NULL,
     status TINYINT UNSIGNED NOT NULL,
     -- status 用数字代替enum值，已有对应关系如下：
-    -- 1-未完成(正常进行中)，2-成功完成，3-失败，4-屏蔽
-    -- 11-完成(一切正常)， 12-完成(有待审核)，13-完成(反悔)
+    -- 1-未完成(正常进行中)
+    -- 11-完成(一切正常)， 12-完成(有待审核)，13-完成(反悔) <- 此处有待商榷
     -- 21-屏蔽
     -- 31-失败
-	-- status ENUM('unfinish', 'finish', 'fail', 'retract', 'hide'),
-    /* 分别对应：尚未完成，成功完成，失败或屏蔽，反悔，屏蔽*/
+    task_type TINYINT UNSIGNED NOT NULL,    -- task表中的该字段
+    -- 1-新浪转发-sina_forward，2-新浪关注-sina_follow，3-新浪评论-sina_review，4-新浪原创-sina_create
+    -- 11-腾讯转发-qq_forward，12-腾讯关注-qq_follow，13-腾讯评论-qq_review，4-腾讯原创-qq_create
+    owner_name varchar(60) NOT NULL;
+    income INT UNSIGNED NOT NULL;
     /* repost_mid 仅针对转发任务，为转发产生的微博的mid，十进制 */
-    repost_mid BIGINT UNSIGNED DEFAULT NULL,    --  此字段是为爬虫验证转发任务准备的，放在这里并不合适，暂时如此
+    --  此字段是为爬虫验证转发任务准备的，放在这里并不合适，暂时如此
+    repost_mid BIGINT UNSIGNED DEFAULT NULL,    
     time DATETIME NOT NULL,
 	PRIMARY KEY(do_id),
 	INDEX (task_id),

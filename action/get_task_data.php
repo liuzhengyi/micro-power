@@ -1,5 +1,11 @@
 <?php
 session_start();
+/*
+ *  本文件负责完善task表，因为填充测试数据时并没有填充完整的数据，
+ *  
+ *  新的测试数据已经比较完整了，所以不许要运行此文件了。
+ *  此文件暂不升级了
+ */
 /* get_task_avatar.php */
 include_once('../config.php');
 include_once($webRoot.'lib/saetv2.ex.class.php');

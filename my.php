@@ -77,7 +77,7 @@ if(is_login()) {    // 已登录
                 $page = 1;
             }
             // 提取当前用户做过的任务的 任务id，任务屏显名称，任务佣金，任务类型 , 完成时间 按照时间倒序
-            $sql = "select do_task.task_id, do_task.time, task_type, task_offer from do_task join task using(task_id) where do_task.user_id = {$_SESSION['uid']} and do_task.status = 11 order by do_id desc";
+            $sql = "select task_id, task_type, owner_name, income, time from do_task where user_id = {$_SESSION['uid']} and do_task.status = 11 order by do_id desc";
             $start = ($page-1)*$per_page;
             $sql_res = $dbo->getPage($sql, $start, $per_page);
         break;
@@ -139,11 +139,12 @@ include("uiparts/docheader.php");
 	<?php } else { // 我的动态，默认 ?>
     <?php
             foreach($sql_res as $row) {
-                $real_price = real_price($row['task_offer'], $_SESSION['slevel']);
-                if('follow' == $row['task_type']) {
-                    echo '<p class="no_vertical_margin">你关注了 '.$row['task_screen_name'].' 的新浪微博，获得 '.$real_price.' 元。</p>';
-                } else if ('forward' == $row['task_type']) {
-                    echo '<p class="no_vertical_margin">你转发了 '.$row['task_screen_name'].'的微博，收入 '.$real_price.' 元。</p>';
+            //$sql = "select task_id, task_type, owner_name, income, time from do_task where user_id = {$_SESSION['uid']} and do_task.status = 11 order by do_id desc";
+                $real_price = to_screen_price($row['income']);
+                if(2 == $row['task_type']) {
+                    echo '<p class="no_vertical_margin">你关注了 '.$row['owner_name'].' 的新浪微博，获得 '.$real_price.' 元。</p>';
+                } else if (1 == $row['task_type']) {
+                    echo '<p class="no_vertical_margin">你转发了 '.$row['owner_name'].'的微博，收入 '.$real_price.' 元。</p>';
                 }
                 echo '<br /><span class="no_vertical_margin">on: '.$row['time'].'</span><hr />';
             }

@@ -57,7 +57,7 @@ if(isset($_GET['id'])) {
 	}
 	// 已经更新了task中的数据，现在做任务
 	// 先获取任务信息
-	$sql = "select sina_uid, task_offer from task join task_info_sina_follow using(task_id) where task_id = $task_id";
+	$sql = "select sina_uid, task_offer, screen_name from task join task_info_sina_follow using(task_id) where task_id = $task_id";
 	$sql_res = $dbo->getRow($sql);
 	if(!$sql_res) {
 		echo '读数据库出错，FILE: '.__FILE__.'; LINE: '.__LINE__.';SQL: '.$sql;
@@ -66,6 +66,7 @@ if(isset($_GET['id'])) {
 	}
 	$sina_uid = $sql_res['sina_uid'];
 	$task_offer = $sql_res['task_offer'];
+    $task_owner_name = $sql_res['screen_name'];
 	$task_res = $c->follow_by_id($sina_uid);
 //	if_weiboapi_fail($task_res, __FILE__, __LINE__);
 //  此处不应使用if_weiboapi_fail(),因为它对调用失败的处理只是简单的输出提示，不满足此处处理的需要。
@@ -83,10 +84,10 @@ if(isset($_GET['id'])) {
             delay_jump(3, $msg, $to_url, $to_name);
         }
 	}
-	// 做成功了，写数据库，写SESSION    对应do_task status 2 正常完成
+	// 做成功了，写数据库，写SESSION    对应do_task status 11 正常完成
 	// 写do_task表
     $money = sql_price($task_offer, $_SESSION['slevel']);
-	$sql = "insert into do_task values(NULL, $task_id, {$_SESSION['uid']}, '2', NULL, now())";
+	$sql = "insert do_task (task_id, user_id, status, task_type, owner_name, income, repost_mid, time)values($task_id, {$_SESSION['uid']}, 11, 2, '$task_owner_name', '$money', NULL, now())";
 	$sql_num = $dbo->exeUpdate($sql);
 	if(1 != $sql_num) {
 		$dbo->close();

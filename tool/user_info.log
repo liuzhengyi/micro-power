@@ -11021,3 +11021,101 @@ id:	error_code:21327	error:expired_token	235
 当前token耗尽api，无法获取粉丝id列表
 id:	error_code:21327	error:expired_token	235
 当前token耗尽api，无法获取粉丝id列表
+api_left[149, 999].	id_num: 0	one record in. at:13-54-50 Sep 24
+api_left[146, 996].	id_num: 1	one record in. at:13-54-52 Sep 24
+api_left[143, 993].	id_num: 2	one record in. at:13-54-54 Sep 24
+api_left[140, 990].	id_num: 3	one record in. at:13-54-56 Sep 24
+api_left[137, 987].	id_num: 4	one record in. at:13-54-58 Sep 24
+api_left[134, 984].	id_num: 5	one record in. at:13-55-00 Sep 24
+api_left[131, 981].	id_num: 6	one record in. at:13-55-01 Sep 24
+api_left[128, 978].	id_num: 7	id:	error_code:20003	error:User does not exists!	136
+one record in. at:13-55-03 Sep 24
+api_left[125, 975].	id_num: 8	one record in. at:13-55-05 Sep 24
+api_left[122, 972].	id_num: 9	one record in. at:13-55-07 Sep 24
+api_left[119, 969].	id_num: 10	one record in. at:13-55-09 Sep 24
+api_left[116, 966].	id_num: 11	one record in. at:13-55-10 Sep 24
+api_left[113, 963].	id_num: 12	one record in. at:13-55-12 Sep 24
+api_left[110, 960].	id_num: 14	one record in. at:13-55-14 Sep 24
+api_left[107, 957].	id_num: 15	one record in. at:13-55-16 Sep 24
+api_left[104, 954].	id_num: 16	one record in. at:13-55-18 Sep 24
+api_left[101, 951].	id_num: 17	one record in. at:13-55-20 Sep 24
+api_left[98, 948].	id_num: 18	one record in. at:13-55-22 Sep 24
+api_left[95, 945].	id_num: 19	one record in. at:13-55-24 Sep 24
+api_left[92, 942].	id_num: 20	one record in. at:13-55-26 Sep 24
+api_left[89, 939].	id_num: 21	id:	error_code:20003	error:User does not exists!	136
+one record in. at:13-55-27 Sep 24
+api_left[86, 936].	id_num: 22	one record in. at:13-55-29 Sep 24
+api_left[83, 933].	id_num: 23	one record in. at:13-55-31 Sep 24
+api_left[80, 930].	id_num: 24	one record in. at:13-55-33 Sep 24
+api_left[77, 927].	id_num: 25	one record in. at:13-55-35 Sep 24
+api_left[74, 924].	id_num: 26	one record in. at:13-55-37 Sep 24
+api_left[71, 921].	id_num: 27	one record in. at:13-55-38 Sep 24
+api_left[68, 918].	id_num: 28	one record in. at:13-55-40 Sep 24
+api_left[65, 915].	id_num: 29	one record in. at:13-55-42 Sep 24
+api_left[62, 912].	id_num: 30	one record in. at:13-55-44 Sep 24
+api_left[59, 909].	id_num: 31	one record in. at:13-55-46 Sep 24
+api_left[56, 906].	id_num: 32	one record in. at:13-55-48 Sep 24
+api_left[53, 903].	id_num: 33	one record in. at:13-55-50 Sep 24
+api_left[50, 900].	id_num: 34	one record in. at:13-55-51 Sep 24
+api_left[47, 897].	id_num: 35	one record in. at:13-55-53 Sep 24
+api_left[44, 894].	id_num: 36	one record in. at:13-55-55 Sep 24
+api_left[41, 891].	id_num: 37	one record in. at:13-55-57 Sep 24
+api_left[38, 888].	id_num: 38	one record in. at:13-55-58 Sep 24
+api_left[35, 885].	id_num: 39	one record in. at:13-56-00 Sep 24
+api_left[32, 882].	id_num: 40	one record in. at:13-56-02 Sep 24
+api_left[29, 879].	id_num: 41	one record in. at:13-56-04 Sep 24
+api_left[26, 876].	id_num: 42	one record in. at:13-56-06 Sep 24
+api_left[23, 873].	id_num: 43	one record in. at:13-56-08 Sep 24
+api_left[20, 870].	id_num: 44	one record in. at:13-56-10 Sep 24
+api_left[17, 867].	id_num: 45	one record in. at:13-56-12 Sep 24
+api_left[14, 864].	id_num: 46	one record in. at:13-56-14 Sep 24
+api_left[11, 861].	id_num: 47	one record in. at:13-56-16 Sep 24
+api_left[8, 858].	id_num: 48	one record in. at:13-56-18 Sep 24
+api_left[147, 855].	id_num: 49	one record in. at:13-56-20 Sep 24
+api_left[144, 852].	id_num: 50	one record in. at:13-56-22 Sep 24
+api_left[141, 849].	id_num: 51	one record in. at:13-56-23 Sep 24
+api_left[138, 846].	id_num: 52	one record in. at:13-56-25 Sep 24
+api_left[135, 843].	id_num: 53	one record in. at:13-56-27 Sep 24
+api_left[132, 840].	id_num: 54	one record in. at:13-56-29 Sep 24
+api_left[129, 837].	id_num: 55	one record in. at:13-56-30 Sep 24
+api_left[126, 834].	id_num: 56	one record in. at:13-56-32 Sep 24
+api_left[123, 831].	id_num: 57	one record in. at:13-56-34 Sep 24
+api_left[120, 828].	id_num: 58	one record in. at:13-56-36 Sep 24
+api_left[117, 825].	id_num: 59	one record in. at:13-56-37 Sep 24
+api_left[114, 822].	id_num: 60	one record in. at:13-56-39 Sep 24
+api_left[111, 819].	id_num: 61	one record in. at:13-56-41 Sep 24
+api_left[108, 816].	id_num: 62	one record in. at:13-56-43 Sep 24
+api_left[105, 813].	id_num: 63	one record in. at:13-56-45 Sep 24
+api_left[102, 810].	id_num: 64	one record in. at:13-56-47 Sep 24
+api_left[99, 807].	id_num: 65	one record in. at:13-56-49 Sep 24
+api_left[96, 804].	id_num: 66	one record in. at:13-56-51 Sep 24
+api_left[93, 801].	id_num: 67	one record in. at:13-56-52 Sep 24
+api_left[90, 798].	id_num: 68	one record in. at:13-56-54 Sep 24
+api_left[87, 795].	id_num: 69	one record in. at:13-56-56 Sep 24
+api_left[84, 792].	id_num: 70	one record in. at:13-56-58 Sep 24
+api_left[81, 789].	id_num: 71	one record in. at:13-57-00 Sep 24
+api_left[78, 786].	id_num: 72	one record in. at:13-57-01 Sep 24
+api_left[75, 783].	id_num: 73	one record in. at:13-57-03 Sep 24
+api_left[72, 780].	id_num: 74	one record in. at:13-57-05 Sep 24
+api_left[69, 777].	id_num: 75	one record in. at:13-57-07 Sep 24
+api_left[66, 774].	id_num: 76	one record in. at:13-57-09 Sep 24
+api_left[63, 771].	id_num: 77	one record in. at:13-57-11 Sep 24
+api_left[60, 768].	id_num: 78	one record in. at:13-57-13 Sep 24
+api_left[57, 765].	id_num: 79	one record in. at:13-57-15 Sep 24
+api_left[54, 762].	id_num: 80	id:	error_code:20003	error:User does not exists!	136
+one record in. at:13-57-16 Sep 24
+api_left[51, 759].	id_num: 81	one record in. at:13-57-18 Sep 24
+api_left[48, 756].	id_num: 82	one record in. at:13-57-20 Sep 24
+api_left[45, 753].	id_num: 83	one record in. at:13-57-22 Sep 24
+api_left[42, 750].	id_num: 84	one record in. at:13-57-24 Sep 24
+api_left[39, 747].	id_num: 85	one record in. at:13-57-26 Sep 24
+api_left[36, 744].	id_num: 86	one record in. at:13-57-27 Sep 24
+api_left[33, 741].	id_num: 87	one record in. at:13-57-29 Sep 24
+api_left[30, 738].	id_num: 88	one record in. at:13-57-31 Sep 24
+api_left[27, 735].	id_num: 89	one record in. at:13-57-33 Sep 24
+api_left[24, 732].	id_num: 90	one record in. at:13-57-35 Sep 24
+api_left[21, 729].	id_num: 91	one record in. at:13-57-36 Sep 24
+api_left[18, 726].	id_num: 92	one record in. at:13-57-38 Sep 24
+api_left[15, 723].	id_num: 93	one record in. at:13-57-40 Sep 24
+api_left[12, 720].	id_num: 94	one record in. at:13-57-42 Sep 24
+api_left[9, 717].	id_num: 95	no avilable token, exit.

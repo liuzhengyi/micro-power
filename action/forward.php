@@ -53,7 +53,7 @@ if(isset($_GET['id'])) {
 	}
     // 已经更新了task中的数据，现在做任务
     // 先获取任务信息
-	$sql = "select sina_wid, task_offer from task join task_info_sina_forward using(task_id) where task_id = $task_id";
+	$sql = "select sina_wid, task_offer, screen_name from task join task_info_sina_forward using(task_id) where task_id = $task_id";
 	$sql_res = $dbo->getRow($sql);
     // error control need upgrade
 	if(!$sql_res) {
@@ -63,6 +63,7 @@ if(isset($_GET['id'])) {
 	}
 	$sina_wid = $sql_res['sina_wid'];
 	$task_offer = $sql_res['task_offer'];
+    $task_owner_name = $sql_res['screen_name'];
 	$task_res = $c->repost($sina_wid);
 //	if_weiboapi_fail($task_res, __FILE__, __LINE__);
 // 没做成功，回滚task表中task_finish_amount数据
@@ -76,10 +77,10 @@ if(isset($_GET['id'])) {
 	}
 // 做成功了，写数据库，写SESSION
 // 写do_task表
-    $money = sql_price($task_offer, $_SESSION['slevel']);
-//	$sql = "insert do_task (task_id, user_id, status, repost_mid, time)values($task_id, {$_SESSION['uid']}, 'finish', {$task_res['retweeted_status']['mid']}, now())";
+    $money = sql_price($task_offer, $_SESSION['slevel']);   // status - 11
+//	$sql = "insert do_task (task_id, user_id, status, repost_mid, time)values($task_id, {$_SESSION['uid']}, '11', {$task_res['retweeted_status']['mid']}, now())";
 //  此处应注意，retweeted_status['mid']是原微博的mid，而非转发产生的mid
-	$sql = "insert do_task (task_id, user_id, status, repost_mid, time)values($task_id, {$_SESSION['uid']}, 'finish', {$task_res['mid']}, now())";
+	$sql = "insert do_task (task_id, user_id, status, task_type, owner_name, income, repost_mid, time)values($task_id, {$_SESSION['uid']}, 11, 1, '$task_owner_name', '$money', '{$task_res['mid']}', now())";
 	$sql_num = $dbo->exeUpdate($sql);
 	if(1 != $sql_num) {
 		echo 'debug. 写数据库失败。file: '.__FILE__.'; line: '.__LINE__;

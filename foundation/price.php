@@ -27,7 +27,7 @@
     }
 
     /* 配置任务页面填入的基础价格(单位为角) 转换为 数据库中存储的基础价格(单位为厘) */
-    function config_to_db_price($money)
+    function config_to_db_price($money) // 注意是，配置任务页面，不是配置页面
     {
         return $money*100;
     }
