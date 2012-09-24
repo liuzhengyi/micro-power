@@ -26,16 +26,15 @@ if(isset($_GET['id'])) {
     $c = new SaeTClientV2( WB_AKEY, WB_SKEY, $_SESSION['stoken']);
 	// 先尝试更新task表中task_finish_amount值，若更新成功则做任务，若任务失败，再回滚数据。未使用事务。
 	$dbo = new dbex($dbServs);
-    if(isset($_GET['type']) && 'hide'==$_GET['type']) { // 屏蔽此任务
-        $sql = "insert into do_task(task_id, user_id, status, time) values($task_id, {$_SESSION['uid']}, 'hide', now())";
+    if(isset($_GET['type']) && 'hide'==$_GET['type']) { // 屏蔽此任务 status-21
+        $sql = "insert into do_task(task_id, user_id, status, time) values($task_id, {$_SESSION['uid']}, '21', now())";
         $sql_res = $dbo->exeUpdate($sql);
         if(1 !== $sql_res) {
             $msg = '屏蔽失败，sql:['.$sql.']</p>';
         } else {
             $msg = '屏蔽成功';
         }
-        $to_url = $_SERVER['HTTP_REFERER'];
-        $to_name = '任务列表';
+        $to_url = $_SERVER['HTTP_REFERER']; $to_name = '任务列表';
         delay_jump(3, $msg, $to_url, $to_name);
         /*  这样好像不管用. but why?
         sleep(1);
@@ -58,16 +57,16 @@ if(isset($_GET['id'])) {
 	}
 	// 已经更新了task中的数据，现在做任务
 	// 先获取任务信息
-	$sql = "select task_sina_uid, task_offer from task where task_id = $task_id";
+	$sql = "select sina_uid, task_offer from task join task_info_sina_follow using(task_id) where task_id = $task_id";
 	$sql_res = $dbo->getRow($sql);
 	if(!$sql_res) {
 		echo '读数据库出错，FILE: '.__FILE__.'; LINE: '.__LINE__.';SQL: '.$sql;
 		$dbo->close();
 		exit();
 	}
-	$task_sina_uid = $sql_res['task_sina_uid'];
+	$sina_uid = $sql_res['sina_uid'];
 	$task_offer = $sql_res['task_offer'];
-	$task_res = $c->follow_by_id($task_sina_uid);
+	$task_res = $c->follow_by_id($sina_uid);
 //	if_weiboapi_fail($task_res, __FILE__, __LINE__);
 //  此处不应使用if_weiboapi_fail(),因为它对调用失败的处理只是简单的输出提示，不满足此处处理的需要。
 	if(isset($task_res['error_code'])) { // 没做成功，回滚task表中task_finish_amount数据
@@ -84,10 +83,10 @@ if(isset($_GET['id'])) {
             delay_jump(3, $msg, $to_url, $to_name);
         }
 	}
-	// 做成功了，写数据库，写SESSION
+	// 做成功了，写数据库，写SESSION    对应do_task status 2 正常完成
 	// 写do_task表
     $money = sql_price($task_offer, $_SESSION['slevel']);
-	$sql = "insert into do_task values(NULL, $task_id, {$_SESSION['uid']}, 'finish', NULL, now())";
+	$sql = "insert into do_task values(NULL, $task_id, {$_SESSION['uid']}, '2', NULL, now())";
 	$sql_num = $dbo->exeUpdate($sql);
 	if(1 != $sql_num) {
 		$dbo->close();
@@ -108,7 +107,7 @@ if(isset($_GET['id'])) {
 	}
 	// 写数据成功，释放数据库连接
 	$dbo->close();
-	$_SESSION['followed_id'][] = $task_sina_uid;
+	$_SESSION['followed_id'][] = $sina_uid;
     $msg = '恭喜！您成功完成了XX任务，获利XX元。';
     $to_url = $_SERVER['HTTP_REFERER'];
     $to_name = '任务列表';

@@ -4,15 +4,20 @@ CREATE TABLE `user` (
 	email VARCHAR(50) ,
 	nick_name VARCHAR(50) NOT NULL,
 	pass CHAR(40) ,
-    role ENUM('user', 'ader', 'master', 'other') DEFAULT 'user',
-    /* 直接在微动力首页上用微博登录的用户默认为user，ader注册需要邀请链接 */
+--    role ENUM('user', 'ader', 'master', 'other') DEFAULT 'user',
+    role TINYINT UNSIGNED,  -- 使用数字映射用户角色
+    -- 已知映射如下：
+    -- 1-做任务赚钱的普通user，2-广告主，3-管理员 ...
     status ENUM('normal', 'verified', 'examine', 'forbid') DEFAULT 'normal',
-    /* 分别对应：普通，已认证，审核，封禁 */
+    -- 同上，已知对应关系如下：
+    -- 1-正常，未认证，2=已认证，
+    -- 11-审核中，12-封禁
+    -- 默认为1
 /*	sina_uid BIGINT UNSIGNED, */
 /*	sina_token VARCHAR(50), */
 /*  token_update_at DATETIME, */
 /*    token_expire_in INT UNSIGNED, */
-	level TINYINT default 3,   /*欲更改为level*/ /* 此level由微动力评定user和ader使用不同的评定标准 */
+	level TINYINT default 1,  /* 此level由微动力评定，user和ader使用不同的评定标准 */
 /*    sina_location VARCHAR(30),      /* 此location有sina提供 */
 /*    sina_description VARCHAR(220),  /* form sina */
 	pro TINYINT UNSIGNED DEFAULT 0, /* 好评，*/
@@ -25,7 +30,7 @@ CREATE TABLE `user` (
 /*	alipay_id VARCHAR(50) DEFAULT NULL,     /* 支付宝id */
 /*	alipay_name VARCHAR(50) DEFAULT NULL,   /* 支付宝用户名 */
 /*    alipay_token VARCHAR(50) DEFAULT NULL,  /* 支付宝token */
-    cell_phone CHAR(11),    /* 可用于实名认证，ader注册必填 */
+    cell_phone CHAR(11) DEFAULT NULL,    /* 可用于实名认证。ader注册必填? */
 	reg_time DATETIME NOT NULL,
 	PRIMARY KEY(user_id),
 	UNIQUE (email),
@@ -36,18 +41,18 @@ CREATE TABLE `user` (
 /* DESCRIBE `user`; */
 
 DROP TABLE IF EXISTS `user_info_sina`;
-CREATE TABLE `user_info_sina` (
+CREATE TABLE `user_info_sina` (     -- 用户绑定新浪微博或使用新浪微博注册时将信息写入此表
     info_id INT UNSIGNED AUTO_INCREMENT NOT NULL,
-    user_id INT UNSIGNED NOT NULL,
-    sina_uid BIGINT UNSIGNED,
+    user_id INT UNSIGNED NOT NULL,  -- 用户微动力id
+    sina_uid BIGINT UNSIGNED,       -- 用户新浪uid
     sina_token VARCHAR(50),
-    token_update_at DATETIME,
+    token_update_at DATETIME,       -- 此两项是给使用api的爬虫使用的，可以提前判断用户的token是否还有效
     token_expire_in INT UNSIGNED,
-    sina_level TINYINT DEFAULT 3,
-    sina_screen_name VARCHAR(60),
-    sina_location VARCHAR(30),
-    sina_description VARCHAR(220),
-    bind_time DATETIME NOT NULL,
+    sina_level TINYINT DEFAULT 3,   -- 新浪微博等级， 微动力评定，评分公式孕育中
+    sina_screen_name VARCHAR(60),   -- 用户新浪屏显名称
+    sina_location VARCHAR(30),      -- 用户新浪location
+    sina_description VARCHAR(220),  -- 用户新浪description
+    bind_time DATETIME NOT NULL,    -- 用户绑定新浪微博的时间
     PRIMARY KEY(info_id),
     UNIQUE (user_id),
     UNIQUE (sina_uid),
@@ -75,43 +80,84 @@ CREATE TABLE `task` (
 	task_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	owner_id INT UNSIGNED NOT NULL, /* ader_id */
 	publisher_id INT UNSIGNED NOT NULL DEFAULT 1,
-	task_type ENUM('follow', 'forward', 'review', 'create'),
-    task_sina_uid BIGINT UNSIGNED NOT NULL,
-    task_screen_name VARCHAR(60),
+--	task_type ENUM('follow', 'forward', 'review', 'create'),    -- change --
+    task_type TINYINT UNSIGNED, -- 用数字映射任务类型，相当于预留了二百多个任务类型
+    -- 目前已有的对应关系：
+    -- 1-新浪转发-sina_forward，2-新浪关注-sina_follow，3-新浪评论-sina_review，4-新浪原创-sina_create
+    -- 11-腾讯转发-qq_forward，12-腾讯关注-qq_follow，13-腾讯评论-qq_review，4-腾讯原创-qq_create
 	task_offer INT UNSIGNED DEFAULT 500,
 	/* 原始佣金 以 厘 为单位 默认为500厘 并非用户的真正佣金 */
 	task_amount INT UNSIGNED NOT NULL,
 	task_finish_amount INT UNSIGNED NOT NULL DEFAULT 0,
-	task_status ENUM('normal', 'finished', 'closed', 'examine') DEFAULT 'normal',
-    /* 分别对应:正常，结束，关闭，审核 */
-    /* task_icon_url 其实是user的小头像*/
-    task_icon_url VARCHAR(80) DEFAULT NULL,
-    /* task_location是关注任务特有的 */
-    task_location VARCHAR(60),
-    /* 对于关注任务，task_icon是大图标， 对于转发任务task_icon是小图标*/
-    /* 下面 4 列是转发任务特有的 */
-	task_sina_wid BIGINT UNSIGNED,
-    task_thumbnail_pic_url VARCHAR(80), /* 微博配图 */
-    task_bmiddle_pic_url VARCHAR(80),
-    task_text VARCHAR(420),
-
+    task_status TINYINT UNSIGNED DEFAULT 1, -- 同task_type，用数字取代之前的enum类型，留下更多可扩展空间
+    -- 目前已有的对应关系：
+    -- 1-正常进行中，2-正常结束，
+    -- 11-非正常关闭，12-审核中
+    -- 默认1-正常
 	PRIMARY KEY (task_id),
 	INDEX (task_type)
 );
-/*DESCRIBE `task`; */
+-- DESCRIBE `task`;
+
+DROP TABLE IF EXISTS `task_info_sina_forward`;
+CREATE TABLE `task_info_sina_forward` (
+    info_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    task_id INT UNSIGNED NOT NULL,
+    sina_uid BIGINT UNSIGNED NOT NULL, -- 任务中微博的主人的新浪UID
+    sina_wid BIGINT UNSIGNED,      -- 任务微博的微博id
+    text VARCHAR(420),             -- 任务微博内容
+    screen_name VARCHAR(60),           -- 任务中微博的主人的新浪屏显名称
+    location VARCHAR(25),              -- 任务中微博的主人的所在地
+    user_description VARCHAR(220) DEFAULT NULL,    --  用户一句话介绍，新浪规定70字以内
+    profile_image_url VARCHAR(80) DEFAULT NULL,    -- 微博主人小头像
+    thumbnail_pic_url VARCHAR(80), -- 微博配图 微缩图
+    bmiddle_pic_url VARCHAR(80),   -- 微博配图 中等大小
+    original_pic_url VARCHAR(80),  -- 微博配图 原始图片地址
+    PRIMARY KEY(info_id),
+    UNIQUE (task_id),
+    INDEX (sina_uid),
+    INDEX (screen_name)
+);
+-- DESCRIBE `task_info_sina_forward`;
+
+DROP TABLE IF EXISTS `task_info_sina_follow`;
+CREATE TABLE `task_info_sina_follow` (
+    info_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+    task_id INT UNSIGNED NOT NULL,
+    sina_uid BIGINT UNSIGNED NOT NULL, --  任务中的新浪UID
+    screen_name VARCHAR(60),           --  任务中的新浪用户名
+    friends_count INT UNSIGNED,        --  用户关注数
+    followers_count INT UNSIGNED,      --  用户粉丝数
+    weibo_count INT UNSIGNED,          --  用户微博数
+    profile_image_url VARCHAR(80) DEFAULT NULL,    -- 用户微博小头像url
+    avatar_large_url varchar(80) DEFAULT NULL,     -- 用户大头像url
+    location varchar(25) DEFAULT NULL,             -- 用户所在地
+    user_description VARCHAR(220) DEFAULT NULL,    -- 用户一句话介绍，新浪规定70字以内
+    PRIMARY KEY(info_id),
+    UNIQUE (task_id),
+    INDEX (screen_name),
+    INDEX (sina_uid)
+);
+-- DESCRIBE `task_info_sina_follow`;
 
 DROP TABLE IF EXISTS `do_task`;
 CREATE TABLE `do_task` (
 	do_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
 	task_id INT UNSIGNED NOT NULL,
 	user_id INT UNSIGNED NOT NULL,
-	status ENUM('unfinish', 'finish', 'fail', 'retract', 'hide'),
+    status TINYINT UNSIGNED NOT NULL,
+    -- status 用数字代替enum值，已有对应关系如下：
+    -- 1-未完成(正常进行中)，2-成功完成，3-失败，4-屏蔽
+    -- 11-完成(一切正常)， 12-完成(有待审核)，13-完成(反悔)
+    -- 21-屏蔽
+    -- 31-失败
+	-- status ENUM('unfinish', 'finish', 'fail', 'retract', 'hide'),
     /* 分别对应：尚未完成，成功完成，失败或屏蔽，反悔，屏蔽*/
     /* repost_mid 仅针对转发任务，为转发产生的微博的mid，十进制 */
-    repost_mid BIGINT UNSIGNED DEFAULT NULL,    -- 此字段放在这里并不太好，暂时如此吧
+    repost_mid BIGINT UNSIGNED DEFAULT NULL,    --  此字段是为爬虫验证转发任务准备的，放在这里并不合适，暂时如此
     time DATETIME NOT NULL,
 	PRIMARY KEY(do_id),
 	INDEX (task_id),
 	INDEX (user_id)
 );
-/*DESCRIBE `do_task`; */
+-- DESCRIBE `do_task`;

@@ -132,4 +132,26 @@ about check_task
         使表变得臃肿。
         同时分离出来的还有user_info_ali表，记录用户绑定的支付宝帐号信息。
     2. 同理，也应该将task表分离
+        准备将task表拆分为
+            task
+            task_info_sina_forward
+                转发微博内容；
+                转发微博配图；
+                微博主人小头像；
+                微博转发次数；
+                微博主人屏显名称；
+                微博发表时间；
+
+            task_info_sina_follow
+                新浪用户uid
+                新浪用户屏显名称；
+                新浪用户小头像；
+                新浪用户大头像；
+                新浪用户location；
+                新浪用户description；
+                新浪用户粉丝数，关注数，微博数；
+
+
+            task_info_qq_forward
+            ...
 

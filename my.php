@@ -35,14 +35,18 @@ if(is_login()) {    // 已登录
 	$dbo = new dbex($dbServs);
 
 	// get query parameter
-	if(isset($_GET['data'])) {
+    // 这段代码好别扭啊，怎么改改？
+	if( isset($_GET['data']) ) {
 		$data = $_GET['data'];
-        if('change' == $data) {
+        if  (   'change' != $data && 'basic' != $data &&
+                'money' != $data && 'action' != $data
+            ) {
             $data = 'action';
         }
 	} else {
 		$data = 'action';
 	}
+
 	switch($data) {
 		case 'change':
 		break;
@@ -63,7 +67,7 @@ if(is_login()) {    // 已登录
 			$reg_time = $res['reg_time'];
         break;
         default:    // case 'action'
-            $sql_count = "select count(1) from do_task where user_id = {$_SESSION['uid']} and status='finish'";
+            $sql_count = "select count(1) from do_task where user_id = {$_SESSION['uid']} and status=11";
             $count = $dbo->getCount($sql_count);
             $per_page = 5;
             $total_page = ceil($count/$per_page);
@@ -73,7 +77,7 @@ if(is_login()) {    // 已登录
                 $page = 1;
             }
             // 提取当前用户做过的任务的 任务id，任务屏显名称，任务佣金，任务类型 , 完成时间 按照时间倒序
-            $sql = "select do_task.task_id, do_task.time, task_screen_name, task_offer, task_type from do_task, task where do_task.user_id={$_SESSION['uid']} and do_task.status = 'finish' and do_task.task_id = task.task_id order by do_id desc ";
+            $sql = "select do_task.task_id, do_task.time, task_type, task_offer from do_task join task using(task_id) where do_task.user_id = {$_SESSION['uid']} and do_task.status = 11 order by do_id desc";
             $start = ($page-1)*$per_page;
             $sql_res = $dbo->getPage($sql, $start, $per_page);
         break;
@@ -94,7 +98,7 @@ include("uiparts/docheader.php");
 			<li><a href="my.php?data=action">我的动态</a></li>
 			<li><a href="my.php?data=basic">基本信息</a></li>
 			<li><a href="my.php?data=money">收支信息</a></li>
-<!--			<li><a href="my.php?data=change">修改信息</a></li>  -->
+			<li><a href="my.php?data=change">修改信息</a></li>
 		</ul>
 	</div> <!-- end of DIV func_column -->
 	<div id="main_content">
@@ -105,7 +109,7 @@ include("uiparts/docheader.php");
 			<li>账户总收益：<?php echo $total_income.' 元。'; ?></li>
 			<li>承接任务数：<?php echo $task_taken; ?> </li>
 			<li>完成任务数：<?php echo $task_finished; ?></li>
-			<li>微博等级：<?php echo $_SESSION['slevel'];echo '<a href="action/evaluate.php" >申请评级</a>'?></li>
+			<li>微动力等级：<?php echo $_SESSION['level'];echo '<a href="action/evaluate.php" >申请评级</a>'?></li>
 		</ul>
 	<?php } else if ('change' == $data){ ?>
 		<h1>修改信息</h1>

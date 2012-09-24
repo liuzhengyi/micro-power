@@ -1,10 +1,15 @@
 	<?php
+    include_once('config.php');
+//    include($webRoot.'lib/saetv2.ex.class.php');
+    $o = new SaeTOAuthV2( WB_AKEY, WB_SKEY);
+    $code_url = $o->getAuthorizeURL( WB_CALLBACK_URL );
 	if(isset($_SESSION['uid'])) {	// 已经登录
 		echo "<p>{$_SESSION['name']}，您好，您已登录。</p>";
 		if(isset($_SESSION['sid'])) {
 			echo "<p>您已绑定新浪微博。</p>";
 		} else {
-			echo "<p>您需要绑定新浪微博才能做任务赚钱</p><a href=\"$authURL\">现在就绑定</a>";
+//			echo "<p>您需要绑定新浪微博才能做任务赚钱</p><a href=\"$authURL\">现在就绑定</a>";
+			echo "<p>您需要绑定新浪微博才能做任务赚钱</p><a href=\"$code_url\">现在就绑定</a>";
 		}
         if(isset($_SESSION['is_bind_weibo']) && $_SESSION['is_bind_weibo']) {
 		    echo '<p>您的微博等级为'.$_SESSION['slevel'].'</p>';
@@ -28,7 +33,7 @@
 		<input type="hidden" name="submitted" value="true">
 	</form>
 	<ul >
-		<li><a href="<?php echo $authURL; ?>">用新浪帐号登录</a></li>
+		<li><a href="<?php echo $code_url; ?>">用新浪帐号登录</a></li>
 		<li><a href="reg.php">注册微动力帐号</a></li>
 	</ul>
 	<?php } ?>

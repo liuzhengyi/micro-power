@@ -10,7 +10,7 @@ ini_set("display_errors", 1);
     include_once($webRoot."lib/dbo.class.php");
     include_once($dbConfFile);
     $dbo = new dbex($dbServs);
-    $stoken = $dbo->getRow('select sina_token as st from user where user_id = 8 limit 1');
+    $stoken = $dbo->getRow('select sina_token as st from user_info_sina where user_id = 8 limit 1');
 	$c = new SaeTClientV2( WB_AKEY, WB_SKEY, $stoken['st']);
 
     // 发布一条微博
@@ -68,8 +68,11 @@ ini_set("display_errors", 1);
             $wid = $v['id'];
             $thumb_pic = $dbo->real_escape_string($v['thumbnail_pic']);
             $middle_pic = $dbo->real_escape_string($v['bmiddle_pic']);
+            $original_pic = $dbo->real_escape_string($v['original_pic']);
             $text = $dbo->real_escape_string($v['text']);
-            echo "insert into task (owner_id, publisher_id, task_type, task_sina_uid, task_screen_name, task_offer, task_amount, task_finish_amount, task_icon_url, task_sina_wid, task_thumbnail_pic_url, task_bmiddle_pic_url, task_text) values (2, 3, 'forward', $sid, '$screen_name', 50, 30, 10, '$profile_image', $wid, '$thumb_pic', '$middle_pic', '$text');</p>";
+            echo "insert into task (owner_id, publisher_id, task_type, task_offer, task_amount, task_finish_amount, task_status) values (2, 3, 1, 500, 300, 10, 1);<br />";
+            echo "insert into task_info_sina_forward (task_id, sina_uid, sina_wid, text, screen_name, location, user_description, profile_image_url, thumbnail_pic_url, bmiddle_pic_url, original_pic_url) values(last_insert_id(), '$sid', '$wid', '$text','$screen_name', NULL, NULL, '$profile_image', '$thumb_pic', '$middle_pic', '$original_pic');<br />";
+            echo '</p>';
         }
         echo '</ul>'; echo '<hr />';
     }
@@ -221,27 +224,27 @@ ini_set("display_errors", 1);
 
     /*
     // 根据screen name获取关注列表
-	$sname = '森女风';
-    $sid = 2172508334;
-	echo '<h2>根据screen_name获取关注列表 name:'.$sname.'</h2>';
-//	$friends = $c->friends_by_name($sname, 0, 50); echo '<ul>';
-	$friends = $c->friends_by_id($sid, 0, 200); echo '<ul>';
-	if_weiboapi_fail($friends,__FILE__, __LINE__);
-	if(isset($friends['error_code'])) {
-		echo '<h3 class="err_msg">error occured: '.$friends['error'].'</h3>';
-	}
-	echo '<ol>';
-	foreach($friends['users'] as $user) {
-//		echo '<li>'.$user['idstr'].' --- '.$user['screen_name'].'</li>';
-        $user_idstr = $dbo->real_escape_string($user['idstr']);
-        $user_screen_name = $dbo->real_escape_string($user['screen_name']);
-        $user_location = $dbo->real_escape_string($user['location']);
-        $user_icon_url = $dbo->real_escape_string($user['avatar_large']);
-		$sql = "INSERT INTO `task` (task_id, owner_id, publisher_id, task_type, task_sina_uid, task_offer, task_amount, task_finish_amount, task_screen_name, task_location, task_icon_url)VALUES (NULL, 1, 1, 'follow', '$user_idstr', 70, 100, 39, '$user_screen_name', '$user_location', '$user_icon_url');";
-        echo "<p>$sql</p>";
-	} echo '</ol><hr />';
-    // 根据screen name获取关注列表
     */
+function get_user_friends_by_name($name, $c, $dbo)
+{
+	echo '<h2>根据sina_uid获取关注列表 uid:'.$sid.'</h2>';
+    $friends = $c->friends_by_name($name, 0, 200);
+    if_weiboapi_fail($friends, __FILE__, __LINE__);
+	foreach($friends['users'] as $user) {
+        $idstr = $dbo->real_escape_string($user['idstr']);
+        $screen_name = $dbo->real_escape_string($user['screen_name']);
+        $friends_count = $dbo->real_escape_string($user['friends_count']);
+        $followers_count = $dbo->real_escape_string($user['followers_count']);
+        $weibo_count = $dbo->real_escape_string($user['statuses_count']);
+        $profile_image_url = $dbo->real_escape_string($user['profile_image_url']);
+        $avatar_large_url = $dbo->real_escape_string($user['avatar_large']);
+        $location = $dbo->real_escape_string($user['location']);
+        $description = $dbo->real_escape_string($user['description']);
+		$sql_basic = "INSERT INTO `task` (owner_id, publisher_id, task_type, task_offer, task_amount, task_finish_amount, task_status )VALUES (1, 1, 2, 700, 100, 39, 1);";
+        $sql_advance = "insert into `task_info_sina_follow` (task_id, sina_uid, screen_name, friends_count, followers_count, weibo_count, profile_image_url, avatar_large_url, location, user_description) values (last_insert_id(), '$idstr', '$screen_name', '$friends_count', '$followers_count', '$weibo_count', '$profile_image_url', '$avatar_large_url', '$location', '$description');";
+        echo "<p>$sql_basic<br />$sql_advance</p>";
+	}
+}
 
 
 /*
@@ -325,6 +328,12 @@ $sid = 2172508334;
 // 发布一条微博
 //$msg = '风真大！';
 //post_message($c, $msg);
+
+
+// 根据user sid 获取用户关注列表
+$sid = 318879995;
+$name = 'ELLE中文网Mok';
+//get_user_friends_by_name($name, $c, $dbo);
 ?>
 <?php
 // 一些数据：
@@ -335,4 +344,5 @@ $sid = 2172508334;
 //  如洗ruxi    --  1974204995
 //  森女风    --  2172508334
 //  孙燕姿  --  1937439635
+//  ELLE中文网Mok   --  318879995
 ?>

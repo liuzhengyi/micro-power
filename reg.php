@@ -9,6 +9,7 @@ require_once($webRoot."config.php");
 require_once($webRoot."foundation/check.func.php");
 require_once($webRoot."lib/dbo.class.php");	// init $dbo
 require_once($webRoot."foundation/status.php");
+require_once($webRoot."foundation/debug.php");
 require_once($dbConfFile); // init $dbServs
 // 判断是否登录
 if(is_login()) {
@@ -58,14 +59,15 @@ if(isset($_POST['submitted'])) {    // 当前页面已提交，现在处理提�
         $ency_p = md5($p1);
     }
 
-    if(empty($_POST['type'])) {
+    if(empty($_POST['role'])) {
         $err_msg[] = '请选择账户类型';
     } else {
-        $t = ('ader' === $_POST['type'])? 'ader' : 'user';
+        $role_type = ('ader' === $_POST['role'])? '2' : '1';    // 数据库里要写数字类型
+        $role = ($role_type == 2)? 'ader' : 'user';             // session中写字符串
     }
 
 	if(empty($err_msg)) {   // 提交的数据没有问题，下面注册并登录
-		$sql = "insert into user (email, nick_name, pass, role, reg_time) values('$e', '$n', sha1('$ency_p'), '$t', now())";
+		$sql = "insert into user (email, nick_name, pass, role, reg_time) values('$e', '$n', sha1('$ency_p'), '$role_type', now())";
 		$num = $dbo->exeUpdate($sql);
 		if(1 != $num) {
 			if(DEBUG) {
@@ -74,14 +76,18 @@ if(isset($_POST['submitted'])) {    // 当前页面已提交，现在处理提�
 				die('<script language="javascript">alert("对不起，出现了一些错误，请稍候");</script>');
 			}
 		} else {
-			$sql = "select user_id from user where email = '$e' limit 1";
+			$sql = "select user_id, level from user where email = '$e' limit 1";
 			$res = $dbo->getRow($sql);
+            // missing error control
 			$_SESSION['uid'] = $res['user_id'];
 			$_SESSION['name'] = $n;
-            $_SESSION['role'] = $t;
-			echo "注册成功...";
-			header("Location:my.php");
-			exit;
+            $_SESSION['role'] = $role;
+            $_SESSION['level'] = $res['level'];
+            $msg = '注册成功...';
+            $to_url = 'my.php';
+            $to_name = '我的主页';
+            $sec = 3;
+            delay_jump($sec, $msg, $to_url, $to_name);
 		}
 	}
 }
@@ -115,7 +121,7 @@ if(isset($_POST['submitted'])) {    // 当前页面已提交，现在处理提�
 		<li><label for="nick_name">您的昵称：<input type="text" name="name" id="nick_name" value="<?php if(isset($n)) {echo $n;}?>" /></label><span class="hint">给自己起个名字吧，用于在页面上显示，2-5个汉字或6到15个字母</span></li>
 		<li><label for="password1">登录密码：<input type="password" name="pass1" id="password1" value="<?php if(isset($p1)){echo $p1;} ?>" /></label><span class="hint">6到16位，要有一定强度哦</span></li>
 		<li><label for="password2">确认密码：<input type="password" name="pass2" id="password2"/></label></li>
-		<li>帐号类型：<label for="type_user"><input type="radio" name="type" id="type_user" value="user" selected="selected" />个人用户</label><label for="type_ader"><input type="radio" name="type" id="type_ader" value="ader">企业用户</label></li>
+		<li>帐号类型：<label for="type_user"><input type="radio" name="role" id="role_user" value="user" selected="selected" />个人用户</label><label for="type_ader"><input type="radio" name="role" id="role_ader" value="ader">企业用户</label></li>
 		<li><input type="submit" name="submit" value="注册帐号" ></li>
 		<li><input type="hidden" name="submitted" value="true" /></li>
 	</ul>

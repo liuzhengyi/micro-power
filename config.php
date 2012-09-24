@@ -8,7 +8,7 @@
 
 // APP KEY & 回调地址
 define( "WB_AKEY" , '1520889573' );
-define( "WB_SKEY" , '38cbaa622f1968a162e2042dc21e4a64' );
+define( "WB_SKEY" , '83c46d912c6eb9e640a861dc903fcb20' );
 //define( "WB_CALLBACK_URL" , 'http://localhost/a/vdongli/callback.php' );
 define( "WB_CALLBACK_URL" , 'http://vdl.viivtech.com/callback.php' );
 
@@ -31,7 +31,7 @@ $siteRoot = "http://vdl.viivtech.com/";
 $dbConfFile = $webRoot."dbConf.php";
 
 
-// 授权地址，为了简化流程，硬编码在此处，当APP KEY 和 回调地址改变时，这里也需要修改。
+// 授权地址，为了简化流程，硬编码在此处，当APP KEY 或/和 回调地址改变时，这里也需要修改。
 $authURL = "https://api.weibo.com/oauth2/authorize?client_id=1520889573&redirect_uri=http%3A%2F%2Fvdl.viivtech.com%2Fcallback.php&response_type=code";
 
 // qq群状态，页脚里的一句话，根据实际情况修改
@@ -39,7 +39,7 @@ $qqgroup_status = "123456789(满) 234567890(满) 345678901(满) 456789012 （加
 // 页头的文档类型声明
 $doctype = '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">';
 $task_per_page = 6;
-$weibo_init_level = 3;
+$weibo_init_level = 3;  /* 此值若更改，请同时更改数据库user_info_sina表中的相应默认值 */
 $reg_check = TRUE;
 
 $token_salt = 'catanddog';

@@ -98,6 +98,11 @@ class dbex {
 		return $result[0];
 	}
 
+    public function lastInsertId()
+    {
+        return $this->insert_id;
+    }
+
 	public function lockWrite($table)
 	{
 		$sql = 'LOCK TABLES '.$table.' WRITE';	

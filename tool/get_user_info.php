@@ -249,5 +249,8 @@ function get_followers_list($c, $sid)
  身份证 21032319880108407x
  昵称 micro-power01
  pass asmicro-power01
+ 
+ 微传播邮箱验证链接
+ http://www.weichuanbo.com/User/Auth/check/vc/MDEyMzQ1Njc4OV8xODA4NTJfYWJjZGVmZ2hpZw==
  */
 ?>

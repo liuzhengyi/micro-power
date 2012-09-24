@@ -75,7 +75,7 @@ function if_weiboapi_fail($res, $file=NULL, $line=NULL, $append_msg=NULL)
  *
  *
  */
-function delay_jump($seconds=0, $msg, $to_url='http://vdl.viivtech.com', $to_name, $color='blue')
+function delay_jump($seconds=0, $msg, $to_url='http://vdl.viivtech.com', $to_name='默认页面', $color='blue')
 {
     $seconds = intval($seconds);
     header("refresh:$seconds;url=$to_url");

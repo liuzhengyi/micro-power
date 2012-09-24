@@ -23,9 +23,8 @@ include_once($webRoot."foundation/check.func.php");
 		$dbo = new dbex($dbServs);
         $e = $dbo->real_escape_string($e);
         $ency_p = md5($p);
-		$sql = "select user_id, nick_name, sina_uid, level from user where email = '$e' and pass = sha1('$ency_p') limit 1";
+		$sql = "select user_id, nick_name, level from user where email = '$e' and pass = sha1('$ency_p') limit 1";
 		$res = $dbo->query($sql);
-		echo $sql;
 		if(1 != $res->num_rows) {	// 邮箱与密码不匹配
 			header('Location:'.$siteRoot.'index.php?login_error=mismatch');
 			exit();
@@ -34,8 +33,11 @@ include_once($webRoot."foundation/check.func.php");
 		$row = $res->fetch_array();
 		$_SESSION['uid'] = $row['user_id'];
 		$_SESSION['name'] = $row['nick_name'];
+		$_SESSION['level']  = $row['level'];
+        $sql = "select sina_uid, sina_level from user_info_sina where user_id = '{$_SESSION['uid']}' limit 1";
+        $row = $dbo->getRow($sql);
 		$_SESSION['sid']  = empty($row['sina_uid'])? NULL : $row['sina_uid'];
-		$_SESSION['slevel']  = $row['level'];
+		$_SESSION['slevel']  = empty($row['sina_level'])? NULL : $row['sina_level'];
 		$dbo->close();
 		header('Location:'.$siteRoot.'my.php');
 		// 后台继续运行，获取用户的已关注用户列表，写入SESSION
