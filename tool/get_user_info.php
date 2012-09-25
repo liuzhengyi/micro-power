@@ -207,6 +207,7 @@ function if_weiboapi_fail_cmd($api_res, $line=null, $out_put=FALSE)
 function api_left($c)
 {
     $api_left = $c->rate_limit_status();
+    if_weiboapi_fail_cmd($api_left, __LINE__, true);
 //    echo "update:{$api_left['api_rate_limits'][0]['remaining_hits']}/{$api_left['api_rate_limits'][0]['limit']}\tcomments:{$api_left['api_rate_limits'][1]['remaining_hits']}/{$api_left['api_rate_limits'][1]['limit']}\tcreate:{$api_left['api_rate_limits'][3]['remaining_hits']}/{$api_left['api_rate_limits'][3]['limit']}\tip:{$api_left['api_rate_limits'][4]['remaining_hits']}/{$api_left['api_rate_limits'][4]['limit']}\t";
 //    echo "ip:{$api_left['remaining_ip_hits']}/{$api_left['ip_limit']}\tuser:{$api_left['remaining_user_hits']}/{$api_left['user_limit']}\n";
     $left = array();

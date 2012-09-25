@@ -15,10 +15,10 @@ $nick_name = 'gipsa@sina';
 $nick_name = '王利洁营养师@sina';
 $token = get_token_by_name($dbo, $nick_name);
 $c = new SaeTClientV2( WB_AKEY, WB_SKEY, $token);
-    $api_left = api_left($c);
-    if($api_left['user'] < 3) {
-        $c = change_token($c, $dbo, 3, false, false);
-    }
+$api_left = api_left($c);
+if($api_left['user'] < 3) {
+    $c = change_token($c, $dbo, 3, false, false);
+}
 // $sid = 1193111400;  //源用户 周国平 后面抓取的用户都是他的粉丝 这么做有弊端
 //  种子用户
 //  ELLE中文网主编Helen  104091 1681200380
@@ -43,7 +43,7 @@ foreach($source_sid as $sid) {
             //        更换token后，循环
         // 检测当前ip剩余api hits
         $api_left = api_left($c);
-        $msg = "api_left[{$api_left['user']}, {$api_left['ip']}].\tid_num: $id_num\t";    // debug
+        $msg = "api_left[{$api_left['user']}, {$api_left['ip']}].\tid_num: $id_num\t($sid)";    // debug
     //    echo $msg;
         write_line($msg);
         if($api_left['ip'] < 50) { // 此处应该使用10*user_count
@@ -261,6 +261,7 @@ function if_weiboapi_fail_cmd($api_res, $line=null, $out_put=FALSE)
 function api_left($c)
 {
     $api_left = $c->rate_limit_status();
+    if_weiboapi_fail_cmd($api_left, __LINE__, true);
 //    echo "update:{$api_left['api_rate_limits'][0]['remaining_hits']}/{$api_left['api_rate_limits'][0]['limit']}\tcomments:{$api_left['api_rate_limits'][1]['remaining_hits']}/{$api_left['api_rate_limits'][1]['limit']}\tcreate:{$api_left['api_rate_limits'][3]['remaining_hits']}/{$api_left['api_rate_limits'][3]['limit']}\tip:{$api_left['api_rate_limits'][4]['remaining_hits']}/{$api_left['api_rate_limits'][4]['limit']}\t";
 //    echo "ip:{$api_left['remaining_ip_hits']}/{$api_left['ip_limit']}\tuser:{$api_left['remaining_user_hits']}/{$api_left['user_limit']}\n";
     $left = array();

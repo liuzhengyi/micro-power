@@ -61,6 +61,12 @@ if ($token) {
 				$msg = "向数据库插入数据出错。file:".__FILE__.";line:".__LINE__."sql:".$sql;
 				debug($msg);
 			}
+            $sql = "update user set bind_status = bind_status + 1 where user_id = '$id' limit 1";
+            $num = $dbo->exeUpdate($sql);
+			if(1 != $num) {
+				$msg = "向数据库插入数据出错。file:".__FILE__.";line:".__LINE__."sql:".$sql;
+				debug($msg);
+			}
 			//写session，跳转
 			$_SESSION['sid'] = $sid;
 			$_SESSION['stoken'] = $token['access_token'];
@@ -76,13 +82,14 @@ if ($token) {
             $_SESSION['slevel'] = $weibo_init_level;
 			exit();
 		} else {			
-            // 尚未注册。在用微博帐号注册
+            // 尚未注册。在用微博帐号注册。注：直接用微博注册者默认为普通会员，广告主需要先注册微动力。
 			$user_info = $c->show_user_by_id($sid); // fetch user basic message according to sid
+            if_weiboapi_fail($user_info);
             $screen_name = $user_info['screen_name'];
             $name = $screen_name.'@sina';
             $location = $user_info['location'];
             $description = $user_info['description'];
-            $sql = "insert into user (nick_name, reg_time) values ('$name', now())";
+            $sql = "insert into user (nick_name, bind_status, reg_time) values ('$name', 1, now())"; // bind_status sina+1
 			$num = $dbo->exeUpdate($sql);
 			if(1 != $num) {
 				$msg = "向数据库插入数据出错。file:".__FILE__.";line:".__LINE__."sql:".$sql;
@@ -100,7 +107,7 @@ if ($token) {
         // 非首次授权。老用户，在用微博帐号登录 或者刷新sina_token
         /* 此处存在一个问题，但这不是一个bug
            如果用户先用微博登录创建了一个账户，又以常规途径创建了一个微动力账户，
-           然后用新注册的微动力账户绑定先前的微博帐号。
+           然后用新注册的微动力账户绑定先前登录过微动力的微博帐号。
            此时，如果授权成功会导致用户以微博帐号的身份登录，向新账户绑定微博的操作无法完成。
            这意味着一个微博帐号只能对应一个微动力帐号。 这不是一个bug。
            */

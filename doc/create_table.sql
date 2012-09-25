@@ -5,21 +5,19 @@ CREATE TABLE `user` (
 	nick_name VARCHAR(50) NOT NULL,
 	pass CHAR(40) ,
 --    role ENUM('user', 'ader', 'master', 'other') DEFAULT 'user',
-    role TINYINT UNSIGNED,  -- 使用数字映射用户角色
+    role TINYINT UNSIGNED NOT NULL DEFAULT 1,  -- 使用数字映射用户角色
     -- 已知映射如下：
     -- 1-做任务赚钱的普通user，2-广告主，3-管理员 ...
-    status ENUM('normal', 'verified', 'examine', 'forbid') DEFAULT 'normal',
+--    status ENUM('normal', 'verified', 'examine', 'forbid') DEFAULT 'normal',
+    status TINYINT UNSIGNED NOT NULL DEFAULT 1,
     -- 同上，已知对应关系如下：
     -- 1-正常，未认证，2=已认证，
     -- 11-审核中，12-封禁
     -- 默认为1
-/*	sina_uid BIGINT UNSIGNED, */
-/*	sina_token VARCHAR(50), */
-/*  token_update_at DATETIME, */
-/*    token_expire_in INT UNSIGNED, */
+    bind_status SMALLINT UNSIGNED DEFAULT 0,  /* 新增 */
+    -- 用位图方式描述用户的绑定状态，small int 占 16位，可以表示16个绑定状态
+    -- 新浪微博+1，腾讯微博+2，支付宝+3，(酷六+7，……)
 	level TINYINT default 1,  /* 此level由微动力评定，user和ader使用不同的评定标准 */
-/*    sina_location VARCHAR(30),      /* 此location有sina提供 */
-/*    sina_description VARCHAR(220),  /* form sina */
 	pro TINYINT UNSIGNED DEFAULT 0, /* 好评，*/
 	con TINYINT UNSIGNED DEFAULT 0, /* 差评 */
 	task_taken INT UNSIGNED DEFAULT 0,  /* user-承接任务数|ader-发布任务数 */
@@ -27,15 +25,11 @@ CREATE TABLE `user` (
     /* 注意：金钱在数据库内部以 厘 为单位存储 */
     total_income INT UNSIGNED DEFAULT 0,    /* user-总入账金额|ader-总投入|其他留空*/
     realtime_income INT UNSIGNED DEFAULT 0, /* user-当前账户金额|ader-当前账户金额|其他留空 */
-/*	alipay_id VARCHAR(50) DEFAULT NULL,     /* 支付宝id */
-/*	alipay_name VARCHAR(50) DEFAULT NULL,   /* 支付宝用户名 */
-/*    alipay_token VARCHAR(50) DEFAULT NULL,  /* 支付宝token */
     cell_phone CHAR(11) DEFAULT NULL,    /* 可用于实名认证。ader注册必填? */
 	reg_time DATETIME NOT NULL,
 	PRIMARY KEY(user_id),
 	UNIQUE (email),
 	UNIQUE (nick_name),
-/*	UNIQUE (sina_uid), */
 	INDEX (email(25))
 );
 /* DESCRIBE `user`; */

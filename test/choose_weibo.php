@@ -14,7 +14,7 @@ if(!is_bound_sina()) {delay_jump(3, "对不起，您尚未绑定新浪微博，�
 $stoken = $_SESSION['stoken'];
 $c = new SaeTClientV2(WB_AKEY, WB_SKEY, $stoken);
 $api_res = $c->user_timeline_by_id(NULL, 1, 50, 0, 0, 1, 1, 0);
-//var_dump($api_res);
+if_weiboapi_fail($api_res);
 $weibos = $api_res['statuses'];
 $i = 0;
 $count = count($weibos);

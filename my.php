@@ -109,7 +109,7 @@ include("uiparts/docheader.php");
 			<li>账户总收益：<?php echo $total_income.' 元。'; ?></li>
 			<li>承接任务数：<?php echo $task_taken; ?> </li>
 			<li>完成任务数：<?php echo $task_finished; ?></li>
-			<li>微动力等级：<?php echo $_SESSION['level'];echo '<a href="action/evaluate.php" >申请评级</a>'?></li>
+			<li>微动力等级：<?php echo $_SESSION['level']; ?></li>
 		</ul>
 	<?php } else if ('change' == $data){ ?>
 		<h1>修改信息</h1>

@@ -21,6 +21,7 @@ $c = new SaeTClientV2( WB_AKEY, WB_SKEY, $_SESSION['stoken']);
 
 // 用户所在地，用户描述，性别，粉丝数，关注数，微博数，收藏数，是否认证，认证原因，注册时间
 $user_info = $c->show_user_by_id($_SESSION['sid']);
+if_weiboapi_fail($uesr_info);
 $user['location'] = $user_info['location'];
 $user['description'] = $user_info['description'];
 $user['gender'] = $user_info['gender'];
@@ -86,7 +87,7 @@ $slevel = 4;
 include_once($webRoot.'lib/dbo.class.php');
 include_once($dbConfFile);
 $dbo = new dbex($dbServs);
-$sql = "update user set level = $slevel where user_id = {$_SESSION['uid']} limit 1";
+$sql = "update user_info_sina set sina_level = $slevel where user_id = {$_SESSION['uid']} limit 1";
 $res = $dbo->exeUpdate($sql);
 $_SESSION['slevel'] = $slevel;
 header("Location:".$_SERVER['HTTP_REFERER']);
