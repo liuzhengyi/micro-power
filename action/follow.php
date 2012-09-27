@@ -11,12 +11,13 @@ include_once($dbConfFile);
 include_once($webRoot."foundation/debug.php");
 include_once($webRoot."foundation/price.php");
 include_once($webRoot."foundation/status.php");
-if(!is_login() || !isset($_GET['id'])) {
-header("Location:".$siteRoot."index.php");
-exit();
-}
+need_login();
+need_be_user();
 
-if(isset($_GET['id'])) {
+if(!isset($_GET['id'])) {   // 非正常访问
+    header("Location:".$siteRoot."index.php");
+    exit();
+} else {
 	$task_id = intval($_GET['id']);
     if(empty($task_id)) {
         header("Location:".$siteRoot."index.php");

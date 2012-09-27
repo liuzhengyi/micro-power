@@ -11,12 +11,13 @@ include_once($dbConfFile);
 include_once($webRoot."foundation/debug.php");
 include_once($webRoot."foundation/price.php");
 include_once($webRoot."foundation/status.php");
-if(!is_login()) {   // 需要登录
-header("Location:".$siteRoot."index.php");
-exit();
-}
+need_login();
+need_be_user();
 
-if(isset($_GET['id'])) {
+if(!isset($_GET['id'])) {   // 非正常访问
+    header("Location:$siteRoot");
+    exit();
+} else {
 	$task_id = intval($_GET['id']);
     if(empty($task_id)) {   // 必须参数不符合要求
         header("Location:".$siteRoot."index.php");
@@ -102,7 +103,4 @@ if(isset($_GET['id'])) {
     $sec=3;$msg='转发成功！';$to_url=$_SERVER['HTTP_REFERER'];$to_name='任务页面';
     delay_jump($sec,$msg,$to_url,$to_name);
 }
-// 未提供必须参数
-header("Location:".$_SERVER['HTTP_REFERER']);
-exit();
 ?>

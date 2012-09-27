@@ -18,6 +18,12 @@ if_weiboapi_fail($api_res);
 $weibos = $api_res['statuses'];
 $i = 0;
 $count = count($weibos);
+?>
+<form action="index.php">
+    <input type="radio" name="hello" value="hello" id="hello" />hello<br />
+    <input type="radio" name="there" value="there" id="there" />there<br />
+</form>
+<?php
 echo '<form action="config_task.php" method="post"><fieldset><legend>请从下列微博中选取一条作为任务</legend>';
 for($i = 0; $i < $count; $i++) {
     $tmp_id = ''; $tmp_id = 'weibo_'.$i;
@@ -25,5 +31,4 @@ for($i = 0; $i < $count; $i++) {
 }
 echo '<input type="submit" name="submit" value="下一步（配置任务）" />';
 echo '</fieldset></form>';
-
 ?>

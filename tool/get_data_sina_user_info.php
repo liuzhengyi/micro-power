@@ -17,21 +17,21 @@ $token = get_token_by_name($dbo, $nick_name);
 $c = new SaeTClientV2( WB_AKEY, WB_SKEY, $token);
 $api_left = api_left($c);
 if($api_left['user'] < 3) {
-    $c = change_token($c, $dbo, 3, false, false);
+    $c = change_token($c, $dbo, 5, false, false);
 }
 // $sid = 1193111400;  //源用户 周国平 后面抓取的用户都是他的粉丝 这么做有弊端
 //  种子用户
 //  ELLE中文网主编Helen  104091 1681200380
 //  ELLE中文网Mok   98286       1649105911
-//  摩羯Sherry      59290       1663465950
+//  摩羯Sherry      59290       1663465950(X)  1663455950(V)
 //  ELLE网站小f姐姐 56312       1497515352
-$source_sid = array('1497515352', '1663465950', '1649105911', '1681200380');
+$source_sid = array('1497515352', '1663455950', '1649105911', '1681200380');
 foreach($source_sid as $sid) {
     $ids = get_followers_list($c, $sid);
     if(!$ids) {
-        $msg = "当前token耗尽api，无法获取粉丝id列表\n";
+        $msg = "api无任何返回，可能是当前token耗尽api，无法获取粉丝id列表";
     //    echo $msg;
-        write_line($msg);
+        write_line_with_time_and_newline($msg);
     }
     foreach($ids as $id_num=>$id_val) {
         if($dbo->checkExist($id_val, 'sid', 'data_sina_user_info')) {
@@ -45,18 +45,17 @@ foreach($source_sid as $sid) {
         $api_left = api_left($c);
         $msg = "api_left[{$api_left['user']}, {$api_left['ip']}].\tid_num: $id_num\t($sid)";    // debug
     //    echo $msg;
-        write_line($msg);
+        write_line_with_time_and_newline($msg);
         if($api_left['ip'] < 50) { // 此处应该使用10*user_count
-            $time = date('H:i:s M j');
-            $msg = "ip remain hits lower than 50({$api_left['ip']}), exit.( at $time )\n";
+            $msg = "ip remain hits lower than 50({$api_left['ip']}), exit.";
     //        echo $msg;
-            write_line($msg);
+            write_line_with_time_and_newline($msg);
             exit();
         }
         // 检测当前user剩余api hits
         $api_left = api_left($c);
         if($api_left['user'] < 10) {
-            $c = change_token($c, $dbo, 10, true, true);
+            $c = change_token($c, $dbo, 15, true, true);
         }
         // 抓取用户信息
         $user_info = get_user_info($c, $id_val, $sid); // 以数组的形式返回数据
@@ -68,8 +67,11 @@ foreach($source_sid as $sid) {
     }
 }
 $sub = '微动力爬虫提示';
-$msg = '种子用户的粉丝抓完了，请换一批种子用户，或者从cron中清除我';
-mail_to_master($msg, $sub);
+$time = date('H:i:s M j');
+$msg = "种子用户的粉丝抓完了，请换一批种子用户，或者从cron中清除我";
+$mail_msg = "种子用户的粉丝抓完了，请换一批种子用户，或者从cron中清除我 (at $time)";
+write_line_with_time_and_newline($msg);
+mail_to_master($mail_msg, $sub);
 
 /*
  *  发一封邮件给网站管理员，可以自定义主题和正文
@@ -114,15 +116,14 @@ function write_info($info, $dbo)
     $info['verified_reason'] = $dbo->real_escape_string($info['verified_reason']);
     $sql = "insert into data_sina_user_info (sid, screen_name, location, description, gender, followers_count, friends_count, statuses_count, favourites_count, verified, verified_reason, created_at, max_reposts, max_comments, aver_reposts, aver_comments, from_sid, get_time) values('{$info['sid']}', '{$info['screen_name']}', '{$info['location']}', '{$info['description']}', '{$info['gender']}', '{$info['followers_count']}', '{$info['friends_count']}', '{$info['statuses_count']}', '{$info['favourites_count']}', '{$info['verified']}', '{$info['verified_reason']}', '{$info['created_at']}', '{$info['max_reposts']}', '{$info['max_comments']}', '{$info['aver_reposts']}', '{$info['aver_comments']}', '{$info['from_sid']}', '{$info['get_time']}')";
     $num = $dbo->exeUpdate($sql);
-    $time = date('H:i:s M j');
     if(1 != $num) {
-        $msg = 'one record faild. at:'."$time\n \$sql: $sql. \n";
+        $msg = 'one record faild. '." \$sql: $sql.";
 //        echo $msg;
-        write_line($msg);
+        write_line_with_time_and_newline($msg);
     } else {
-        $msg = 'one record in. at:'."$time\n";
+        $msg = 'one record in. ';
 //        echo $msg;
-        write_line($msg);
+        write_line_with_time_and_newline($msg);
     }
 
 }
@@ -150,7 +151,7 @@ function change_token($c, $dbo, $bottom=10, $mail=true, $write=true)
                     mail_to_master($msg, $sub);
                 } else {
                     $write_msg = "$sub: $msg \n";
-                    write_line($write_msg);
+                    write_line_with_time_and_newline($write_msg);
                 }
             }
 //            var_dump($token);   // debug
@@ -161,16 +162,15 @@ function change_token($c, $dbo, $bottom=10, $mail=true, $write=true)
                 $msg = 'token changed, user_id:'."$uid\n";
 //                echo $msg;
                 if($write) {
-                    write_line($msg);
+                    write_line_with_time_and_newline($msg);
                 }
                 return $c;
             }
         }
         // 当前没有可用token了
-        $time = date('H:i:s M j');
-        $msg = "no avilable token, exit.(at $time )\n";
+        $msg = "no avilable token, exit.";
 //        echo $msg;
-        write_line($msg);
+        write_line_with_time_and_newline($msg);
         exit();
     }
 }
@@ -244,15 +244,15 @@ function if_weiboapi_fail_cmd($api_res, $line=null, $out_put=FALSE)
 {
     if(isset($api_res['error_code'])) {
         if($out_put) {
-            $msg = "id:$sid\terror_code:{$api_res['error_code']}\terror:{$api_res['error']}\t$line\n";
+            $msg = "id:$sid\terror_code:{$api_res['error_code']}\terror:{$api_res['error']}\t$line ";
 //            echo $msg;
-            write_line($msg);
+            write_line_with_time_and_newline($msg);
         }
     }
     if(!$api_res && $out_put) {
-        $msg = "weibo api returns nothing.\n";
+        $msg = "weibo api returns nothing. ";
 //        echo $msg;
-        write_line($msg);
+        write_line_with_time_and_newline($msg);
     }
 }
 /*
@@ -281,8 +281,10 @@ function get_token_by_name($dbo, $nick_name)
 /*
  *  写一行数据到文件
  */
-function write_line($line, $file='/home/evan/vdongli/tool/get_data_sina_user_info.log')
+function write_line_with_time_and_newline($line, $file='/home/evan/vdongli/tool/get_data_sina_user_info.log')
 {
+    $time = date('H:i:s M j');
+    $line .= " (at $time)\n";
     $fp = fopen($file, 'a+');
     fwrite($fp, $line);
     fclose($fp);

@@ -5,7 +5,9 @@ session_start();
  * 我都还没有主意
  */
 include_once("config.php");	// init $authURL
-include_once("lib/saetv2.ex.class.php");
+include_once($webRoot."foundation/debug.php");
+include_once($webRoot."foundation/switch.php");
+include_once($webRoot."lib/saetv2.ex.class.php");
 /*
 include_once("foundation/debug.php");
 $res['error_code'] = '123';

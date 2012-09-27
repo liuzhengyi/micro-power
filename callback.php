@@ -19,6 +19,7 @@ require_once( $webRoot.'lib/dbo.class.php' );	// init class dbo
 require_once( $dbConfFile );		// init $dbServs
 
 require_once( $webRoot.'foundation/debug.php');
+require_once( $webRoot.'foundation/switch.php');
 
 // 用授权者的code换取token
 $o = new SaeTOAuthV2( WB_AKEY , WB_SKEY );
@@ -129,9 +130,10 @@ if ($token) {
         }
 	}
 	// 写session
-	$sql = "select user_id, level, sina_level from user join user_info_sina using(user_id) where sina_uid = $sid limit 1";
+	$sql = "select user_id, role, level, sina_level from user join user_info_sina using(user_id) where sina_uid = $sid limit 1";
 	$res = $dbo->getRow($sql);
 	$_SESSION['uid'] = $res['user_id'];
+    $_SESSION['role'] = user_role_switch($res['role'], FALSE);
 	$_SESSION['sid'] = $sid;
 	$_SESSION['name'] = $name;
 	$_SESSION['stoken'] = $token['access_token'];

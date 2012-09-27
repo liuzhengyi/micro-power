@@ -34,18 +34,15 @@ if(is_login()) {    // 已登录
 	require_once($dbConfFile);
 	$dbo = new dbex($dbServs);
 
-	// get query parameter
-    // 这段代码好别扭啊，怎么改改？
-	if( isset($_GET['data']) ) {
-		$data = $_GET['data'];
-        if  (   'change' != $data && 'basic' != $data &&
-                'money' != $data && 'action' != $data
-            ) {
+	// 确定参数data的值
+    if(!isset($_GET['data'])) {
+        $data = 'action';
+    } else {
+        $data = $_GET['data'];
+        if  ( 'change' != $data && 'basic' != $data && 'money' != $data && 'action' != $data ) {
             $data = 'action';
         }
-	} else {
-		$data = 'action';
-	}
+    }
 
 	switch($data) {
 		case 'change':
@@ -105,10 +102,11 @@ include("uiparts/docheader.php");
 	<?php if('money' == $data) { ?>
 		<h1>详细收支情况</h1>
 		<ul>
-			<li>账户当前收益：<?php echo $realtime_income.' 元。'; ?></li>
-			<li>账户总收益：<?php echo $total_income.' 元。'; ?></li>
-			<li>承接任务数：<?php echo $task_taken; ?> </li>
-			<li>完成任务数：<?php echo $task_finished; ?></li>
+            <?php $role_db = user_role_switch($_SESSION['role'], true);?>
+			<li>账户当前<?php if(1 == $role_db){echo '收益';}else{echo '余额';}?>：<?php echo $realtime_income.' 元。'; ?></li>
+			<li>账户总<?php if(1 == $role_db){echo '收益';}else{echo '投入';}?>：<?php echo $total_income.' 元。'; ?></li>
+			<li><?php if(1 == $role_db){echo '承接';}else{echo '发布';}?>任务数：<?php echo $task_taken; ?> </li>
+			<li><?php if(1 == $role_db){echo '完成';}else{echo '完结';}?>任务数：<?php echo $task_finished; ?></li>
 			<li>微动力等级：<?php echo $_SESSION['level']; ?></li>
 		</ul>
 	<?php } else if ('change' == $data){ ?>
