@@ -40,7 +40,7 @@ if(isset($_GET['id'])) {
 // 从数据库中取出task_id标识的关注任务的uid
 $dbo = new dbex($dbServs);
 echo 'task id: '.$task_id."\n";
-$sql = "select task_sina_uid, task_screen_name from task where task_id = $task_id and task_type = 'follow' limit 1";
+$sql = "select sina_uid, screen_name from task_info_sina_follow where task_id = $task_id limit 1";
 $sql_res = $dbo->getRow($sql);
 if(!$sql_res || 0 === count($sql_res)) {
     echo "error: 不存在该任务或该任务不是关注任务，对于非关注任务，请使用其专用接口。\n";
@@ -54,7 +54,7 @@ echo 'task_screen_name: '.$task_screen_name."\n";
 
 // 从数据库do_task表中检索出 **一定时间之内** 做过该任务的人的sid和uid
 echo "data in db.do_task\n";
-$sql = "select user_id, sina_uid, nick_name from do_task JOIN user using(user_id) where task_id = $task_id";  // and time ... // attention!!!
+$sql = "select user_id, sina_uid, nick_name from do_task JOIN user_info_sina using(user_id) JOIN user using(user_id) where task_id = $task_id";  // and time ... // attention!!!
 $sql_res = $dbo->getRs($sql);
 if(!$sql_res || 0 === count($sql_res)) {
     echo "nobody\n";
@@ -67,7 +67,8 @@ if(!$sql_res || 0 === count($sql_res)) {
 // 此时 $do_task 中存放的是 user_id 和 sina_uid 的键值对。
 
 // 使用api查询任务微博的转发微博 statuses/repost_timeline/ids
-$sql = 'select sina_token from user where user_id = 10 limit 1';
+$uid = 9;    // 此处需要一个具有可用token的uid
+$sql = "select sina_token from user_info_sina where user_id = $uid limit 1";
 $sql_res = $dbo->getRow($sql);
 $c = new SaeTClientV2( WB_AKEY, WB_SKEY, $sql_res['sina_token'] );
 //echo "data from sina api, uid:\n";

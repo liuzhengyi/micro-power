@@ -100,7 +100,7 @@ class dbex {
 
     public function lastInsertId()
     {
-        return $this->insert_id;
+        return $this->dbc->insert_id;
     }
 
 	public function lockWrite($table)

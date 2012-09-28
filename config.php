@@ -49,4 +49,6 @@ $sina_weibo_id_length = 16;
 
 // smtp  设置
 // 除了文件pre_reg.php外，别的地方好像也用不到扫描图片信息，暂时就先放在pre_reg.php中吧。
+// 企业用户向微动力缴纳的佣金的额度，
+$ader_normal_rate = 0.1;
 ?>
