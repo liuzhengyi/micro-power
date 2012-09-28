@@ -104,10 +104,14 @@ switch ($type_db) {
         }
         break;
     case 2: // sina_follow
-
-        $pid = strval(intval($_POST['id']));    // person_id 任务中要关注的人的新浪uid
-        $uid = $_SESSION['sid'];
-        $person = $c->show_user_by_id($pid);
+        if(isset($_GET['comment']) && 'by_name' == $_GET['comment']) {
+            $name = strval($_POST['screen_name']);  // 任务中要关注的人的新浪屏显名称
+            $person = $c->show_user_by_name($name);
+        } else {
+            $pid = strval(intval($_POST['id']));    // person_id 任务中要关注的人的新浪uid
+            $person = $c->show_user_by_id($pid);
+        }
+//        if_weiboapi_fail($person);
         if('20003' == $person['error_code']) {
             $msg = '您要关注的用户不存在！';
             $to_url = $siteRoot.'task.php';

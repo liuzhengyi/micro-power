@@ -45,8 +45,8 @@ $title = "欢迎来到微动力-确认创建任务";
 $csfile = array("style/main.css", "style/solo.css");
 
 // 确定请求任务类型
-if(isset($_GET['type'])) {
-	$type = $_GET['type'];
+if(isset($_POST['type'])) {
+	$type = $_POST['type'];
 	if($type != 'sina_follow' && $type != 'sina_forward' && $type != 'sina_review' && $type != 'sina_create') {
         header("Location:index.php");
 	}
@@ -62,30 +62,26 @@ $dbo = new dbex($dbServs);
 
 switch ($type_db) {
     case 1: // sina_forward
-        $task_type = '新浪转发';
     case 11:    // qq_forward
-        $task_type = '腾讯转发';
         $id_text = $_POST['status_id-text'];
         $wid = strval(intval($id_text));    // weibo id
         $text = substr($id_text, strlen($wid)+1);     // weibo text
         break;
     case 2: // sina_follow
-        $task_type = '新浪关注';
     case 12:    // qq_follow
-        $task_type = '腾讯关注';
-        $id_name = $_POST['person_id-name'];    // id-name
-        $uid = strval(intval($id_name));        // 要关注的用户在相应平台上的id
-        $name = substr($id_name, strlen($uid)+1);         // 要关注的用户在相应平台上的用户名
+        if(isset($_GET['comment']) && 'by_name' == $_GET['comment']) {
+            $name = strval($_POST['sina_screen_name']);
+        } else {
+            $id_name = $_POST['person_id-name'];    // id-name
+            $uid = strval(intval($id_name));        // 要关注的用户在相应平台上的id
+            $name = substr($id_name, strlen($uid)+1);         // 要关注的用户在相应平台上的用户名
+        }
         break;
     case 3: // sina_review
-        $task_type = '新浪评论';
     case 13:    // qq_review
-        $task_type = '腾讯评论';
         break;
     case 4: // sina_create
-        $task_type = '新浪原创';
     case 14:    // qq_create
-        $task_type = '腾讯原创';
         break;
     default:
         $msg = '暂不支持该类型';
@@ -150,9 +146,14 @@ require_once("uiparts/docheader.php");
                         <dt>预计总费用（含佣金）</dt><dd><?php echo $total_price;?>元</dd>
                         <dt>您的当前余额</dt><dd><?php echo $realtime_income;?>元</dd>
                     </dl>
+                <?php if(isset($_GET['comment']) && 'by_name' == $_GET['comment']) { ?>
+                    <form action="action/create_task.php?comment=by_name" method="post">
+                        <input type="hidden" name="screen_name" value="<?php echo $name;?>" />
+                <?php } else { ?>
                     <form action="action/create_task.php" method="post">
-                        <input type="hidden" name="type" value="sina_follow" />
                         <input type="hidden" name="id" value="<?php echo $uid;?>" />
+                <?php } ?>
+                        <input type="hidden" name="type" value="sina_follow" />
                         <input type="hidden" name="base_price" value="<?php echo $base_price;?>" />
                         <input type="hidden" name="amount" value="<?php echo $amount;?>" />
                         <input type="submit" name="submit" value="创建">

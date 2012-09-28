@@ -102,7 +102,7 @@ require_once("uiparts/docheader.php");
                 <div id="create_task">
                     <div id="choose_friend"><!-- 从关注者中选择 -->
                     <h3>从关注者中选择</h3>
-                    <form action="create_task_confirm.php?type=sina_follow" method="post">
+                    <form action="create_task_confirm.php" method="post">
 <?php
     foreach($friends['users'] as $friend) {
         $input_id = 'friend_'.$friend['id'];
@@ -113,12 +113,13 @@ require_once("uiparts/docheader.php");
 ?>
                     <label for="base_price1">基础出价<input type="text" name="base_price" id="base_price1" /></label><br />
                     <label for="amount1">期望点击数量<input type="text" name="amount" id="amount1" /></label><br />
+                    <input type="hidden" name="type" value="sina_follow" />
                     <p><input type="submit" name="submit" value="就ta了" /></p>
                     </form>
                     </div><!-- end of DIV choose_friend -->
                     <div id="choose_follower"><!-- 从粉丝中选择 -->
                     <h3>从粉丝中选择</h3>
-                    <form action="create_task_confirm.php?type=sina_follow" method="post">
+                    <form action="create_task_confirm.php" method="post">
 <?php
     foreach($followers['users'] as $follower) {
         $input_id = 'follower_'.$follower['id'];
@@ -129,15 +130,17 @@ require_once("uiparts/docheader.php");
 ?>
                     <label for="base_price2">基础出价<input type="text" name="base_price" id="base_price2" /></label><br />
                     <label for="amount2">期望点击数量<input type="text" name="amount" id="amount2" /></label><br />
+                    <input type="hidden" name="type" value="sina_follow" />
                     <p><input type="submit" name="submit" value="就ta了" /></p>
                     </form>
                     </div><!-- end of DIV choose_friend -->
                     <div id="fill_name"><!-- 填写昵称 -->
-                    <h3>直接填写昵称</h3>   <!-- 此处需要提交给另外一个文件，我想 -->
-                    <form action="#" method="post">
+                    <h3>直接填写昵称</h3>   <!-- 此处需要提交给另外一个文件，我想 --><!-- 不需要，就用一个文件解决-->
+                    <form action="create_task_confirm.php?comment=by_name" method="post">
                     <label for="sina_screen_name">新浪昵称<input type="text" name="sina_screen_name" id="sina_screen_name" /></label><br />
                     <label for="base_price3">基础出价<input type="text" name="base_price" id="base_price3" /></label><br />
                     <label for="amount3">期望点击数量<input type="text" name="amount" id="amount3" /></label><br />
+                    <input type="hidden" name="type" value="sina_follow" />
                     <p><input type="submit" name="submit" value="确定"></p>
                     </form>
                     </div><!-- end of DIV fill_name -->
@@ -147,7 +150,7 @@ require_once("uiparts/docheader.php");
                 <div id="create_task">
                     <div id="choose_weibo">
                     <h3>选择一条微博</h3>
-                    <form action="create_task_confirm.php?type=sina_forward" method="post">
+                    <form action="create_task_confirm.php" method="post">
 <?php
     foreach($statuses['statuses'] as $status) {
         $input_id = 'status_'.$status['idstr'];
@@ -158,6 +161,7 @@ require_once("uiparts/docheader.php");
 ?>
                     <label for="base_price3">基础出价<input type="text" name="base_price" id="base_price3" /></label><br />
                     <label for="amount3">期望点击数量<input type="text" name="amount" id="amount3" /></label><br />
+                    <input type="hidden" name="type" value="sina_forward" />
                     <input type="submit" name="submit" value="就ta了" />
                     </form>
                     </div><!-- end of DIV choose_weibo -->
