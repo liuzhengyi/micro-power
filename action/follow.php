@@ -87,8 +87,8 @@ if(!isset($_GET['id'])) {   // 非正常访问
 	}
 	// 做成功了，写数据库，写SESSION    对应do_task status 11 正常完成
 	// 写do_task表
-    $money = sql_price($task_offer, $_SESSION['slevel']);
-	$sql = "insert do_task (task_id, user_id, status, task_type, owner_name, income, repost_mid, time)values($task_id, {$_SESSION['uid']}, 11, 2, '$task_owner_name', '$money', NULL, now())";
+    $db_level_money = price_base_to_level($task_offer, $_SESSION['slevel']);
+	$sql = "insert do_task (task_id, user_id, status, task_type, owner_name, income, repost_mid, time)values($task_id, {$_SESSION['uid']}, 11, 2, '$task_owner_name', '$db_level_money', NULL, now())";
 	$sql_num = $dbo->exeUpdate($sql);
 	if(1 != $sql_num) {
 		$dbo->close();
@@ -98,7 +98,7 @@ if(!isset($_GET['id'])) {   // 非正常访问
 	}
 	// 写user表
 	$sql =	"update user set task_taken=task_taken+1, task_finished=task_finished+1,"
-		." total_income=total_income+$money, realtime_income=realtime_income+$money"
+		." total_income=total_income+$db_level_money, realtime_income=realtime_income+$db_level_money"
 		." where user_id = {$_SESSION['uid']} limit 1";
 	$sql_num = $dbo->exeUpdate($sql);
 	if(1 != $sql_num) {

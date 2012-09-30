@@ -1,24 +1,25 @@
 	<?php
     include_once('config.php');
+//  下面三行是可以产生 新浪认证服务器地址的 代码，为了提高效率，该地址被硬编码入config.php
 //    include($webRoot.'lib/saetv2.ex.class.php');
 //    $o = new SaeTOAuthV2( WB_AKEY, WB_SKEY);
 //    $code_url = $o->getAuthorizeURL( WB_CALLBACK_URL );
 	if(isset($_SESSION['uid'])) {	// 已经登录
-		echo "<p>{$_SESSION['name']}，您好，您已登录。</p>";
+        if('ader' == $_SESSION['role']) {
+            $screen_type = '企业用户';
+        } else if ( 'user' == $_SESSION['role'] ) {
+            $screen_type = '个人用户';
+        } else if ( 'master' == $_SESSION['role'] ) {
+            $screen_type = '管理员';
+        }
+		echo "<p>{$_SESSION['name']}，您好，您是 $screen_type (level {$_SESSION['level']})。</p>";
 		if(isset($_SESSION['sid'])) {
-			echo "<p>您已绑定新浪微博。</p>";
+			echo "<p>您已绑定新浪微博。(level {$_SESSION['slevel']})(<a href={$siteRoot}action/evaluate.php>评级</a>)</p>";
 		} else {
 			echo "<p>您需要绑定新浪微博才能做任务赚钱</p><a href=\"$authURL\">现在就绑定</a>";
 //			echo "<p>您需要绑定新浪微博才能做任务赚钱</p><a href=\"$code_url\">现在就绑定</a>";
 		}
-        if(isset($_SESSION['is_bind_weibo']) && $_SESSION['is_bind_weibo']) {
-		    echo '<p>您的微博等级为'.$_SESSION['slevel'].'</p>';
-            if($_SESSION['slevel'] < 4) {
-			echo '<p>建议您对微博进行评级，评级能够增加您的佣金</p>';
-			echo '<a href="'.$siteRoot.'action/evaluate.php">现在评级</a>';
-            }
-		}
-		echo "<p><a href=\"action/logout.php\">退出</a></p>";
+	echo "<p><a href=\"action/logout.php\">退出</a></p>";
 	} else {			// 尚未登录或登录失败
 		if(isset($_GET['login_error']) && 'wrong_format' == $_GET['login_error']) {
 			echo '<p class="err_msg">邮箱或密码的格式不对</p>'; 

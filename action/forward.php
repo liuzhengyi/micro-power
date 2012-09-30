@@ -78,10 +78,10 @@ if(!isset($_GET['id'])) {   // 非正常访问
 	}
 // 做成功了，写数据库，写SESSION
 // 写do_task表
-    $money = sql_price($task_offer, $_SESSION['slevel']);   // status - 11
+    $db_level_money = price_base_to_level($task_offer, $_SESSION['slevel']);
 //	$sql = "insert do_task (task_id, user_id, status, repost_mid, time)values($task_id, {$_SESSION['uid']}, '11', {$task_res['retweeted_status']['mid']}, now())";
 //  此处应注意，retweeted_status['mid']是原微博的mid，而非转发产生的mid
-	$sql = "insert do_task (task_id, user_id, status, task_type, owner_name, income, repost_mid, time)values($task_id, {$_SESSION['uid']}, 11, 1, '$task_owner_name', '$money', '{$task_res['mid']}', now())";
+	$sql = "insert do_task (task_id, user_id, status, task_type, owner_name, income, repost_mid, time)values($task_id, {$_SESSION['uid']}, 11, 1, '$task_owner_name', '$db_level_money', '{$task_res['mid']}', now())";
 	$sql_num = $dbo->exeUpdate($sql);
 	if(1 != $sql_num) {
 		echo 'debug. 写数据库失败。file: '.__FILE__.'; line: '.__LINE__;
@@ -89,7 +89,7 @@ if(!isset($_GET['id'])) {   // 非正常访问
 		exit();
 	}
 	$sql =	"update user set task_taken=task_taken+1, task_finished=task_finished+1,"
-		." total_income=total_income+$money, realtime_income=realtime_income+$money"
+		." total_income=total_income+$db_level_money, realtime_income=realtime_income+$db_level_money"
 		." where user_id = {$_SESSION['uid']} limit 1";
 	// 写user表
 	$sql_num = $dbo->exeUpdate($sql);

@@ -1,34 +1,60 @@
 <?php
-    /* from db to screen , real price */
-    /* 根据数据库中表示的基础价格(厘)，计算用户实际价格的屏显(元)*/
-    /* 应该更名为 db_to_screen_real_price*/
-    function real_price($task_offer, $slevel)
-    {   return ($task_offer*$slevel/4)/1000;
-    }
+/*
+ *  本文件函数规定不同情况下price的转换
+ *  转换规则和各种情况下使用的单位有关，
+ *  当这些单位发生改变时，本页面的函数也应改变，以保持程序中使用这些函数的地方无需改变
+*/
 
-    /* 根据数据库中标示的基础价格(厘)，计算最高价格的屏显 */
-    /* db_to_screen_top_price */
-    function top_price($task_offer)
-    {   $top_slevel = 10;
-        return real_price($task_offer, $top_slevel);
-    }
+// 基础价 转换为 某一级别用户的价（基础价到用户价的转换公式）要求参数为整数（以厘为单位）
+function price_base_to_level($base_price, $level)
+{   
+    $base_price = floatval($base_price);
+    $level = floatval($level);
+    return ($base_price*$level/4);
+}
 
-    /* 根据任务在数据库中标价(厘)，计算用户完成任务应该插入数据库的数额(厘) */
-    /* db_to_db_real_price */
-    function sql_price($task_offer, $slevel)
-    {   return $task_offer*$slevel/4;
-    }
+// 数据库价格(厘) 转换为 用户屏显价格(元)
+function price_db_to_user($money)
+{
+    $money = intval($money);
+    return $money/1000;
+}
 
-    /* 将数据库中的金钱数额(厘) 换算成屏幕显示数额(元) */
-    /* db_to_screen*/
-    function to_screen_price($money)
-    {
-        return $money/1000;
-    }
+// 用户屏显价格(元) 转换为数据库价格(厘)
+function price_user_to_db($money)
+{
+    $money = floatval($money);
+    return $money*1000;
+}
 
-    /* 配置任务页面填入的基础价格(单位为角) 转换为 数据库中存储的基础价格(单位为厘) */
-    function config_to_db_price($money) // 注意是，配置任务页面，不是配置页面
-    {
-        return $money*100;
-    }
+// 配置页面价格（角） 转换为 数据库价格（厘）
+function price_config_to_db($money)
+{
+    $money = intval($money);
+    return $money*100;
+}
+
+// 配置页面价格（角） 转换为 用户页面价格（元）
+function price_config_to_user($money)
+{
+    $money = intval($money);
+    return $money/10;
+}
+
+// 用户屏显价格(元) 转换为配置页面 角
+function price_user_to_config($money)
+{
+    $money = floatval($money);
+    return $money*10;
+}
+
+// 基础价 转换为 最高价
+function price_base_to_top($base_price, $top_level=10)
+{    
+    return price_base_to_level($base_price, $top_level);
+}
+
+// 最高价 转换为 基础价
+function price_top_to_base() {}   // 暂无此需求
+
 ?>

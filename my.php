@@ -52,8 +52,8 @@ if(is_login()) {    // 已登录
 			$res = $dbo->getRow($sql);
 			$task_taken = $res['task_taken'];
 			$task_finished = $res['task_finished'];
-			$total_income = to_screen_price($res['total_income']);
-			$realtime_income = to_screen_price($res['realtime_income']);
+			$total_user_money = price_db_to_user($res['total_income']);
+			$realtime_user_money = price_db_to_user($res['realtime_income']);
 		break;
 		case 'basic':	// case 'basic'
 			$sql = "select email, pro, con, reg_time from user where user_id = '{$_SESSION['uid']}' limit 1";
@@ -64,19 +64,35 @@ if(is_login()) {    // 已登录
 			$reg_time = $res['reg_time'];
         break;
         default:    // case 'action'
-            $sql_count = "select count(1) from do_task where user_id = {$_SESSION['uid']} and status=11";
-            $count = $dbo->getCount($sql_count);
-            $per_page = 5;
-            $total_page = ceil($count/$per_page);
-            if(isset($_GET['page']) && intval($_GET['page']) >= 1 && intval($_GET['page']) <= $total_page) {
-                $page = intval($_GET['page']);
-            } else {
-                $page = 1;
+            if('user' == $_SESSION['role']) {
+                $sql_count = "select count(1) from do_task where user_id = {$_SESSION['uid']} and status=11";
+                $count = $dbo->getCount($sql_count);
+                $per_page = 5;
+                $total_page = ceil($count/$per_page);
+                if(isset($_GET['page']) && intval($_GET['page']) >= 1 && intval($_GET['page']) <= $total_page) {
+                    $page = intval($_GET['page']);
+                } else {
+                    $page = 1;
+                }
+                // 提取当前用户做过的任务的 任务id，任务屏显名称，任务佣金，任务类型 , 完成时间 按照时间倒序
+                $sql = "select task_id, task_type, owner_name, income, time from do_task where user_id = {$_SESSION['uid']} and do_task.status = 11 order by do_id desc";
+                $start = ($page-1)*$per_page;
+                $sql_res = $dbo->getPage($sql, $start, $per_page);
+            } else if('ader' == $_SESSION['role']) {
+                $sql_count = "select count(1) from task where owner_id = {$_SESSION['uid']} and task_status=11";
+                $count = $dbo->getCount($sql_count);
+                $per_page = 5;
+                $total_page = ceil($count/$per_page);
+                if(isset($_GET['page']) && intval($_GET['page']) >= 1 && intval($_GET['page']) <= $total_page) {
+                    $page = intval($_GET['page']);
+                } else {
+                    $page = 1;
+                }
+                // 提取当前用户发布过的任务的 任务id，任务类型 任务基本佣金，任务期望数量，目前完成数量
+                $sql = "select task_id, task_type, task_offer, task_amount, task_finish_amount from task where owner_id = {$_SESSION['uid']} and task_status = 1 order by task_id desc";
+                $start = ($page-1)*$per_page;
+                $sql_res = $dbo->getPage($sql, $start, $per_page);
             }
-            // 提取当前用户做过的任务的 任务id，任务屏显名称，任务佣金，任务类型 , 完成时间 按照时间倒序
-            $sql = "select task_id, task_type, owner_name, income, time from do_task where user_id = {$_SESSION['uid']} and do_task.status = 11 order by do_id desc";
-            $start = ($page-1)*$per_page;
-            $sql_res = $dbo->getPage($sql, $start, $per_page);
         break;
 	}
 } else {	// 尚未登录
@@ -103,8 +119,8 @@ include("uiparts/docheader.php");
 		<h1>详细收支情况</h1>
 		<ul>
             <?php $role_db = user_role_switch($_SESSION['role'], true);?>
-			<li>账户当前<?php if(1 == $role_db){echo '收益';}else{echo '余额';}?>：<?php echo $realtime_income.' 元。'; ?></li>
-			<li>账户总<?php if(1 == $role_db){echo '收益';}else{echo '投入';}?>：<?php echo $total_income.' 元。'; ?></li>
+			<li>账户当前<?php if(1 == $role_db){echo '收益';}else{echo '余额';}?>：<?php echo $realtime_user_money.' 元。'; ?></li>
+			<li>账户总<?php if(1 == $role_db){echo '收益';}else{echo '投入';}?>：<?php echo $total_user_money.' 元。'; ?></li>
 			<li><?php if(1 == $role_db){echo '承接';}else{echo '发布';}?>任务数：<?php echo $task_taken; ?> </li>
 			<li><?php if(1 == $role_db){echo '完成';}else{echo '完结';}?>任务数：<?php echo $task_finished; ?></li>
 			<li>微动力等级：<?php echo $_SESSION['level']; ?></li>
@@ -136,15 +152,31 @@ include("uiparts/docheader.php");
 		</ul>
 	<?php } else { // 我的动态，默认 ?>
     <?php
-            foreach($sql_res as $row) {
-            //$sql = "select task_id, task_type, owner_name, income, time from do_task where user_id = {$_SESSION['uid']} and do_task.status = 11 order by do_id desc";
-                $real_price = to_screen_price($row['income']);
-                if(2 == $row['task_type']) {
-                    echo '<p class="no_vertical_margin">你关注了 '.$row['owner_name'].' 的新浪微博，获得 '.$real_price.' 元。</p>';
-                } else if (1 == $row['task_type']) {
-                    echo '<p class="no_vertical_margin">你转发了 '.$row['owner_name'].'的微博，收入 '.$real_price.' 元。</p>';
+            if('user' == $_SESSION['role']) {
+            // 普通用户
+                foreach($sql_res as $row) {
+                    $user_income = price_db_to_user($row['income']);
+                    if(2 == $row['task_type']) {
+                        echo '<p class="no_vertical_margin">我关注了 '.$row['owner_name'].' 的新浪微博，获得 '.$user_income.' 元。</p>';
+                    } else if (1 == $row['task_type']) {
+                        echo '<p class="no_vertical_margin">我转发了 '.$row['owner_name'].'的微博，收入 '.$user_income.' 元。</p>';
+                    }
+                    echo '<br /><span class="no_vertical_margin">on: '.$row['time'].'</span><hr />';
                 }
-                echo '<br /><span class="no_vertical_margin">on: '.$row['time'].'</span><hr />';
+            } else if('ader' == $_SESSION['role']) {
+            // 企业用户
+                foreach($sql_res as $row) {
+                    $user_base_price = price_db_to_user($row['task_offer']);
+                    $db_total_price = $row['task_offer']*$row['task_amount'];
+                    $user_total_price = price_db_to_user($db_total_price);
+                    if(2 == $row['task_type']) {
+                        $type_name = '新浪关注任务';
+                    } else if (1 == $row['task_type']) {
+                        $type_name = '新浪转发任务';
+                    }
+                        echo '<p class="no_vertical_margin">您发布了'.$type_name.'，基本佣金'.$user_base_price.'。预期点击量：'.$row['task_amount'].'。预期总支出：'.$user_total_price.' 元。</p>';
+                    echo '<br /><span class="no_vertical_margin">on: '.$row['time'].'</span><hr />';
+                }
             }
             ?>
 		<div id="page_bar">

@@ -88,7 +88,7 @@ require_once("$dbConfFile"); // init $dbServs
 	<ul class="nodec">
 		<li><label for="user_email">常用邮箱：<input type="text" name="email" id="user_email" value="<?php if(isset($e)) {echo $e;}?>" /></label><span class="hint">请输入常用邮箱作为登录名称，还可用来找回密码</span></li>
 		<li><label for="veri_code">验证文字：<input type="text" name="vericode" id="veri_code" /></label><span class="hint">请输入下面图片中的字母，不区分大小写</span></li>
-		<li>验证图片：<img src="tool/veriCode.php" /><span class="hint"><a href="pre_reg.php" onclick="return true;" >看不清？点我换一张</a></span></li>
+		<li>验证图片：<img src="tool/veriCode.php" /><span class="hint"><a href="pre_reg.php?id=<?php echo rand(3011,4011);?>" onclick="return true;" >看不清？点我换一张</a></span></li>
 		<li><input type="submit" name="submit" value="发送注册链接" ></li>
 		<li><input type="hidden" name="submitted" value="true" /></li>
 	</ul>

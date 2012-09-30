@@ -96,18 +96,16 @@ require_once("uiparts/docheader.php");
         <?php switch ($type) { case 'sina_follow': ?>
                 <div id="task_show">
                 <?php foreach($res as $row) {
-                    $real_price = $row['task_offer']*$_SESSION['slevel']/40;
-                    $top_price = $row['task_offer']*10/40;
-                    $real_price = real_price($row['task_offer'], $_SESSION['slevel']);
-                    $top_price = top_price($row['task_offer']);
+                    $user_level_price = price_db_to_user(price_base_to_level($row['task_offer'], $_SESSION['slevel']));
+                    $user_top_price = price_db_to_user(price_base_to_top($row['task_offer']));
                 ?>
                     <div id="task_block">
                     <img src="<?php echo $row['avatar_large_url']; ?>" />
                     <p class="task_describe">
                         <a href="http://weibo.com/u/<?php echo $row['sina_uid']?>" target="_blank"><?php echo $row['screen_name']; ?></a><br />
                         来自：<?php echo $row['location']; ?><br />
-                        关注ta您可获得<?php echo $real_price; ?>元，
-                        最高可获得<?php echo $top_price; ?>元<a href="help.php#price"><sup>?</sup></a>。
+                        关注ta您可获得<?php echo $user_level_price; ?>元，
+                        最高可获得<?php echo $user_top_price; ?>元<a href="help.php#price"><sup>?</sup></a>。
                         <?php
                         if(isset($_SESSION['is_bind_weibo']) && $_SESSION['is_bind_weibo']) {
                             if(in_array($row['sina_uid'], $_SESSION['followed_id'], false)) {
@@ -128,15 +126,13 @@ require_once("uiparts/docheader.php");
             <?php case 'sina_forward': ?>
                 <div id="task_show">
                     <?php foreach($res as $row) {
-                        $real_price = $row['task_offer']*$_SESSION['slevel']/40;
-                        $top_price = $row['task_offer']*10/40;
-                        $real_price = real_price($row['task_offer'], $_SESSION['slevel']);
-                        $top_price = top_price($row['task_offer']);
+                        $user_level_price = price_db_to_user(price_base_to_level($row['task_offer'], $_SESSION['slevel']));
+                        $user_top_price = price_db_to_user(price_base_to_top($row['task_offer']));
                     ?>
                     <div class="task_block">
                         <p><?php
                            echo '<p class="forward_task_text">'.$row['text'].'</p>';
-                           echo '<p class="forward_task_comment">by:<a href="http://weibo.com/u/'.$row['sina_uid'].'" target="_blank">'.$row['screen_name'].'</a>。<br />转发此微博，您可以获利'.$real_price.'元，最高可获利'.$top_price.'元<sup><a href="help.php#price">?</a></sup>。';
+                           echo '<p class="forward_task_comment">by:<a href="http://weibo.com/u/'.$row['sina_uid'].'" target="_blank">'.$row['screen_name'].'</a>。<br />转发此微博，您可以获利'.$user_level_price.'元，最高可获利'.$user_top_price.'元<sup><a href="help.php#price">?</a></sup>。';
                             if(isset($_SESSION['is_bind_weibo']) && $_SESSION['is_bind_weibo']) {
                                 echo '<a href="action/forward.php?id='.$row['task_id'].'">转发</a>';
                             } else {

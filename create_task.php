@@ -1,38 +1,19 @@
 <?php
 session_start();
 /* create_task.php
- * 创建任务页面，仅对ader和master开放
+ * 创建任务接口页面，仅对ader和master开放
+ * 负责提供创建任务的接口，
+ *
+ * 拥有权限的用户可以本页面上配置一个想要创建的任务，
+ * 包括：从自己的粉丝&关注者中选择一个用户作为关注任务的目标用户
+ *       填写一个新浪昵称，作为关注用户的目标用户
+ *       从自己的原创微博中选择一条，作为转发任务的目标微博
+ * 本页面将信息提交给create_task_confirm.php
+ *
+ * 目前可以创建的任务类型有：
+ *      新浪转发 sina_forward (type:1)
+ *      新浪关注 sina_follow (type:2)
  */
-?>
-<?php
-/*
-创建任务者的role应该是ader或master。<br />
-
-通过通过参数确定要创建何种任务，然后结合task_info_xxx表，确定创建任务所需数据。<br />
-
-创建一个新浪转发任务，<br />
-1.检测创建者是否绑定新浪微博，否则退出。<br />
-2.列出创建者的原创微博列表以供创建者选择。<br />
-3.设定任务单价，期望点击数量。<br />
-4.算账，扣钱，钱不够则返回3，重新设定。<br />
-5.发布。<br />
-
-创建一个新浪关注任务，<br />
-1.检测创建这是否绑定新浪微博，否则退出；<br />
-2.让创建者选择从（自己，粉丝，关注，输入昵称）；<br />
-3.设定任务单价，期望点击数量；<br />
-4.算账，扣钱，余额不够则返回3，重新设定；<br />
-5.发布。<br />
-
-创建一个新浪微博原创任务：<br />
-1.检测创建者是否绑定新浪，否则退出；<br />
-2.创建者描述原创任务；<br />
-3.设定单价，期望点击数量；<br />
-4.算账，扣钱，余额不足则返回3，重新设定；<br />
-5.发布。<br />
-*/
-?>
-<?php
 include_once("config.php");	// init $authURL
 include_once($webRoot."foundation/status.php");
 need_login();
@@ -111,10 +92,10 @@ require_once("uiparts/docheader.php");
         echo '<label for="'.$input_id.'"><input type="radio" id="'.$input_id.'" name="person_id-name" value="'.$input_value.'" />'.$screen_name.'</label><br />';
     }
 ?>
-                    <label for="base_price1">基础出价<input type="text" name="base_price" id="base_price1" /></label><br />
-                    <label for="amount1">期望点击数量<input type="text" name="amount" id="amount1" /></label><br />
-                    <input type="hidden" name="type" value="sina_follow" />
-                    <p><input type="submit" name="submit" value="就ta了" /></p>
+                        <label for="base_price1">基础出价<input type="text" name="base_price" id="base_price1" /></label>角(请填入100以内的正整数)<br />
+                        <label for="amount1">期望点击数量<input type="text" name="amount" id="amount1" /></label>次（请填入正整数）<br />
+                        <input type="hidden" name="type" value="sina_follow" />
+                        <p><input type="submit" name="submit" value="就ta了" /></p>
                     </form>
                     </div><!-- end of DIV choose_friend -->
                     <div id="choose_follower"><!-- 从粉丝中选择 -->
@@ -128,20 +109,20 @@ require_once("uiparts/docheader.php");
         echo '<label for="'.$input_id.'"><input type="radio" id="'.$input_id.'" name="person_id-name" value="'.$input_value.'" />'.$screen_name.'</label><br />';
     }
 ?>
-                    <label for="base_price2">基础出价<input type="text" name="base_price" id="base_price2" /></label><br />
-                    <label for="amount2">期望点击数量<input type="text" name="amount" id="amount2" /></label><br />
-                    <input type="hidden" name="type" value="sina_follow" />
-                    <p><input type="submit" name="submit" value="就ta了" /></p>
+                        <label for="base_price2">基础出价<input type="text" name="base_price" id="base_price2" /></label>角(请填入100以内的正整数)<br />
+                        <label for="amount2">期望点击数量<input type="text" name="amount" id="amount2" /></label>(请填入正整数)<br />
+                        <input type="hidden" name="type" value="sina_follow" />
+                        <p><input type="submit" name="submit" value="就ta了" /></p>
                     </form>
                     </div><!-- end of DIV choose_friend -->
                     <div id="fill_name"><!-- 填写昵称 -->
-                    <h3>直接填写昵称</h3>   <!-- 此处需要提交给另外一个文件，我想 --><!-- 不需要，就用一个文件解决-->
+                    <h3>直接填写昵称</h3>
                     <form action="create_task_confirm.php?comment=by_name" method="post">
-                    <label for="sina_screen_name">新浪昵称<input type="text" name="sina_screen_name" id="sina_screen_name" /></label><br />
-                    <label for="base_price3">基础出价<input type="text" name="base_price" id="base_price3" /></label><br />
-                    <label for="amount3">期望点击数量<input type="text" name="amount" id="amount3" /></label><br />
-                    <input type="hidden" name="type" value="sina_follow" />
-                    <p><input type="submit" name="submit" value="确定"></p>
+                        <label for="sina_screen_name">新浪昵称<input type="text" name="sina_screen_name" id="sina_screen_name" /></label><br />
+                        <label for="base_price3">基础出价<input type="text" name="base_price" id="base_price3" /></label>角(请填入100以内的正整数)<br />
+                        <label for="amount3">期望点击数量<input type="text" name="amount" id="amount3" /></label>次（请填入正整数）<br />
+                        <input type="hidden" name="type" value="sina_follow" />
+                        <p><input type="submit" name="submit" value="确定"></p>
                     </form>
                     </div><!-- end of DIV fill_name -->
                 </div><!-- end of DIV create_task -->
@@ -159,8 +140,8 @@ require_once("uiparts/docheader.php");
         echo '<label for="'.$input_id.'"><input type="radio" id="'.$input_id.'" name="status_id-text" value="'.$input_value.'" />'.$text."</label><br />\n";
     }
 ?>
-                    <label for="base_price3">基础出价<input type="text" name="base_price" id="base_price3" /></label><br />
-                    <label for="amount3">期望点击数量<input type="text" name="amount" id="amount3" /></label><br />
+                    <label for="base_price4">基础出价<input type="text" name="base_price" id="base_price4" /></label>角(请填入100以内的正整数)<br />
+                    <label for="amount3">期望点击数量<input type="text" name="amount" id="amount3" /></label>次（请填入正整数）<br />
                     <input type="hidden" name="type" value="sina_forward" />
                     <input type="submit" name="submit" value="就ta了" />
                     </form>

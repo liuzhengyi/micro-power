@@ -86,14 +86,15 @@ switch ($type_db) {
     default:
         $msg = '暂不支持该类型';
 }
-$base_price = $_POST['base_price']; // 基础价
+$config_base_price = $_POST['base_price']; // 基础价
 $amount = $_POST['amount'];         // 期望点击数
-$total_price = $base_price*$amount*($ader_normal_rate+1); // 预期总费用 $ader_normal_rate init in config.php
+$config_total_price = $config_base_price*$amount*($ader_normal_rate+1); // 预期总费用 $ader_normal_rate init in config.php
+$user_total_price = price_config_to_user($config_total_price);
 
 // 当前企业用户的余额信息
 $sql = "select realtime_income from user where user_id = '{$_SESSION['uid']}'";
 $sql_res = $dbo->getRow($sql);
-$realtime_income = $sql_res['realtime_income'];
+$user_realtime_income = price_db_to_user($sql_res['realtime_income']);
 
 ?>
 <?php
@@ -119,16 +120,16 @@ require_once("uiparts/docheader.php");
                 <div id="create_task">
                     <dl>
                         <dt>任务描述</dt><dd>转发新浪微博 <sub><?php echo $text;?></sub></dd>
-                        <dt>基础单价</dt><dd><?php echo $base_price; ?>元</dd>
+                        <dt>基础单价</dt><dd><?php echo $config_base_price; ?>角</dd>
                         <dt>期望点击次数</dt><dd><?php echo $amount; ?>次</dd>
-                        <dt>预计总费用（含佣金）</dt><dd><?php echo $total_price;?>元</dd>
-                        <dt>您的当前余额</dt><dd><?php echo $realtime_income;?>元</dd>
+                        <dt>预计总费用（含佣金）</dt><dd><?php echo $user_total_price;?>元</dd>
+                        <dt>您的当前余额</dt><dd><?php echo $user_realtime_income;?>元</dd>
                         <dt>您确定要创建这个任务吗？</dt>
                         <dd>
                     <form action="action/create_task.php" method="post">
                         <input type="hidden" name="type" value="sina_forward" />
                         <input type="hidden" name="id" value="<?php echo $wid;?>" />
-                        <input type="hidden" name="base_price" value="<?php echo $base_price;?>" />
+                        <input type="hidden" name="base_price" value="<?php echo $config_base_price;?>" />
                         <input type="hidden" name="amount" value="<?php echo $amount;?>" />
                         <input type="submit" name="submit" value="创建">
                         <a href="create_task.php">返回修改一下</a>
@@ -141,10 +142,10 @@ require_once("uiparts/docheader.php");
                 <div id="create_task">
                     <dl>
                         <dt>任务描述</dt><dd>关注新浪用户 <sub><?php echo $name;?></sub></dd>
-                        <dt>基础单价</dt><dd><?php echo $base_price; ?>元</dd>
+                        <dt>基础单价</dt><dd><?php echo $config_base_price; ?>角</dd>
                         <dt>期望点击次数</dt><dd><?php echo $amount; ?>次</dd>
-                        <dt>预计总费用（含佣金）</dt><dd><?php echo $total_price;?>元</dd>
-                        <dt>您的当前余额</dt><dd><?php echo $realtime_income;?>元</dd>
+                        <dt>预计总费用（含佣金）</dt><dd><?php echo $user_total_price;?>元</dd>
+                        <dt>您的当前余额</dt><dd><?php echo $user_realtime_income;?>元</dd>
                     </dl>
                 <?php if(isset($_GET['comment']) && 'by_name' == $_GET['comment']) { ?>
                     <form action="action/create_task.php?comment=by_name" method="post">
@@ -154,7 +155,7 @@ require_once("uiparts/docheader.php");
                         <input type="hidden" name="id" value="<?php echo $uid;?>" />
                 <?php } ?>
                         <input type="hidden" name="type" value="sina_follow" />
-                        <input type="hidden" name="base_price" value="<?php echo $base_price;?>" />
+                        <input type="hidden" name="base_price" value="<?php echo $config_base_price;?>" />
                         <input type="hidden" name="amount" value="<?php echo $amount;?>" />
                         <input type="submit" name="submit" value="创建">
                         <a href="create_task.php">返回修改一下</a>
