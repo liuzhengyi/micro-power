@@ -4,15 +4,13 @@ CREATE TABLE `user` (
 	email VARCHAR(50) ,
 	nick_name VARCHAR(50) NOT NULL,
 	pass CHAR(40) ,
---    role ENUM('user', 'ader', 'master', 'other') DEFAULT 'user',
     role TINYINT UNSIGNED NOT NULL DEFAULT 1,  -- 使用数字映射用户角色
-    -- 已知映射如下：
-    -- 1-做任务赚钱的普通user，2-广告主，3-管理员 ...
---    status ENUM('normal', 'verified', 'examine', 'forbid') DEFAULT 'normal',
+    -- 已有映射如下：
+    -- 1-做任务赚钱的普通用户(user)，2-广告主(ader)，3-管理员(master) ...
     status TINYINT UNSIGNED NOT NULL DEFAULT 1,
     -- 同上，已知对应关系如下：
-    -- 1-正常，未认证，2=已认证，
-    -- 11-审核中，12-封禁
+    -- 1-正常，未认证(normal)，2=已认证(verified)，
+    -- 11-审核中(examine)，12-封禁(forbid)
     -- 默认为1
     bind_status SMALLINT UNSIGNED DEFAULT 0,  /* 新增 */
     -- 用位图方式描述用户的绑定状态，small int 占 16位，可以表示16个绑定状态
@@ -23,10 +21,10 @@ CREATE TABLE `user` (
 	task_taken INT UNSIGNED DEFAULT 0,  /* user-承接任务数|ader-发布任务数 */
 	task_finished INT UNSIGNED DEFAULT 0,   /* user-完成任务数|ader-发布的任务被完结数 */
     /* 注意：金钱在数据库内部以 厘 为单位存储 */
-    total_income INT UNSIGNED DEFAULT 0,    /* user-总入账金额|ader-总投入|其他留空*/
-        -- total_money INT UNSIGNED DEFAULT 0,    /* user-总入账金额|ader-总投入|其他留空*/
-    realtime_income INT UNSIGNED DEFAULT 0, /* user-当前账户金额|ader-当前账户金额|其他留空 */
-        -- realtime_money INT UNSIGNED DEFAULT 0, /* user-当前账户金额|ader-当前账户金额|其他留空 */
+        -- --total_income INT UNSIGNED DEFAULT 0,    /* user-总入账金额|ader-总投入|其他留空*/
+    total_money INT UNSIGNED DEFAULT 0,    /* user-总入账金额|ader-总投入|其他留空*/
+        -- --realtime_income INT UNSIGNED DEFAULT 0, /* user-当前账户金额|ader-当前账户金额|其他留空 */
+    realtime_money INT UNSIGNED DEFAULT 0, /* user-当前账户金额|ader-当前账户金额|其他留空 */
     cell_phone CHAR(11) DEFAULT NULL,    /* 可用于实名认证。ader注册必填? */
 	reg_time DATETIME NOT NULL,
 	PRIMARY KEY(user_id),
@@ -43,12 +41,12 @@ CREATE TABLE `user_info_sina` (     -- 用户绑定新浪微博或使用新浪�
     sina_uid BIGINT UNSIGNED,       -- 用户新浪uid
     sina_token VARCHAR(50),
     token_update_at DATETIME,       -- 此两项是给使用api的爬虫使用的，可以提前判断用户的token是否还有效
-    token_expire_in INT UNSIGNED,
-        -- token_expires_in INT UNSIGNED,
+        -- --token_expire_in INT UNSIGNED,
+    token_expires_in INT UNSIGNED,
     sina_level TINYINT DEFAULT 3,   -- 新浪微博等级， 微动力评定，评分公式孕育中
     sina_screen_name VARCHAR(60),   -- 用户新浪屏显名称
-        -- sina_profile_image_url varchar(80),    -- 用户新浪小头像地址
-        -- sina_avatar_url varchar(80),    -- 用户新浪大头像地址
+        -- ADD sina_profile_image_url varchar(80),    -- 用户新浪小头像地址
+        -- ADD sina_avatar_url varchar(80),    -- 用户新浪大头像地址
     sina_location VARCHAR(30),      -- 用户新浪location
     sina_description VARCHAR(220),  -- 用户新浪description
     bind_time DATETIME NOT NULL,    -- 用户绑定新浪微博的时间
@@ -79,29 +77,30 @@ CREATE TABLE `task` (
 	task_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	owner_id INT UNSIGNED NOT NULL, /* ader_id */
 	publisher_id INT UNSIGNED NOT NULL DEFAULT 1,
---	task_type ENUM('follow', 'forward', 'review', 'create'),    -- change --
-    task_type TINYINT UNSIGNED, -- 用数字映射任务类型，相当于预留了二百多个任务类型
-        -- type TINYINT UNSIGNED, -- 用数字映射任务类型，相当于预留了二百多个任务类型
+        -- -- task_type TINYINT UNSIGNED, -- 用数字映射任务类型，相当于预留了二百多个任务类型
+    type TINYINT UNSIGNED, -- 用数字映射任务类型，相当于预留了二百多个任务类型
     -- 目前已有的对应关系：
     -- 1-新浪转发-sina_forward，2-新浪关注-sina_follow，3-新浪评论-sina_review，4-新浪原创-sina_create
+        -- 1-新浪转发-sina_repost，2-新浪关注-sina_follow，3-新浪评论-sina_review，4-新浪原创-sina_create
     -- 11-腾讯转发-qq_forward，12-腾讯关注-qq_follow，13-腾讯评论-qq_review，4-腾讯原创-qq_create
-	task_offer INT UNSIGNED DEFAULT 500,
-	    -- base_price INT UNSIGNED DEFAULT 500,
+        -- 11-腾讯转发-qq_follow，12-腾讯关注-qq_follow，13-腾讯评论-qq_review，4-腾讯原创-qq_create
+	    -- -- task_offer INT UNSIGNED DEFAULT 500,
+	base_price INT UNSIGNED DEFAULT 500,
 	/* 原始佣金 以 厘 为单位 默认为500厘 并非用户的真正佣金 */
-	task_amount INT UNSIGNED NOT NULL,
-	    -- amount INT UNSIGNED NOT NULL,
-    task_finish_amount INT UNSIGNED NOT NULL DEFAULT 0,
-	    -- finish_amount INT UNSIGNED NOT NULL DEFAULT 0,
-    task_status TINYINT UNSIGNED DEFAULT 1, -- 同task_type，用数字取代之前的enum类型，留下更多可扩展空间
-        -- status TINYINT UNSIGNED DEFAULT 1, -- 同task_type，用数字取代之前的enum类型，留下更多可扩展空间
+	    -- -- task_amount INT UNSIGNED NOT NULL,
+	amount INT UNSIGNED NOT NULL,
+        -- -- task_finish_amount INT UNSIGNED NOT NULL DEFAULT 0,
+	finish_amount INT UNSIGNED NOT NULL DEFAULT 0,
+        -- -- task_status TINYINT UNSIGNED DEFAULT 1, -- 同type，用数字取代之前的enum类型，留下更多可扩展空间
+    status TINYINT UNSIGNED DEFAULT 1, -- 同type，用数字取代之前的enum类型，留下更多可扩展空间
     -- 目前已有的对应关系：
     -- 1-正常进行中，2-正常结束，
     -- 11-非正常关闭，12-审核中
     -- 默认1-正常
-        -- create_at datetime not null,
-        -- expire_at datetime not null,
+    create_at timestamp not null,
+    expire_in bigint unsigned not null default 864000,
 	PRIMARY KEY (task_id),
-	INDEX (task_type)
+	INDEX (type)
 );
 -- DESCRIBE `task`;
 
@@ -161,8 +160,8 @@ CREATE TABLE `do_task` (
     task_type TINYINT UNSIGNED NOT NULL,    -- task表中的该字段
     -- 1-新浪转发-sina_forward，2-新浪关注-sina_follow，3-新浪评论-sina_review，4-新浪原创-sina_create
     -- 11-腾讯转发-qq_forward，12-腾讯关注-qq_follow，13-腾讯评论-qq_review，4-腾讯原创-qq_create
-    owner_name varchar(60) NOT NULL;
-    income INT UNSIGNED NOT NULL;
+    owner_name varchar(60) NOT NULL,
+    income INT UNSIGNED NOT NULL,
     /* repost_mid 仅针对转发任务，为转发产生的微博的mid，十进制 */
     --  此字段是为爬虫验证转发任务准备的，放在这里并不合适，暂时如此
     repost_mid BIGINT UNSIGNED DEFAULT NULL,    

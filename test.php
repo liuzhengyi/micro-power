@@ -70,7 +70,7 @@ ini_set("display_errors", 1);
             $middle_pic = $dbo->real_escape_string($v['bmiddle_pic']);
             $original_pic = $dbo->real_escape_string($v['original_pic']);
             $text = $dbo->real_escape_string($v['text']);
-            echo "insert into task (owner_id, publisher_id, task_type, task_offer, task_amount, task_finish_amount, task_status) values (2, 3, 1, 500, 300, 10, 1);<br />";
+            echo "insert into task (owner_id, publisher_id, type, base_price, amount, finish_amount, status) values (2, 3, 1, 500, 300, 10, 1);<br />";
             echo "insert into task_info_sina_forward (task_id, sina_uid, sina_wid, text, screen_name, location, user_description, profile_image_url, thumbnail_pic_url, bmiddle_pic_url, original_pic_url) values(last_insert_id(), '$sid', '$wid', '$text','$screen_name', NULL, NULL, '$profile_image', '$thumb_pic', '$middle_pic', '$original_pic');<br />";
             echo '</p>';
         }
@@ -146,7 +146,7 @@ ini_set("display_errors", 1);
         $weibo_bmiddle_pic_url = $dbo->real_escape_string($weibo['bmiddle_pic_url']);
         $weibo_text = $dbo->real_escape_string($weibo['text']);
         // 输出相应sql语句
-        //$sql = "<p>INSERT INTO `task` (task_id, owner_id, publisher_id, task_type, task_sina_uid, task_sina_wid, task_offer, task_amount, task_finish_amount, task_screen_name, task_icon_url, task_thumbnail_pic_url, task_bmiddle_pic_url, task_text) values(NULL, 1, 1, 'forward', $weibo_user_id, $weibo_id, 60, 123, 121, '$weibo_user_screen_name', '$weibo_user_profile_image_url', '$weibo_thumbnail_pic', '$weibo_bmiddle_pic_url', '$weibo_text');</p>";
+        //$sql = "<p>INSERT INTO `task` (task_id, owner_id, publisher_id, type, task_sina_uid, task_sina_wid, base_price, amount, finish_amount, task_screen_name, task_icon_url, task_thumbnail_pic_url, task_bmiddle_pic_url, task_text) values(NULL, 1, 1, 'forward', $weibo_user_id, $weibo_id, 60, 123, 121, '$weibo_user_screen_name', '$weibo_user_profile_image_url', '$weibo_thumbnail_pic', '$weibo_bmiddle_pic_url', '$weibo_text');</p>";
         //echo $sql;
         // 输出简单信息
         $line = $weibo_text.' by: '.$weibo_user_screen_name;
@@ -240,7 +240,7 @@ function get_user_friends_by_name($name, $c, $dbo)
         $avatar_large_url = $dbo->real_escape_string($user['avatar_large']);
         $location = $dbo->real_escape_string($user['location']);
         $description = $dbo->real_escape_string($user['description']);
-		$sql_basic = "INSERT INTO `task` (owner_id, publisher_id, task_type, task_offer, task_amount, task_finish_amount, task_status )VALUES (1, 1, 2, 700, 100, 39, 1);";
+		$sql_basic = "INSERT INTO `task` (owner_id, publisher_id, type, base_price, amount, finish_amount, status )VALUES (1, 1, 2, 700, 100, 39, 1);";
         $sql_advance = "insert into `task_info_sina_follow` (task_id, sina_uid, screen_name, friends_count, followers_count, weibo_count, profile_image_url, avatar_large_url, location, user_description) values (last_insert_id(), '$idstr', '$screen_name', '$friends_count', '$followers_count', '$weibo_count', '$profile_image_url', '$avatar_large_url', '$location', '$description');";
         echo "<p>$sql_basic<br />$sql_advance</p>";
 	}
@@ -275,7 +275,7 @@ function get_user_friends_by_name($name, $c, $dbo)
 // 测试50个用户的最新50条微博的平均转发/评论数
 // 好费API啊！！！
 /*
-$sql = 'select task_sina_uid from task where task_type="follow" limit 50';
+$sql = 'select task_sina_uid from task where type="follow" limit 50';
 $uids = $dbo->getRs($sql);
 echo '<table><tr><th>微博id</th><th>最新微博数量</th><th>每条微博平均被转发数</th><th>每条微博平均被评论数</th></tr>';
 foreach($uids as $uid) {

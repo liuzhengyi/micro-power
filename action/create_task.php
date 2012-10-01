@@ -31,16 +31,17 @@ $c = new SaeTClientV2( WB_AKEY, WB_SKEY, $_SESSION['stoken']);
 include_once($webRoot."lib/dbo.class.php");
 include_once($dbConfFile);
 $dbo = new dbex($dbServs);
-$sql = "select realtime_income from user where user_id = '{$_SESSION['uid']}'";
+$sql = "select realtime_money from user where user_id = '{$_SESSION['uid']}'";
 $sql_res = $dbo->getRow($sql);
 //if_mysql_fail($dbo, $sql_res, $sql, __FILE__, __LINE__);
-$db_realtime_income = $sql_res['realtime_income'];
+$db_realtime_money = $sql_res['realtime_money'];
 $config_base_price = intval($_POST['base_price']);
 $db_base_price = price_config_to_db($config_base_price);
 $amount = intval($_POST['amount']);
+$expire_in = intval($_POST['expire_in']);
 $config_total_price = $config_base_price*$amount*(1+$ader_normal_rate);
 $db_total_price = price_config_to_db($config_total_price);
-if($db_realtime_income < $db_total_price) {
+if($db_realtime_money < $db_total_price) {
     $msg = '余额不足，请重新配置任务。';
     $to_url = $siteRoot.'create_task.php';
     $to_name = 'create task page';
@@ -63,15 +64,15 @@ switch ($type_db) {
         foreach($statuses['statuses'] as $status) {
             if($wid == $status['id']) { // wid 是当前用户的原创微博
                 // 扣钱先
-                $sql = "update user set realtime_income = realtime_income-$db_total_price where user_id = '{$_SESSION['uid']}' limit 1";
+                $sql = "update user set realtime_money = realtime_money - $db_total_price where user_id = '{$_SESSION['uid']}' limit 1";
                 $num = $dbo->exeUpdate($sql);
                 if(1 != $num) {$msg="扣钱失败，跳转。SQL:".$sql; debug($msg, __FILE__, __LINE__);}
                 // 扣钱成功，写task表
-                $sql = "insert into task (owner_id, publisher_id, task_type, task_offer, task_amount, task_status) values('{$_SESSION['uid']}', '{$_SESSION['uid']}', 1, '$db_base_price', '$amount', 1)";
+                $sql = "insert into task (owner_id, publisher_id, type, base_price, amount, status, create_at, expire_in) values('{$_SESSION['uid']}', '{$_SESSION['uid']}', 1, '$db_base_price', '$amount', 1, now(), '$expire_in')";
                 $num = $dbo->exeUpdate($sql);
                 if(1 != $num) {
                     // 写数据表失败，回滚金钱数据
-                    $sql2 = "update user set realtime_income=realtime_income+$db_total_price where user_id = '{$_SESSION['uid']}' limit 1";
+                    $sql2 = "update user set realtime_money=realtime_money + $db_total_price where user_id = '{$_SESSION['uid']}' limit 1";
                     $num2 = $dbo->exeUpdate($sql2);
                     if(1 != $num2) {
                         $msg = "回滚金钱数据失败，这个比较糟糕。SQL:".$sql2;
@@ -93,7 +94,7 @@ switch ($type_db) {
                     // 回滚金钱数据和task表数据
                     $sql1 = "delete from task where task_id = '$last_task_id' limit 1";
                     $num1 = $dbo->exeUpdate($sql1);
-                    $sql2 = "update user set realtime_income=realtime_income+$db_total_price where user_id = '{$_SESSION['uid']}' limit 1";
+                    $sql2 = "update user set realtime_money = realtime_money + $db_total_price where user_id = '{$_SESSION['uid']}' limit 1";
                     $num2 = $dbo->exeUpdate($sql2);
                     if(1 != $num1 ) {$msg="回滚金钱数据失败，这个比较糟糕。SQL:".$sql1; debug($msg, __FILE__, __LINE__);}
                     if(1 != $num2 ) {$msg="回滚task数据失败，SQL:".$sql2; debug($msg, __FILE__, __LINE__);}
@@ -121,15 +122,15 @@ switch ($type_db) {
             delay_jump(3, $msg, $to_url, $to_name);
         }
         // 欲关注的用户存在，扣钱先
-        $sql = "update user set realtime_income = realtime_income-$db_total_price where user_id = '{$_SESSION['uid']}' limit 1";
+        $sql = "update user set realtime_money = realtime_money - $db_total_price where user_id = '{$_SESSION['uid']}' limit 1";
         $num = $dbo->exeUpdate($sql);
         if(1 != $num) {$msg="扣钱失败，跳转。SQL:".$sql; debug($msg, __FILE__, __LINE__);}
         // 扣钱成功，写task表
-        $sql = "insert into task (owner_id, publisher_id, task_type, task_offer, task_amount, task_status) values('{$_SESSION['uid']}', '{$_SESSION['uid']}', 2, '$db_base_price', '$amount', 1)";
+        $sql = "insert into task (owner_id, publisher_id, type, base_price, amount, status, create_at, expire_in) values('{$_SESSION['uid']}', '{$_SESSION['uid']}', 2, '$db_base_price', '$amount', 1, now(), '$expire_in')";
         $num = $dbo->exeUpdate($sql);
         if(1 != $num) {
             // 写数据表失败，回滚金钱数据
-            $sql2 = "update user set realtime_income=realtime_income+$db_total_price where user_id = '{$_SESSION['uid']}' limit 1";
+            $sql2 = "update user set realtime_money = realtime_money + $db_total_price where user_id = '{$_SESSION['uid']}' limit 1";
             $num2 = $dbo->exeUpdate($sql2);
             if(1 != $num2) {
                 $msg = "回滚金钱数据失败，这个比较糟糕。SQL:".$sql2;
@@ -150,12 +151,13 @@ switch ($type_db) {
             // 回滚金钱数据和task表数据
             $sql1 = "delete from task where task_id = '$last_task_id' limit 1";
             $num1 = $dbo->exeUpdate($sql1);
-            $sql2 = "update user set realtime_income=realtime_income+$db_total_price where user_id = '{$_SESSION['uid']}' limit 1";
+            $sql2 = "update user set realtime_money = realtime_money + $db_total_price where user_id = '{$_SESSION['uid']}' limit 1";
             $num2 = $dbo->exeUpdate($sql2);
             if(1 != $num1 ) {$msg="回滚金钱数据失败，这个比较糟糕。SQL:".$sql1; debug($msg, __FILE__, __LINE__);}
             if(1 != $num2 ) {$msg="回滚task数据失败，SQL:".$sql2; debug($msg, __FILE__, __LINE__);}
         }
         // 任务插入完毕
+        $_SESSION['user_realtime_money'] -= price_db_to_user($db_total_price);
         $msg = "恭喜，任务创建成功";
         $to_url = $siteRoot.'task.php'; // 如何跳到指定的任务？设立‘我的任务页面’？
         delay_jump(3, $msg, $to_url, '任务列表');

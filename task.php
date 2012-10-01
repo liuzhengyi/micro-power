@@ -45,7 +45,7 @@ $type_db = task_type_switch($type, TRUE);
 include_once("lib/dbo.class.php");
 include_once($dbConfFile);
 $dbo = new dbex($dbServs);
-$sql_count = "select count(1) from task where task_type='$type_db' and task_status=1";
+$sql_count = "select count(1) from task where type='$type_db' and status=1";
 $count = $dbo->getCount($sql_count);
 global $task_per_page;	// init in config.php
 $per_page = $task_per_page;
@@ -56,11 +56,11 @@ if(isset($_GET['page']) && $_GET['page'] >= 1 && $_GET['page'] <= $total_page) {
 	$page = 1;
 }
 switch($type) {
-    case 'sina_forward': // sina_forward , task_type == 1
-        $sql = "select task_id, owner_id, publisher_id,task_offer, task_amount, task_finish_amount, sina_uid, sina_wid, text, screen_name, location, user_description, profile_image_url, thumbnail_pic_url, bmiddle_pic_url, original_pic_url from task join task_info_sina_forward using(task_id) where task_type = 1 and  task_status=1 and task_id not in (select task_id from do_task where user_id = {$_SESSION['uid']})";
+    case 'sina_forward': // sina_forward , type == 1
+        $sql = "select task_id, owner_id, publisher_id,base_price, amount, finish_amount, sina_uid, sina_wid, text, screen_name, location, user_description, profile_image_url, thumbnail_pic_url, bmiddle_pic_url, original_pic_url from task join task_info_sina_forward using(task_id) where type = 1 and  status=1 and task_id not in (select task_id from do_task where user_id = {$_SESSION['uid']})";
         break;
-    default: // sina_follow , task_type == 2
-        $sql = "select task_id, owner_id, publisher_id, task_offer, task_amount, task_finish_amount, sina_uid, screen_name, friends_count, followers_count, weibo_count, profile_image_url, avatar_large_url, location, user_description from task join task_info_sina_follow using(task_id) where task_type=2 and task_status=1 and task_id not in (select task_id from do_task where user_id = {$_SESSION['uid']})";
+    default: // sina_follow , type == 2
+        $sql = "select task_id, owner_id, publisher_id, base_price, amount, finish_amount, sina_uid, screen_name, friends_count, followers_count, weibo_count, profile_image_url, avatar_large_url, location, user_description from task join task_info_sina_follow using(task_id) where type=2 and status=1 and task_id not in (select task_id from do_task where user_id = {$_SESSION['uid']})";
 }
 $start = ($page-1)*$per_page;
 $res = $dbo->getPage($sql, $start, $per_page);
@@ -96,8 +96,8 @@ require_once("uiparts/docheader.php");
         <?php switch ($type) { case 'sina_follow': ?>
                 <div id="task_show">
                 <?php foreach($res as $row) {
-                    $user_level_price = price_db_to_user(price_base_to_level($row['task_offer'], $_SESSION['slevel']));
-                    $user_top_price = price_db_to_user(price_base_to_top($row['task_offer']));
+                    $user_level_price = price_db_to_user(price_base_to_level($row['base_price'], $_SESSION['slevel']));
+                    $user_top_price = price_db_to_user(price_base_to_top($row['base_price']));
                 ?>
                     <div id="task_block">
                     <img src="<?php echo $row['avatar_large_url']; ?>" />
@@ -126,8 +126,8 @@ require_once("uiparts/docheader.php");
             <?php case 'sina_forward': ?>
                 <div id="task_show">
                     <?php foreach($res as $row) {
-                        $user_level_price = price_db_to_user(price_base_to_level($row['task_offer'], $_SESSION['slevel']));
-                        $user_top_price = price_db_to_user(price_base_to_top($row['task_offer']));
+                        $user_level_price = price_db_to_user(price_base_to_level($row['base_price'], $_SESSION['slevel']));
+                        $user_top_price = price_db_to_user(price_base_to_top($row['base_price']));
                     ?>
                     <div class="task_block">
                         <p><?php

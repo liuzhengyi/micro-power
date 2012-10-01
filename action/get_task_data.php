@@ -16,7 +16,7 @@ include_once($webRoot.'foundation/debug.php');
 $c = new SaeTClientV2(WB_AKEY, WB_SKEY, $_SESSION['stoken']);
 $dbo = new dbex($dbServs);
 /* 获取关注任务的图标url */
-$sql = "select task_id, task_sina_uid from task where task_type='follow' and (task_icon_url IS NULL OR task_screen_name IS NULL OR task_location IS NULL) limit 2";
+$sql = "select task_id, task_sina_uid from task where type='follow' and (task_icon_url IS NULL OR task_screen_name IS NULL OR task_location IS NULL) limit 2";
 $sql_res =  $dbo->getRs($sql);
 foreach($sql_res as $user) {
     $user_info = $c->show_user_by_id($user['task_sina_uid']);
@@ -31,7 +31,7 @@ foreach($sql_res as $user) {
 }
 
 /* 获取转发任务的小图标，微博内容，微博图片大url和小url */
-$sql = "select task_id, task_sina_wid from task where task_type='forward' and (task_icon_url IS NULL OR task_thumbnail_pic_url IS NULL OR task_bmiddle_pic_url IS NULL OR task_text IS NULL) limit 50";
+$sql = "select task_id, task_sina_wid from task where type='forward' and (task_icon_url IS NULL OR task_thumbnail_pic_url IS NULL OR task_bmiddle_pic_url IS NULL OR task_text IS NULL) limit 50";
 $sql_res = $dbo->getRs($sql);
 foreach($sql_res as $user) {
     $weibo = $c->show_status($user['task_sina_wid']);

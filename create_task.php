@@ -93,7 +93,8 @@ require_once("uiparts/docheader.php");
     }
 ?>
                         <label for="base_price1">基础出价<input type="text" name="base_price" id="base_price1" /></label>角(请填入100以内的正整数)<br />
-                        <label for="amount1">期望点击数量<input type="text" name="amount" id="amount1" /></label>次（请填入正整数）<br />
+                        <label for="amount1">任务数量<input type="text" name="amount" id="amount1" /></label>次（请填入正整数）<br />
+                        <label for="expire_in1">有效时间<input type="text" name="expire_in" id="expire_in1" /></label>天（请填入100以内的正整数）<br />
                         <input type="hidden" name="type" value="sina_follow" />
                         <p><input type="submit" name="submit" value="就ta了" /></p>
                     </form>
@@ -110,7 +111,8 @@ require_once("uiparts/docheader.php");
     }
 ?>
                         <label for="base_price2">基础出价<input type="text" name="base_price" id="base_price2" /></label>角(请填入100以内的正整数)<br />
-                        <label for="amount2">期望点击数量<input type="text" name="amount" id="amount2" /></label>(请填入正整数)<br />
+                        <label for="amount2">任务数量<input type="text" name="amount" id="amount2" /></label>(请填入正整数)<br />
+                        <label for="expire_in2">有效时间<input type="text" name="expire_in" id="expire_in2" /></label>天（请填入100以内的正整数）<br />
                         <input type="hidden" name="type" value="sina_follow" />
                         <p><input type="submit" name="submit" value="就ta了" /></p>
                     </form>
@@ -120,7 +122,8 @@ require_once("uiparts/docheader.php");
                     <form action="create_task_confirm.php?comment=by_name" method="post">
                         <label for="sina_screen_name">新浪昵称<input type="text" name="sina_screen_name" id="sina_screen_name" /></label><br />
                         <label for="base_price3">基础出价<input type="text" name="base_price" id="base_price3" /></label>角(请填入100以内的正整数)<br />
-                        <label for="amount3">期望点击数量<input type="text" name="amount" id="amount3" /></label>次（请填入正整数）<br />
+                        <label for="amount3">任务数量<input type="text" name="amount" id="amount3" /></label>次（请填入正整数）<br />
+                        <label for="expire_in3">有效时间<input type="text" name="expire_in" id="expire_in3" /></label>天（请填入100以内的正整数）<br />
                         <input type="hidden" name="type" value="sina_follow" />
                         <p><input type="submit" name="submit" value="确定"></p>
                     </form>
@@ -141,7 +144,8 @@ require_once("uiparts/docheader.php");
     }
 ?>
                     <label for="base_price4">基础出价<input type="text" name="base_price" id="base_price4" /></label>角(请填入100以内的正整数)<br />
-                    <label for="amount3">期望点击数量<input type="text" name="amount" id="amount3" /></label>次（请填入正整数）<br />
+                    <label for="amount4">任务数量<input type="text" name="amount" id="amount4" /></label>次（请填入正整数）<br />
+                    <label for="expire_in4">有效时间<input type="text" name="expire_in" id="expire_in4" /></label>天（请填入100以内的正整数）<br />
                     <input type="hidden" name="type" value="sina_forward" />
                     <input type="submit" name="submit" value="就ta了" />
                     </form>

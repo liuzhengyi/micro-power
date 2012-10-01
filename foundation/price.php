@@ -30,14 +30,14 @@ function price_user_to_db($money)
 // 配置页面价格（角） 转换为 数据库价格（厘）
 function price_config_to_db($money)
 {
-    $money = intval($money);
+    $money = floatval($money);
     return $money*100;
 }
 
 // 配置页面价格（角） 转换为 用户页面价格（元）
 function price_config_to_user($money)
 {
-    $money = intval($money);
+    $money = floatval($money);
     return $money/10;
 }
 

@@ -39,7 +39,7 @@ if(isset($_GET['id'])) {
 // 从数据库中取出task_id标识的关注任务的uid
 $dbo = new dbex($dbServs);
 echo '<h2>任务 '.$task_id.' 的完成情况</h3>';
-$sql = "select task_sina_uid, task_screen_name from task where task_id = $task_id and task_type = 'follow' limit 1";
+$sql = "select task_sina_uid, task_screen_name from task where task_id = $task_id and type = 'follow' limit 1";
 $sql_res = $dbo->getRow($sql);
 if(!$sql_res || 0 === count($sql_res)) {
     echo '<p>不存在该任务或该任务不是关注任务，对于非关注任务，请使用其专用接口。</p>';

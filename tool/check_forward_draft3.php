@@ -28,7 +28,7 @@ if(!is_login()) {
 $uid = $_SESSION['uid'];
 $dbo = new dbex($dbServs);
 echo '<h3>我做转发任务产生的mid</h3>';
-$sql = "select task_id, repost_mid, task_text from do_task JOIN task using(task_id) where user_id = $uid and status = 'finish' and task_type = 'forward' limit 10";
+$sql = "select task_id, repost_mid, task_text from do_task JOIN task using(task_id) where user_id = $uid and status = 'finish' and type = 'forward' limit 10";
 $sql_res = $dbo->getRs($sql);
 $task_weibo_mids = array();
 if(0 != count($sql_res)) {

@@ -25,7 +25,7 @@ if(!isset($_GET['id'])) {   // 非正常访问
     }
 
     $c = new SaeTClientV2( WB_AKEY, WB_SKEY, $_SESSION['stoken']);
-	// 先尝试更新task表中task_finish_amount值，若更新成功则做任务，若任务失败，再回滚数据。未使用事务。
+	// 先尝试更新task表中finish_amount值，若更新成功则做任务，若任务失败，再回滚数据。未使用事务。
 	$dbo = new dbex($dbServs);
     if(isset($_GET['type']) && 'hide'==$_GET['type']) { // 屏蔽此任务 status-21
         $sql = "insert into do_task(task_id, user_id, status, time) values($task_id, {$_SESSION['uid']}, '21', now())";
@@ -47,9 +47,9 @@ if(!isset($_GET['id'])) {   // 非正常访问
         */
     }
     // 尝试完成此任务
-	$sql = "update task set task_finish_amount=task_finish_amount+1 where task_id=$task_id and task_finish_amount < task_amount limit 1";
+	$sql = "update task set finish_amount=finish_amount+1 where task_id=$task_id and finish_amount < amount limit 1";
 	$sql_num = $dbo->exeUpdate($sql);
-	if(1 != $sql_num) {	// 更新task表中task_finish_amount失败，尝试其他任务
+	if(1 != $sql_num) {	// 更新task表中finish_amount失败，尝试其他任务
 		$dbo->close();
 		$msg = "对不起，此任务已经被做完了请选择其他任务。";
         $to_url = $_SERVER['HTTP_REFERER'];
@@ -58,7 +58,7 @@ if(!isset($_GET['id'])) {   // 非正常访问
 	}
 	// 已经更新了task中的数据，现在做任务
 	// 先获取任务信息
-	$sql = "select sina_uid, task_offer, screen_name from task join task_info_sina_follow using(task_id) where task_id = $task_id";
+	$sql = "select sina_uid, base_price, screen_name from task join task_info_sina_follow using(task_id) where task_id = $task_id";
 	$sql_res = $dbo->getRow($sql);
 	if(!$sql_res) {
 		echo '读数据库出错，FILE: '.__FILE__.'; LINE: '.__LINE__.';SQL: '.$sql;
@@ -66,13 +66,13 @@ if(!isset($_GET['id'])) {   // 非正常访问
 		exit();
 	}
 	$sina_uid = $sql_res['sina_uid'];
-	$task_offer = $sql_res['task_offer'];
+	$base_price = $sql_res['base_price'];
     $task_owner_name = $sql_res['screen_name'];
 	$task_res = $c->follow_by_id($sina_uid);
 //	if_weiboapi_fail($task_res, __FILE__, __LINE__);
 //  此处不应使用if_weiboapi_fail(),因为它对调用失败的处理只是简单的输出提示，不满足此处处理的需要。
-	if(isset($task_res['error_code'])) { // 没做成功，回滚task表中task_finish_amount数据
-		$sql = "update task set task_finish_amount = task_finish_amount - 1 where task_id = $task_id limit 1";
+	if(isset($task_res['error_code'])) { // 没做成功，回滚task表中finish_amount数据
+		$sql = "update task set finish_amount = finish_amount - 1 where task_id = $task_id limit 1";
 		$dbo->exeUpdate($sql);
 		$dbo->close();
         if(21327 === $task_res['error_code']) {
@@ -87,7 +87,7 @@ if(!isset($_GET['id'])) {   // 非正常访问
 	}
 	// 做成功了，写数据库，写SESSION    对应do_task status 11 正常完成
 	// 写do_task表
-    $db_level_money = price_base_to_level($task_offer, $_SESSION['slevel']);
+    $db_level_money = price_base_to_level($base_price, $_SESSION['slevel']);
 	$sql = "insert do_task (task_id, user_id, status, task_type, owner_name, income, repost_mid, time)values($task_id, {$_SESSION['uid']}, 11, 2, '$task_owner_name', '$db_level_money', NULL, now())";
 	$sql_num = $dbo->exeUpdate($sql);
 	if(1 != $sql_num) {
@@ -98,7 +98,7 @@ if(!isset($_GET['id'])) {   // 非正常访问
 	}
 	// 写user表
 	$sql =	"update user set task_taken=task_taken+1, task_finished=task_finished+1,"
-		." total_income=total_income+$db_level_money, realtime_income=realtime_income+$db_level_money"
+		." total_money=total_money+$db_level_money, realtime_money=realtime_money+$db_level_money"
 		." where user_id = {$_SESSION['uid']} limit 1";
 	$sql_num = $dbo->exeUpdate($sql);
 	if(1 != $sql_num) {
@@ -109,6 +109,7 @@ if(!isset($_GET['id'])) {   // 非正常访问
 	}
 	// 写数据成功，释放数据库连接
 	$dbo->close();
+    $_SESSION['user_realtime_money'] = $_SESSION['user_realtime_money'] + price_db_to_user($db_level_price);
 	$_SESSION['followed_id'][] = $sina_uid;
     $msg = '恭喜！您成功完成了XX任务，获利XX元。';
     $to_url = $_SERVER['HTTP_REFERER'];

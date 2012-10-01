@@ -86,15 +86,17 @@ switch ($type_db) {
     default:
         $msg = '暂不支持该类型';
 }
-$config_base_price = $_POST['base_price']; // 基础价
-$amount = $_POST['amount'];         // 期望点击数
-$config_total_price = $config_base_price*$amount*($ader_normal_rate+1); // 预期总费用 $ader_normal_rate init in config.php
+$config_base_price = intval($_POST['base_price']); // 基础价
+$amount = intval($_POST['amount']);         // 期望点击数
+global $ader_normal_rate;   // init in config.php
+$config_total_price = $config_base_price*$amount*($ader_normal_rate+1);
 $user_total_price = price_config_to_user($config_total_price);
+$expire_in = intval($_POST['expire_in']);
 
 // 当前企业用户的余额信息
-$sql = "select realtime_income from user where user_id = '{$_SESSION['uid']}'";
+$sql = "select realtime_money from user where user_id = '{$_SESSION['uid']}'";
 $sql_res = $dbo->getRow($sql);
-$user_realtime_income = price_db_to_user($sql_res['realtime_income']);
+$user_realtime_money = price_db_to_user($sql_res['realtime_money']);
 
 ?>
 <?php
@@ -123,7 +125,8 @@ require_once("uiparts/docheader.php");
                         <dt>基础单价</dt><dd><?php echo $config_base_price; ?>角</dd>
                         <dt>期望点击次数</dt><dd><?php echo $amount; ?>次</dd>
                         <dt>预计总费用（含佣金）</dt><dd><?php echo $user_total_price;?>元</dd>
-                        <dt>您的当前余额</dt><dd><?php echo $user_realtime_income;?>元</dd>
+                        <dt>有效日期</dt><dd><?php echo $expire_in; ?>天</dd>
+                        <dt>您的当前余额</dt><dd><?php echo $user_realtime_money;?>元</dd>
                         <dt>您确定要创建这个任务吗？</dt>
                         <dd>
                     <form action="action/create_task.php" method="post">
@@ -131,6 +134,7 @@ require_once("uiparts/docheader.php");
                         <input type="hidden" name="id" value="<?php echo $wid;?>" />
                         <input type="hidden" name="base_price" value="<?php echo $config_base_price;?>" />
                         <input type="hidden" name="amount" value="<?php echo $amount;?>" />
+                        <input type="hidden" name="expire_in" value="<?php echo $expire_in; ?>">
                         <input type="submit" name="submit" value="创建">
                         <a href="create_task.php">返回修改一下</a>
                     </form>
@@ -145,7 +149,8 @@ require_once("uiparts/docheader.php");
                         <dt>基础单价</dt><dd><?php echo $config_base_price; ?>角</dd>
                         <dt>期望点击次数</dt><dd><?php echo $amount; ?>次</dd>
                         <dt>预计总费用（含佣金）</dt><dd><?php echo $user_total_price;?>元</dd>
-                        <dt>您的当前余额</dt><dd><?php echo $user_realtime_income;?>元</dd>
+                        <dt>有效日期</dt><dd><?php echo $expire_in; ?>天</dd>
+                        <dt>您的当前余额</dt><dd><?php echo $user_realtime_money;?>元</dd>
                     </dl>
                 <?php if(isset($_GET['comment']) && 'by_name' == $_GET['comment']) { ?>
                     <form action="action/create_task.php?comment=by_name" method="post">
@@ -157,6 +162,7 @@ require_once("uiparts/docheader.php");
                         <input type="hidden" name="type" value="sina_follow" />
                         <input type="hidden" name="base_price" value="<?php echo $config_base_price;?>" />
                         <input type="hidden" name="amount" value="<?php echo $amount;?>" />
+                        <input type="hidden" name="expire_in" value="<?php echo $expire_in; ?>">
                         <input type="submit" name="submit" value="创建">
                         <a href="create_task.php">返回修改一下</a>
                     </form>

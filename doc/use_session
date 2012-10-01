@@ -1,9 +1,0 @@
-SESSION 名值对应关系
-
-uid	用户在本站的id
-name	用户在本站的昵称
-sid	用户在sina的id
-stoken	用户的weibo授权token
-slevel	用户的微博级别，由我们评定
-is_login    是否登录
-is_bind_weibo   是否绑定weibo

@@ -7,14 +7,27 @@
 	if(isset($_SESSION['uid'])) {	// 已经登录
         if('ader' == $_SESSION['role']) {
             $screen_type = '企业用户';
+            $money_name = '当前余额';
         } else if ( 'user' == $_SESSION['role'] ) {
             $screen_type = '个人用户';
+            $money_name = '当前投入';
         } else if ( 'master' == $_SESSION['role'] ) {
             $screen_type = '管理员';
+            $money_name = '当前余额';
         }
+        /*
+include_once($webRoot.'lib/dbo.class.php');
+include_once( $dbConfFile );
+        $dbo = new dbex($dbServs);
+        $sql = "select realtime_money from user where user_id = '{$_SESSION['uid']}' limit 1";
+        $sql_res = $dbo->getRow($sql);
+        $realtime_money = price_db_to_user($sql_res['realtime_money']);
+        */
+        $user_realtime_money = $_SESSION['user_realtime_money'];
 		echo "<p>{$_SESSION['name']}，您好，您是 $screen_type (level {$_SESSION['level']})。</p>";
+        echo "<p>您的 $money_name ： $user_realtime_money 元。</p>";
 		if(isset($_SESSION['sid'])) {
-			echo "<p>您已绑定新浪微博。(level {$_SESSION['slevel']})(<a href={$siteRoot}action/evaluate.php>评级</a>)</p>";
+			echo "<p>您已绑定新浪微博。(level {$_SESSION['slevel']} <a href={$siteRoot}action/evaluate.php>评级</a>)</p>";
 		} else {
 			echo "<p>您需要绑定新浪微博才能做任务赚钱</p><a href=\"$authURL\">现在就绑定</a>";
 //			echo "<p>您需要绑定新浪微博才能做任务赚钱</p><a href=\"$code_url\">现在就绑定</a>";

@@ -20,6 +20,7 @@ require_once( $dbConfFile );		// init $dbServs
 
 require_once( $webRoot.'foundation/debug.php');
 require_once( $webRoot.'foundation/switch.php');
+require_once( $webRoot.'foundation/price.php');
 
 // 用授权者的code换取token
 $o = new SaeTOAuthV2( WB_AKEY , WB_SKEY );
@@ -56,7 +57,7 @@ if ($token) {
 			$id = $_SESSION['uid'];
             $api_res = $c->show_user_by_id($sid);
             if_weiboapi_fail($api_res);
-            $sql = "insert into user_info_sina (user_id, sina_uid, sina_token, token_update_at, token_expire_in, sina_screen_name, sina_location, sina_description, bind_time) values ('$id', '$sid', '{$token['access_token']}', now(), '{$token['expires_in']}', '{$api_res['screen_name']}', '{$api_res['location']}', '{$api_res['description']}', now())";
+            $sql = "insert into user_info_sina (user_id, sina_uid, sina_token, token_update_at, token_expires_in, sina_screen_name, sina_location, sina_description, bind_time) values ('$id', '$sid', '{$token['access_token']}', now(), '{$token['expires_in']}', '{$api_res['screen_name']}', '{$api_res['location']}', '{$api_res['description']}', now())";
 			$num = $dbo->exeUpdate($sql);
 			if(1 != $num) {
 				$msg = "向数据库插入数据出错。file:".__FILE__.";line:".__LINE__."sql:".$sql;
@@ -96,7 +97,7 @@ if ($token) {
 				$msg = "向数据库插入数据出错。file:".__FILE__.";line:".__LINE__."sql:".$sql;
 				debug($msg, __FILE__, __LINE__);
             }
-            $sql = "insert into user_info_sina (user_id, sina_uid, sina_token, token_update_at, token_expire_in, sina_screen_name, sina_location, sina_description, bind_time) values (last_insert_id(), '$sid', '{$token['access_token']}', now(), '{$token['expires_in']}', '$screen_name', '$location', '$description', now())";
+            $sql = "insert into user_info_sina (user_id, sina_uid, sina_token, token_update_at, token_expires_in, sina_screen_name, sina_location, sina_description, bind_time) values (last_insert_id(), '$sid', '{$token['access_token']}', now(), '{$token['expires_in']}', '$screen_name', '$location', '$description', now())";
             $num = $dbo->exeUpdate($sql);
             if(1 != $num) 
             {
@@ -119,7 +120,7 @@ if ($token) {
         $stoken = $row['st'];
         if($token['access_token'] !== $stoken) {
             // 数据库中该用户的sina_token过期了，更新数据库
-            $sql = "update user_info_sina set sina_token = '{$token['access_token']}', token_update_at=now(), token_expire_in='{$token['expires_in']}' where sina_uid = '$sid' limit 1";
+            $sql = "update user_info_sina set sina_token = '{$token['access_token']}', token_update_at=now(), token_expires_in='{$token['expires_in']}' where sina_uid = '$sid' limit 1";
             $sql_res = $dbo->exeUpdate($sql);
             if(1 !== $sql_res) {
                 // 更新token失败，
@@ -130,12 +131,13 @@ if ($token) {
         }
 	}
 	// 写session
-	$sql = "select user_id, role, level, sina_level from user join user_info_sina using(user_id) where sina_uid = $sid limit 1";
+	$sql = "select user_id, role, realtime_money as rm, level, sina_level from user join user_info_sina using(user_id) where sina_uid = $sid limit 1";
 	$res = $dbo->getRow($sql);
 	$_SESSION['uid'] = $res['user_id'];
     $_SESSION['role'] = user_role_switch($res['role'], FALSE);
 	$_SESSION['sid'] = $sid;
 	$_SESSION['name'] = $name;
+	$_SESSION['user_realtime_money'] = price_db_to_user($res['rm']);
 	$_SESSION['stoken'] = $token['access_token'];
 	$_SESSION['level'] = $res['level'];
 	$_SESSION['slevel'] = $res['sina_level'];

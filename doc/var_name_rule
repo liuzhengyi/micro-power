@@ -1,0 +1,10 @@
+跟价格有关的变量命名：(非数据库中字段命名)
+[db|config|user]_[base|top|total|level]_price
+db -> 数据库中的变量，以厘为单位
+config -> 配置页面的价格变量，以角为单位
+user -> user看到的页面上的价格，以元为单位
+
+base -> 基础价
+top -> 最高价
+level -> 根据当前用户级别得出的价
+total -> 预期总价，由base和amount推算出来，加上企业佣金的总价

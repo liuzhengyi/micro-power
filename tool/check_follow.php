@@ -69,6 +69,7 @@ if(!$sql_res || 0 === count($sql_res)) {
 // 使用api查询任务微博的转发微博 statuses/repost_timeline/ids
 $uid = 9;    // 此处需要一个具有可用token的uid
 $sql = "select sina_token from user_info_sina where user_id = $uid limit 1";
+$sql = 'select sina_token from user_info_sina where sina_token is not null and unix_timestamp(now()) < unix_timestamp(token_update_at)+token_expires_in limit 1';
 $sql_res = $dbo->getRow($sql);
 $c = new SaeTClientV2( WB_AKEY, WB_SKEY, $sql_res['sina_token'] );
 //echo "data from sina api, uid:\n";

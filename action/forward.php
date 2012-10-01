@@ -25,7 +25,7 @@ if(!isset($_GET['id'])) {   // 非正常访问
     }
     
     $c = new SaeTClientV2(WB_AKEY, WB_SKEY, $_SESSION['stoken']);
-    // 先尝试更新task表中task_finish_amount值，若更新成功则做任务，若任务失败，再回滚数据。未使用事务。
+    // 先尝试更新task表中finish_amount值，若更新成功则做任务，若任务失败，再回滚数据。未使用事务。
 	$dbo = new dbex($dbServs);
     if(isset($_GET['type']) && 'hide'==$_GET['type']) {
         // 屏蔽此任务   对应status-21
@@ -41,10 +41,10 @@ if(!isset($_GET['id'])) {   // 非正常访问
         $to_name = '任务列表';
         delay_jump(3, $msg, $to_url, $to_name);
     }
-    // 尝试更新task_finish_amount 
-	$sql = "update task set task_finish_amount=task_finish_amount+1 where task_id=$task_id and task_finish_amount < task_amount limit 1";
+    // 尝试更新finish_amount 
+	$sql = "update task set finish_amount=finish_amount+1 where task_id=$task_id and finish_amount < amount limit 1";
 	$sql_num = $dbo->exeUpdate($sql);
-    // 若更新task表中task_finish_amount失败，跳回任务页面
+    // 若更新task表中finish_amount失败，跳回任务页面
 	if(1 != $sql_num) {
 		$dbo->close();
 		$msg = "对不起，此任务已经被做完了请选择其他任务。";
@@ -54,7 +54,7 @@ if(!isset($_GET['id'])) {   // 非正常访问
 	}
     // 已经更新了task中的数据，现在做任务
     // 先获取任务信息
-	$sql = "select sina_wid, task_offer, screen_name from task join task_info_sina_forward using(task_id) where task_id = $task_id";
+	$sql = "select sina_wid, base_price, screen_name from task join task_info_sina_forward using(task_id) where task_id = $task_id";
 	$sql_res = $dbo->getRow($sql);
     // error control need upgrade
 	if(!$sql_res) {
@@ -63,25 +63,25 @@ if(!isset($_GET['id'])) {   // 非正常访问
         debug($err_msg, __FILE__, __LINE__, TRUE, 'fatal');
 	}
 	$sina_wid = $sql_res['sina_wid'];
-	$task_offer = $sql_res['task_offer'];
+	$base_price = $sql_res['base_price'];
     $task_owner_name = $sql_res['screen_name'];
 	$task_res = $c->repost($sina_wid);
 //	if_weiboapi_fail($task_res, __FILE__, __LINE__);
-// 没做成功，回滚task表中task_finish_amount数据
+// 没做成功，回滚task表中finish_amount数据
 	if(isset($task_res['error_code'])) {
 		echo	'某处出了错误：'.$task_res['error']
 			."。您未能完成任务，请<a href=\"{$_SERVER['HTTP_REFERER']}\">点此返回</a>";
-		$sql = "update task set task_finish_amount = task_finish_amount - 1 where task_id = $task_id limit 1";
+		$sql = "update task set finish_amount = finish_amount - 1 where task_id = $task_id limit 1";
 		$dbo->exeUpdate($sql);
 		$dbo->close();
 		exit();
 	}
 // 做成功了，写数据库，写SESSION
 // 写do_task表
-    $db_level_money = price_base_to_level($task_offer, $_SESSION['slevel']);
+    $db_level_price = price_base_to_level($base_price, $_SESSION['slevel']);
 //	$sql = "insert do_task (task_id, user_id, status, repost_mid, time)values($task_id, {$_SESSION['uid']}, '11', {$task_res['retweeted_status']['mid']}, now())";
 //  此处应注意，retweeted_status['mid']是原微博的mid，而非转发产生的mid
-	$sql = "insert do_task (task_id, user_id, status, task_type, owner_name, income, repost_mid, time)values($task_id, {$_SESSION['uid']}, 11, 1, '$task_owner_name', '$db_level_money', '{$task_res['mid']}', now())";
+	$sql = "insert do_task (task_id, user_id, status, task_type, owner_name, income, repost_mid, time)values($task_id, {$_SESSION['uid']}, 11, 1, '$task_owner_name', '$db_level_price', '{$task_res['mid']}', now())";
 	$sql_num = $dbo->exeUpdate($sql);
 	if(1 != $sql_num) {
 		echo 'debug. 写数据库失败。file: '.__FILE__.'; line: '.__LINE__;
@@ -89,7 +89,7 @@ if(!isset($_GET['id'])) {   // 非正常访问
 		exit();
 	}
 	$sql =	"update user set task_taken=task_taken+1, task_finished=task_finished+1,"
-		." total_income=total_income+$db_level_money, realtime_income=realtime_income+$db_level_money"
+		." total_money=total_money+$db_level_price, realtime_money=realtime_money+$db_level_price"
 		." where user_id = {$_SESSION['uid']} limit 1";
 	// 写user表
 	$sql_num = $dbo->exeUpdate($sql);
@@ -100,6 +100,7 @@ if(!isset($_GET['id'])) {   // 非正常访问
 	}
 	// 写数据成功，释放数据库连接
 	$dbo->close();
+    $_SESSION['user_realtime_money'] = $_SESSION['user_realtime_money'] + price_db_to_user($db_level_price);
     $sec=3;$msg='转发成功！';$to_url=$_SERVER['HTTP_REFERER'];$to_name='任务页面';
     delay_jump($sec,$msg,$to_url,$to_name);
 }

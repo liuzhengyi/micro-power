@@ -48,12 +48,12 @@ if(is_login()) {    // 已登录
 		case 'change':
 		break;
 		case 'money':
-			$sql = "select task_taken, task_finished, total_income, realtime_income from user where user_id = '{$_SESSION['uid']}'";
+			$sql = "select task_taken, task_finished, total_money, realtime_money from user where user_id = '{$_SESSION['uid']}'";
 			$res = $dbo->getRow($sql);
 			$task_taken = $res['task_taken'];
 			$task_finished = $res['task_finished'];
-			$total_user_money = price_db_to_user($res['total_income']);
-			$realtime_user_money = price_db_to_user($res['realtime_income']);
+			$total_user_money = price_db_to_user($res['total_money']);
+			$realtime_user_money = price_db_to_user($res['realtime_money']);
 		break;
 		case 'basic':	// case 'basic'
 			$sql = "select email, pro, con, reg_time from user where user_id = '{$_SESSION['uid']}' limit 1";
@@ -79,7 +79,7 @@ if(is_login()) {    // 已登录
                 $start = ($page-1)*$per_page;
                 $sql_res = $dbo->getPage($sql, $start, $per_page);
             } else if('ader' == $_SESSION['role']) {
-                $sql_count = "select count(1) from task where owner_id = {$_SESSION['uid']} and task_status=11";
+                $sql_count = "select count(1) from task where owner_id = {$_SESSION['uid']}";
                 $count = $dbo->getCount($sql_count);
                 $per_page = 5;
                 $total_page = ceil($count/$per_page);
@@ -89,7 +89,7 @@ if(is_login()) {    // 已登录
                     $page = 1;
                 }
                 // 提取当前用户发布过的任务的 任务id，任务类型 任务基本佣金，任务期望数量，目前完成数量
-                $sql = "select task_id, task_type, task_offer, task_amount, task_finish_amount from task where owner_id = {$_SESSION['uid']} and task_status = 1 order by task_id desc";
+                $sql = "select task_id, type, base_price, amount, finish_amount, create_at, expire_in from task where owner_id = {$_SESSION['uid']} order by task_id desc";
                 $start = ($page-1)*$per_page;
                 $sql_res = $dbo->getPage($sql, $start, $per_page);
             }
@@ -157,25 +157,26 @@ include("uiparts/docheader.php");
                 foreach($sql_res as $row) {
                     $user_income = price_db_to_user($row['income']);
                     if(2 == $row['task_type']) {
-                        echo '<p class="no_vertical_margin">我关注了 '.$row['owner_name'].' 的新浪微博，获得 '.$user_income.' 元。</p>';
+                        echo '<p class="no_vertical_margin">您关注了 '.$row['owner_name'].' 的新浪微博，获得 '.$user_income.' 元。</p>';
                     } else if (1 == $row['task_type']) {
-                        echo '<p class="no_vertical_margin">我转发了 '.$row['owner_name'].'的微博，收入 '.$user_income.' 元。</p>';
+                        echo '<p class="no_vertical_margin">您转发了 '.$row['owner_name'].'的微博，收入 '.$user_income.' 元。</p>';
                     }
                     echo '<br /><span class="no_vertical_margin">on: '.$row['time'].'</span><hr />';
                 }
             } else if('ader' == $_SESSION['role']) {
             // 企业用户
                 foreach($sql_res as $row) {
-                    $user_base_price = price_db_to_user($row['task_offer']);
-                    $db_total_price = $row['task_offer']*$row['task_amount'];
+                    $user_base_price = price_db_to_user($row['base_price']);
+                    $db_total_price = $row['base_price']*$row['amount'];
                     $user_total_price = price_db_to_user($db_total_price);
-                    if(2 == $row['task_type']) {
+                    if(2 == $row['type']) {
                         $type_name = '新浪关注任务';
-                    } else if (1 == $row['task_type']) {
+                    } else if (1 == $row['type']) {
                         $type_name = '新浪转发任务';
                     }
-                        echo '<p class="no_vertical_margin">您发布了'.$type_name.'，基本佣金'.$user_base_price.'。预期点击量：'.$row['task_amount'].'。预期总支出：'.$user_total_price.' 元。</p>';
-                    echo '<br /><span class="no_vertical_margin">on: '.$row['time'].'</span><hr />';
+                        echo '<p class="no_vertical_margin">您发布了'.$type_name.'，基本佣金'.$user_base_price.'。预期点击量：'.$row['amount'].'。预期总支出：'.$user_total_price.' 元。</p>';
+                    echo '<br /><span class="no_vertical_margin">on: '.$row['create_at'].'</span>';
+                    echo '<br /><span class="no_vertical_margin">expire in '.$row['expire_in'].' days</span><hr />';
                 }
             }
             ?>

@@ -6,6 +6,8 @@ session_start();
  */
 include_once("../config.php");
 include_once($webRoot."foundation/check.func.php");
+include_once($webRoot."foundation/switch.php");
+include_once($webRoot."foundation/price.php");
 	if(isset($_SEEEION['uid']) && isset($_SEISSION['name'])) { // 已经登录，跳转
 		header('Location:'.$siteRoot.'my.php');
 		exit();
@@ -23,7 +25,7 @@ include_once($webRoot."foundation/check.func.php");
 		$dbo = new dbex($dbServs);
         $e = $dbo->real_escape_string($e);
         $ency_p = md5($p);
-		$sql = "select user_id, nick_name, level from user where email = '$e' and pass = sha1('$ency_p') limit 1";
+		$sql = "select user_id, nick_name, role, level, realtime_money from user where email = '$e' and pass = sha1('$ency_p') limit 1";
 		$res = $dbo->query($sql);
 		if(1 != $res->num_rows) {	// 邮箱与密码不匹配
 			header('Location:'.$siteRoot.'index.php?login_error=mismatch');
@@ -33,11 +35,14 @@ include_once($webRoot."foundation/check.func.php");
 		$row = $res->fetch_array();
 		$_SESSION['uid'] = $row['user_id'];
 		$_SESSION['name'] = $row['nick_name'];
+        $_SESSION['role'] = user_role_switch($row['role'], false);  // from num to string
 		$_SESSION['level']  = $row['level'];
-        $sql = "select sina_uid, sina_level from user_info_sina where user_id = '{$_SESSION['uid']}' limit 1";
+		$_SESSION['user_realtime_money']  = price_db_to_user($row['realtime_money']);
+        $sql = "select sina_uid, sina_level, sina_token from user_info_sina where user_id = '{$_SESSION['uid']}' limit 1";
         $row = $dbo->getRow($sql);
 		$_SESSION['sid']  = empty($row['sina_uid'])? NULL : $row['sina_uid'];
 		$_SESSION['slevel']  = empty($row['sina_level'])? NULL : $row['sina_level'];
+		$_SESSION['stoken']  = empty($row['sina_token'])? NULL : $row['sina_token'];
 		$dbo->close();
 		header('Location:'.$siteRoot.'my.php');
 		// 后台继续运行，获取用户的已关注用户列表，写入SESSION

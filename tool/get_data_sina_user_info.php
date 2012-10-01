@@ -134,7 +134,7 @@ function write_info($info, $dbo)
  */
 function change_token($c, $dbo, $bottom=10, $mail=true, $write=true)
 {
-    $sql = "select sina_token as st, unix_timestamp(token_update_at) as tua, token_expire_in as tei, user_id as uid from user_info_sina where sina_token IS NOT NULL limit 10";
+    $sql = "select sina_token as st, unix_timestamp(token_update_at) as tua, token_expires_in as tei, user_id as uid from user_info_sina where sina_token IS NOT NULL limit 10";
     $sql_res = $dbo->getRs($sql);
     while(1) {
         foreach($sql_res as $res) {

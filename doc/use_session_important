@@ -1,0 +1,21 @@
+SESSION 名值对应关系
+
+uid	用户在本站的id
+name	        用户在本站的昵称
+role            用户的身份('user', 'ader', 'master')
+level           用户的微动力帐号级别
+realtime_money  用户当前账户金额(对ader是余额，是user是收益)
+sid             用户在sina的id
+slevel	        用户的微博级别，由我们评定
+stoken	        用户的weibo授权token
+is_bind_weibo   是否绑定weibo
+
+
+注意！
+以下数据在需要和数据中的数据保持同步。
+在数据库中对应的数据更新时，相应的session也要更新。
+它们是：
+    user_realtime_money(当用户做任务或ader发布任务时回发生改变)
+    level(用户的微动力账户级别，评级时有可能发生改变)
+    slevel(用户的新浪微博账户级别，评级时有可能发生改变)
+    stoken(用户的新浪微博授权token，token刷新时会发生改变)
