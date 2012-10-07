@@ -36,9 +36,28 @@ $sql_res = $dbo->getRow($sql);
 //if_mysql_fail($dbo, $sql_res, $sql, __FILE__, __LINE__);
 $db_realtime_money = $sql_res['realtime_money'];
 $config_base_price = intval($_POST['base_price']);
+// verify $config_base_price
+if( 1 > $config_base_price || 100 < $config_base_price) {
+    $msg = 'improper configuration: base_price should between 1 and 100.';
+    $to_url = $siteRoot.'create_task.php';
+    $to_name = 'create task page';
+    delay_jump(3, $msg, $to_url, $to_name);
+}
 $db_base_price = price_config_to_db($config_base_price);
 $amount = intval($_POST['amount']);
+if(1 > $amount || 1000 < $amount ) {
+    $msg = 'improper configuration: task amount should between 1 and 1000.';
+    $to_url = $siteRoot.'create_task.php';
+    $to_name = 'create task page';
+    delay_jump(3, $msg, $to_url, $to_name);
+}
 $expire_in = intval($_POST['expire_in']);
+if(1 > $expire_in || 300 < $expire_in ) {
+    $msg = 'improper configuration: expire_in should between 0 and 300.';
+    $to_url = $siteRoot.'create_task.php';
+    $to_name = 'create task page';
+    delay_jump(3, $msg, $to_url, $to_name);
+}
 $config_total_price = $config_base_price*$amount*(1+$ader_normal_rate);
 $db_total_price = price_config_to_db($config_total_price);
 if($db_realtime_money < $db_total_price) {
@@ -62,7 +81,8 @@ switch ($type_db) {
         $statuses = $c->user_timeline_by_id($uid, $page, $count, $since_id, $max_id, $feature, $trim_user, $baes_app);
         if_weiboapi_fail($statuses);
         foreach($statuses['statuses'] as $status) {
-            if($wid == $status['id']) { // wid 是当前用户的原创微博
+            if("$wid" == $status['id']) {
+            // wid 是当前用户的原创微博
                 // 扣钱先
                 $sql = "update user set realtime_money = realtime_money - $db_total_price where user_id = '{$_SESSION['uid']}' limit 1";
                 $num = $dbo->exeUpdate($sql);
@@ -105,22 +125,41 @@ switch ($type_db) {
                 delay_jump(3, $msg, $to_url, '任务列表');
             }
         }
+        // $wid is not 当前用户的原创微博
+        $msg = 'improper status: need YuanCHuangWeiBo';
+        $to_url = $siteRoot.'create_task.php';
+        $to_name = 'create task page';
+        delay_jump(3, $msg, $to_url, $to_name);
         break;
     case 2: // sina_follow
-        if(isset($_GET['comment']) && 'by_name' == $_GET['comment']) {
+        if(!empty($_GET['comment']) && 'by_name' == $_GET['comment']) {
             $name = strval($_POST['screen_name']);  // 任务中要关注的人的新浪屏显名称
+            $name_len = strlen($name);
+            if($name_len > 45) {
+                $msg = '用户名不符合规定';
+                $to_url = $siteRoot.'create_task.php';
+                $to_name = '任务创建页面';
+                delay_jump(3, $msg, $to_url, $to_name);
+            }
             $person = $c->show_user_by_name($name);
         } else {
             $pid = strval(intval($_POST['id']));    // person_id 任务中要关注的人的新浪uid
+            $pid_len = strlen($pid);
+            if( 10 > $pid_len || 12 < $pid_len ) {
+                $msg = 'improper user_id: perhaps you did choose correct person.';
+                $to_url = $siteRoot.'create_task.php';
+                $to_name = '任务创建页面';
+                delay_jump(3, $msg, $ot_url, $to_name);
+            }
             $person = $c->show_user_by_id($pid);
         }
-//        if_weiboapi_fail($person);
         if('20003' == $person['error_code']) {
-            $msg = '您要关注的用户不存在！';
+            $msg = '您指定的用户不存在！';
             $to_url = $siteRoot.'task.php';
             $to_name = '任务列表';
             delay_jump(3, $msg, $to_url, $to_name);
         }
+        if_weiboapi_fail($person);
         // 欲关注的用户存在，扣钱先
         $sql = "update user set realtime_money = realtime_money - $db_total_price where user_id = '{$_SESSION['uid']}' limit 1";
         $num = $dbo->exeUpdate($sql);

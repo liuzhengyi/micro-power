@@ -93,7 +93,7 @@ require_once("uiparts/docheader.php");
     }
 ?>
                         <label for="base_price1">基础出价<input type="text" name="base_price" id="base_price1" /></label>角(请填入100以内的正整数)<br />
-                        <label for="amount1">任务数量<input type="text" name="amount" id="amount1" /></label>次（请填入正整数）<br />
+                        <label for="amount1">任务数量<input type="text" name="amount" id="amount1" /></label>次（请填入正整数 lt 1000）<br />
                         <label for="expire_in1">有效时间<input type="text" name="expire_in" id="expire_in1" /></label>天（请填入100以内的正整数）<br />
                         <input type="hidden" name="type" value="sina_follow" />
                         <p><input type="submit" name="submit" value="就ta了" /></p>

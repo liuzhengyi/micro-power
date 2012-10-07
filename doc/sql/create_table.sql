@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS `user`;
 CREATE TABLE `user` (
 	user_id INT UNSIGNED AUTO_INCREMENT NOT NULL,
 	email VARCHAR(50) ,
-	nick_name VARCHAR(50) NOT NULL,
+	nick_name VARCHAR(55) NOT NULL, -- 新浪不超过规定十五的汉字或30个字符，一个汉字算两个字符
 	pass CHAR(40) ,
     role TINYINT UNSIGNED NOT NULL DEFAULT 1,  -- 使用数字映射用户角色
     -- 已有映射如下：

@@ -5,6 +5,7 @@
         <?php if('ader' == user_role_switch($_SESSION['role'], false)) {?>
         <li><a href="create_task.php">新建任务</a></li>
         <?php }?>
+		<li><a href="my_task.php">我的任务</a></li>
 		<li><a href="my.php">个人中心</a></li>
 		<?php }?>
 		<li><a href="help.php">帮助</a></li>
