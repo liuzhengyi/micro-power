@@ -11,7 +11,7 @@ session_start();
  * 本页面将信息提交给create_task_confirm.php
  *
  * 目前可以创建的任务类型有：
- *      新浪转发 sina_forward (type:1)
+ *      新浪转发 sina_repost (type:1)
  *      新浪关注 sina_follow (type:2)
  */
 include_once("config.php");	// init $authURL
@@ -26,10 +26,10 @@ $title = "欢迎来到微动力-创建任务";
 $csfile = array("style/main.css", "style/solo.css");
 
 // 确定请求任务类型
-$default_type = 'sina_follow';
+$default_type = 'sina_repost';
 if(isset($_GET['type'])) {
 	$type = $_GET['type'];
-	if($type != 'sina_follow' && $type != 'sina_forward' && $type != 'sina_review' && $type != 'sina_create') {
+	if($type != 'sina_repost' && $type != 'sina_follow' && $type != 'sina_review' && $type != 'sina_create') {
 		$type = $default_type;
 	}
 } else {
@@ -42,7 +42,7 @@ include_once("lib/dbo.class.php");
 include_once($dbConfFile);
 $dbo = new dbex($dbServs);
 switch ($type_db) {
-    case 1: // sina_forward
+    case 1: // sina_repost
         $uid = $_SESSION['sid']; $page=1; $count=200; $since_id=0; $max_id=0;
         $feature = 1;   // 0:全部，1：原创，2图片，3视频，4音乐
         $trim_user = 1; // 0:返回完整user信息，1：user字段仅返回uid
@@ -70,7 +70,7 @@ require_once("uiparts/docheader.php");
 	<div id="func_column">
 		<ul >
 			<li><a href="create_task.php?type=sina_follow">创建新浪关注任务</a></li>
-			<li><a href="create_task.php?type=sina_forward">创建新浪转发任务</a></li>
+			<li><a href="create_task.php?type=sina_repost">创建新浪转发任务</a></li>
 			<li><a alt="create_task.php?type=sina_review">创建新浪评论任务(暂不可用)</a></li>
 			<li><a alt="create_task.php?type=sina_create">创建新浪原创任务(暂不可用)</a></li>
 		</ul>
@@ -130,7 +130,7 @@ require_once("uiparts/docheader.php");
                     </div><!-- end of DIV fill_name -->
                 </div><!-- end of DIV create_task -->
             <?php break; ?>
-            <?php case 'sina_forward': ?> 
+            <?php case 'sina_repost': ?> 
                 <div id="create_task">
                     <div id="choose_weibo">
                     <h3>选择一条微博</h3>
@@ -146,7 +146,7 @@ require_once("uiparts/docheader.php");
                     <label for="base_price4">基础出价<input type="text" name="base_price" id="base_price4" /></label>角(请填入100以内的正整数)<br />
                     <label for="amount4">任务数量<input type="text" name="amount" id="amount4" /></label>次（请填入正整数）<br />
                     <label for="expire_in4">有效时间<input type="text" name="expire_in" id="expire_in4" /></label>天（请填入100以内的正整数）<br />
-                    <input type="hidden" name="type" value="sina_forward" />
+                    <input type="hidden" name="type" value="sina_repost" />
                     <input type="submit" name="submit" value="就ta了" />
                     </form>
                     </div><!-- end of DIV choose_weibo -->

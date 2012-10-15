@@ -10,12 +10,13 @@
             $money_name = '当前余额';
         } else if ( 'user' == $_SESSION['role'] ) {
             $screen_type = '个人用户';
-            $money_name = '当前投入';
+            $money_name = '当前收益';
         } else if ( 'master' == $_SESSION['role'] ) {
             $screen_type = '管理员';
             $money_name = '当前余额';
         }
         /*
+	// 这是从数据库中获取用户实时金钱的代码，目前使用的是SESSION
 include_once($webRoot.'lib/dbo.class.php');
 include_once( $dbConfFile );
         $dbo = new dbex($dbServs);

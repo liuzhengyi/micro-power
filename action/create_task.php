@@ -15,7 +15,7 @@ $title = "欢迎来到微动力-创建任务";
 // 确定请求任务类型
 if(isset($_POST['type'])) {
 	$type = $_POST['type'];
-	if($type != 'sina_follow' && $type != 'sina_forward' && $type != 'sina_review' && $type != 'sina_create') {
+	if($type != 'sina_follow' && $type != 'sina_repost' && $type != 'sina_review' && $type != 'sina_create') {
         $msg = '赞不支持此类型的任务';
         $to_url = $siteRoot.'create_task.php';
         delay_jump(2, $msg, $to_url, '创建任务页面');
@@ -74,7 +74,7 @@ if($db_realtime_money < $db_total_price) {
 */
 
 switch ($type_db) {
-    case 1: // sina_forward
+    case 1: // sina_repost
         $wid = strval(intval($_POST['id']));
         $uid = $_SESSION['sid']; $page=1; $count=50; $since_id=0; $max_id=0; $base_app=0; $trime_user = 0;
         $feature = 1;   // 0-全部，1-原创，2-图片，3-视频，4-音乐
@@ -106,7 +106,7 @@ switch ($type_db) {
                 $screen_name = $dbo->real_escape_string($status['user']['screen_name']);
                 $location = $dbo->real_escape_string($status['user']['location']);
                 $description = $dbo->real_escape_string($status['user']['description']);
-                $sql = "insert into task_info_sina_forward values(NULL, '$last_task_id', '{$_SESSION['sid']}', '$wid', '$text', '$screen_name', '$location', '$description', '{$status['user']['profile_image_url']}', '{$status['thumbnail_pic_url']}', '{$status['bmiddle_pic_url']}', '{$status['original_pic_url']}')";
+                $sql = "insert into task_info_sina_repost values(NULL, '$last_task_id', '{$_SESSION['sid']}', '$wid', '$text', '$screen_name', '$location', '$description', '{$status['user']['profile_image_url']}', '{$status['thumbnail_pic_url']}', '{$status['bmiddle_pic_url']}', '{$status['original_pic_url']}')";
                 $num = $dbo->exeUpdate($sql);
                 if(1 != $num) {
                     $msg='数据库插入数据出错。SQL:'.$sql;

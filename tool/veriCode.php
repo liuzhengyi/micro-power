@@ -107,7 +107,8 @@ class SimpleCaptcha {
             'maxSize' => $this->height/2+4, 
             //                      'font' => 'Duality.ttf'
             //'font' => '/usr/share/fonts/truetype/unfonts/UnBatang.ttf'
-            'font' => '/usr/share/fonts/chinese/TrueType/uming.ttf'
+            //'font' => '/usr/share/fonts/chinese/TrueType/uming.ttf'
+	    'font' => '/usr/share/fonts/truetype/wqy/wqy-microhei.ttc'
         );
 
         $x      = 10*$this->scale;

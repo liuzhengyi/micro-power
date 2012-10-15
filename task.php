@@ -33,7 +33,7 @@ $c = new SaeTClientV2( WB_AKEY, WB_SKEY, $_SESSION['stoken']);
 $default_type = 'sina_follow';
 if(isset($_GET['type'])) {
 	$type = $_GET['type'];
-	if($type != 'sina_follow' && $type != 'sina_forward' && $type != 'sina_review' && $type != 'sina_create') {
+	if($type != 'sina_follow' && $type != 'sina_repost' && $type != 'sina_review' && $type != 'sina_create') {
 		$type = $default_type;
 	}
 } else {
@@ -56,8 +56,8 @@ if(isset($_GET['page']) && $_GET['page'] >= 1 && $_GET['page'] <= $total_page) {
 	$page = 1;
 }
 switch($type) {
-    case 'sina_forward': // sina_forward , type == 1
-        $sql = "select task_id, owner_id, publisher_id,base_price, amount, finish_amount, sina_uid, sina_wid, text, screen_name, location, user_description, profile_image_url, thumbnail_pic_url, bmiddle_pic_url, original_pic_url from task join task_info_sina_forward using(task_id) where type = 1 and  status=1 and task_id not in (select task_id from do_task where user_id = {$_SESSION['uid']})";
+    case 'sina_repost': // sina_repost , type == 1
+        $sql = "select task_id, owner_id, publisher_id,base_price, amount, finish_amount, sina_uid, sina_wid, text, screen_name, location, user_description, profile_image_url, thumbnail_pic_url, bmiddle_pic_url, original_pic_url from task join task_info_sina_repost using(task_id) where type = 1 and  status=1 and task_id not in (select task_id from do_task where user_id = {$_SESSION['uid']})";
         break;
     default: // sina_follow , type == 2
         $sql = "select task_id, owner_id, publisher_id, base_price, amount, finish_amount, sina_uid, screen_name, friends_count, followers_count, weibo_count, profile_image_url, avatar_large_url, location, user_description from task join task_info_sina_follow using(task_id) where type=2 and status=1 and task_id not in (select task_id from do_task where user_id = {$_SESSION['uid']})";
@@ -84,7 +84,7 @@ require_once("uiparts/docheader.php");
 	<div id="func_column">
 		<ul >
 			<li><a href="task.php?type=sina_follow">关注任务</a></li>
-			<li><a href="task.php?type=sina_forward">转发任务</a></li>
+			<li><a href="task.php?type=sina_repost">转发任务</a></li>
 			<li><a alt="task.php?type=sina_review">评论任务(暂不可用)</a></li>
 			<li><a alt="task.php?type=sina_create">原创任务(暂不可用)</a></li>
 		</ul>
@@ -123,7 +123,7 @@ require_once("uiparts/docheader.php");
                 <?php } ?>
                 </div><!-- end of DIV task_show -->
             <?php break; ?>
-            <?php case 'sina_forward': ?>
+            <?php case 'sina_repost': ?>
                 <div id="task_show">
                     <?php foreach($res as $row) {
                         $user_level_price = price_db_to_user(price_base_to_level($row['base_price'], $_SESSION['slevel']));
@@ -131,15 +131,15 @@ require_once("uiparts/docheader.php");
                     ?>
                     <div class="task_block">
                         <p><?php
-                           echo '<p class="forward_task_text">'.$row['text'].'</p>';
-                           echo '<p class="forward_task_comment">by:<a href="http://weibo.com/u/'.$row['sina_uid'].'" target="_blank">'.$row['screen_name'].'</a>。<br />转发此微博，您可以获利'.$user_level_price.'元，最高可获利'.$user_top_price.'元<sup><a href="help.php#price">?</a></sup>。';
+                           echo '<p class="repost_task_text">'.$row['text'].'</p>';
+                           echo '<p class="repost_task_comment">by:<a href="http://weibo.com/u/'.$row['sina_uid'].'" target="_blank">'.$row['screen_name'].'</a>。<br />转发此微博，您可以获利'.$user_level_price.'元，最高可获利'.$user_top_price.'元<sup><a href="help.php#price">?</a></sup>。';
                             if(isset($_SESSION['is_bind_weibo']) && $_SESSION['is_bind_weibo']) {
-                                echo '<a href="action/forward.php?id='.$row['task_id'].'">转发</a>';
+                                echo '<a href="action/repost.php?id='.$row['task_id'].'">转发</a>';
                             } else {
                                 echo '转发(不可用)<a href="help.php#task_invalid"><sup>?</sup></a>';
                             }
                             ?>
-                        。<a href="action/forward.php?id=<?php echo $row['task_id']; ?>&type=hide">屏蔽</a></p><hr />
+                        。<a href="action/repost.php?id=<?php echo $row['task_id']; ?>&type=hide">屏蔽</a></p><hr />
                         </p>
                     </div>
                     <?php } ?>

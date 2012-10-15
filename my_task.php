@@ -1,9 +1,9 @@
 <?php
 session_start();
 /* my_task.php
- * 负责显示和管理用户的个人任务信息
+ * 负责显示和管理用户的个人任务信息 包括个人用户和企业用户
  * 下有若干标签页，由$_GET['type']控制  (新浪转发任务，新浪关注任务……)(按时间等排序)
- *	'sina_forward' == $_GET['type'] 
+ *	'sina_repost' == $_GET['type'] 
  *		显示新浪转发任务信息
  *	'fins_follow' == $_GET['type'] 
  *		显示关信息
@@ -18,8 +18,8 @@ include_once($webRoot."foundation/status.php");
 $csfile = array("style/main.css", "style/solo.css");
 $title = "我的任务";
 // 以下两句获得授权地址，为了简化，已经将授权地址硬编码入配置文件
-//$o = new SaeTOAuthV2( WB_AKEY, WB_SKEY );
-//$code_url = $o->getAuthorizeURL( WB_CALLBACK_URL );
+// $o = new SaeTOAuthV2( WB_AKEY, WB_SKEY );
+// $code_url = $o->getAuthorizeURL( WB_CALLBACK_URL );
 ?>
 <?php
 if(is_login()) {    // 已登录
@@ -40,7 +40,8 @@ if(is_login()) {    // 已登录
     if( 'ader' == $_SESSION['role'] ) {
         switch($type) {
             case 'sina_repost':
-                $sql = "select * from task_info_sina_forward";
+                $sql = "select * from task_info_sina_repost";
+                $res = $dbo->getRow($sql);
             break;
             case 'sina_follow':
                 $sql = "select task_taken, task_finished, total_money, realtime_money from user where user_id = '{$_SESSION['uid']}'";
@@ -56,6 +57,8 @@ if(is_login()) {    // 已登录
     } else if( 'user' == $_SESSION['role'] ) {
         switch($type) {
             case 'sina_repost':
+                $sql = "select * from task_info_sina_repost";
+                $res = $dbo->getRow($sql);
             break;
             case 'sina_follow':
                 $sql = "select task_taken, task_finished, total_money, realtime_money from user where user_id = '{$_SESSION['uid']}'";
@@ -123,6 +126,9 @@ include("uiparts/docheader.php");
     <?php   default: ?>
     <h2>暂不支持此类型任务</h2>
     <?php } ?>
+
+    <?php var_dump($res); ?>
+    <?php if( isset($total_page) && 0 < $total_page ) { ?>
 		<div id="page_bar">
 		<ul>
 		<?php	
@@ -131,6 +137,7 @@ include("uiparts/docheader.php");
 		?>
 		</ul>
 		</div><!-- end of DIV page_bar -->
+    <?php } ?> 
 
 	</div><!-- end of DIV main_content -->
 	<?php include("uiparts/messcol.php"); ?>

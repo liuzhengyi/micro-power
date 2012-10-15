@@ -65,9 +65,12 @@ if(is_login()) {    // 已登录
         break;
         default:    // case 'action'
             if('user' == $_SESSION['role']) {
+            // 个人用户
+                //$sql_count = "select count(1) from do_task where user_id = {$_SESSION['uid']} and (status=11 or status=21)";
                 $sql_count = "select count(1) from do_task where user_id = {$_SESSION['uid']} and status=11";
                 $count = $dbo->getCount($sql_count);
-                $per_page = 5;
+                global $action_per_page;
+                $per_page = $action_per_page;
                 $total_page = ceil($count/$per_page);
                 if(isset($_GET['page']) && intval($_GET['page']) >= 1 && intval($_GET['page']) <= $total_page) {
                     $page = intval($_GET['page']);
@@ -75,6 +78,7 @@ if(is_login()) {    // 已登录
                     $page = 1;
                 }
                 // 提取当前用户做过的任务的 任务id，任务屏显名称，任务佣金，任务类型 , 完成时间 按照时间倒序
+                // status: 11 - 正常完成；21 - 屏蔽；
                 $sql = "select task_id, task_type, owner_name, income, time from do_task where user_id = {$_SESSION['uid']} and do_task.status = 11 order by do_id desc";
                 $start = ($page-1)*$per_page;
                 $sql_res = $dbo->getPage($sql, $start, $per_page);
@@ -180,14 +184,16 @@ include("uiparts/docheader.php");
                 }
             }
             ?>
-		<div id="page_bar">
-		<ul>
-		<?php	
-		$url = 'http://'.$hostName.$_SERVER['SCRIPT_NAME']."?type=$type&page=";
-		page_bar($url, $total_page, $page, TRUE);
-		?>
-		</ul>
-		</div><!-- end of DIV page_bar -->
+        <?php if( 0 < $total_page ) { ?>
+            <div id="page_bar">
+            <ul>
+            <?php	
+            $url = 'http://'.$hostName.$_SERVER['SCRIPT_NAME']."?data=$data&page=";
+            page_bar($url, $total_page, $page, TRUE);
+            ?>
+            </ul>
+            </div><!-- end of DIV page_bar -->
+        <?php } ?>
 	<?php } ?>
 
 	</div><!-- end of DIV main_content -->

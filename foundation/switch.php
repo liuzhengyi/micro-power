@@ -6,7 +6,7 @@ function task_type_switch($type, $to_db=TRUE)
 {
     if($to_db) {
         switch ($type) {
-            case 'sina_forward':
+            case 'sina_repost':
             case 1:
                 return 1;
             case 'sina_follow':
@@ -18,7 +18,7 @@ function task_type_switch($type, $to_db=TRUE)
             case 'sina_create':
             case 4:
                 return 4;
-            case 'qq_forward':
+            case 'qq_repost':
             case 11:
                 return 11;
             case 'qq_follow':
@@ -36,8 +36,8 @@ function task_type_switch($type, $to_db=TRUE)
     } else {
         switch ($type) {
             case 1:
-            case 'sina_forward':
-                return 'sina_forward';
+            case 'sina_repost':
+                return 'sina_repost';
             case 2:
             case 'sina_follow':
                 return 'sina_follow';
@@ -48,8 +48,8 @@ function task_type_switch($type, $to_db=TRUE)
             case 'sina_create':
                 return 'sina_create';
             case 11:
-            case 'qq_forward':
-                return 'qq_forward';
+            case 'qq_repost':
+                return 'qq_repost';
             case 12:
             case 'qq_follow':
                 return 'qq_follow';
@@ -60,7 +60,7 @@ function task_type_switch($type, $to_db=TRUE)
             case 'qq_create':
                 return 'qq_create';
             default:
-                return 'sina_forward';
+                return 'sina_repost';
 
         }
     }

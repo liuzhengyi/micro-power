@@ -47,7 +47,7 @@ $csfile = array("style/main.css", "style/solo.css");
 // 确定请求任务类型
 if(isset($_POST['type'])) {
 	$type = $_POST['type'];
-	if($type != 'sina_follow' && $type != 'sina_forward' && $type != 'sina_review' && $type != 'sina_create') {
+	if($type != 'sina_follow' && $type != 'sina_repost' && $type != 'sina_review' && $type != 'sina_create') {
         header("Location:index.php");
 	}
 } else {
@@ -61,8 +61,8 @@ include_once($dbConfFile);
 $dbo = new dbex($dbServs);
 
 switch ($type_db) {
-    case 1: // sina_forward
-    case 11:    // qq_forward
+    case 1: // sina_repost
+    case 11:    // qq_repost
         $id_text = $_POST['status_id-text'];
         $wid = strval(intval($id_text));    // weibo id
         $text = substr($id_text, strlen($wid)+1);     // weibo text
@@ -108,7 +108,7 @@ require_once("uiparts/docheader.php");
 	<div id="func_column">
 		<ul >
 			<li><a href="create_task.php?type=sina_follow">创建新浪关注任务</a></li>
-			<li><a href="create_task.php?type=sina_forward">创建新浪转发任务</a></li>
+			<li><a href="create_task.php?type=sina_repost">创建新浪转发任务</a></li>
 			<li><a alt="create_task.php?type=sina_review">创建新浪评论任务(暂不可用)</a></li>
 			<li><a alt="create_task.php?type=sina_create">创建新浪原创任务(暂不可用)</a></li>
 		</ul>
@@ -118,7 +118,7 @@ require_once("uiparts/docheader.php");
     <p class="hint"> 绑定微博后您才可以创建任务。<a href="<?php echo $authURL; ?>">现在绑定</a></p>
     <?php } ?>
     <h3>您要创建的任务如下：</h3>
-        <?php switch ($type) { case 'sina_forward': ?>
+        <?php switch ($type) { case 'sina_repost': ?>
                 <div id="create_task">
                     <dl>
                         <dt>任务描述</dt><dd>转发新浪微博 <sub><?php echo $text;?></sub></dd>
@@ -130,7 +130,7 @@ require_once("uiparts/docheader.php");
                         <dt>您确定要创建这个任务吗？</dt>
                         <dd>
                     <form action="action/create_task.php" method="post">
-                        <input type="hidden" name="type" value="sina_forward" />
+                        <input type="hidden" name="type" value="sina_repost" />
                         <input type="hidden" name="id" value="<?php echo $wid;?>" />
                         <input type="hidden" name="base_price" value="<?php echo $config_base_price;?>" />
                         <input type="hidden" name="amount" value="<?php echo $amount;?>" />

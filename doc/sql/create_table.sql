@@ -31,7 +31,7 @@ CREATE TABLE `user` (
 	UNIQUE (email),
 	UNIQUE (nick_name),
 	INDEX (email(25))
-);
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /* DESCRIBE `user`; */
 
 DROP TABLE IF EXISTS `user_info_sina`;
@@ -55,7 +55,7 @@ CREATE TABLE `user_info_sina` (     -- 用户绑定新浪微博或使用新浪�
     UNIQUE (sina_uid),
     INDEX (sina_uid),
     INDEX (sina_screen_name)
-);
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*DESCRIBE `user_info_sina`; */
 
 DROP TABLE IF EXISTS `user_info_ali`;
@@ -69,7 +69,7 @@ CREATE TABLE `user_info_ali` (
     UNIQUE (user_id),
     UNIQUE (ali_uid),
     INDEX (ali_name)
-);
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 /*DESCRIBE `user_info_ali`; */
 
 DROP TABLE IF EXISTS `task`;
@@ -80,10 +80,8 @@ CREATE TABLE `task` (
         -- -- task_type TINYINT UNSIGNED, -- 用数字映射任务类型，相当于预留了二百多个任务类型
     type TINYINT UNSIGNED, -- 用数字映射任务类型，相当于预留了二百多个任务类型
     -- 目前已有的对应关系：
-    -- 1-新浪转发-sina_forward，2-新浪关注-sina_follow，3-新浪评论-sina_review，4-新浪原创-sina_create
         -- 1-新浪转发-sina_repost，2-新浪关注-sina_follow，3-新浪评论-sina_review，4-新浪原创-sina_create
-    -- 11-腾讯转发-qq_forward，12-腾讯关注-qq_follow，13-腾讯评论-qq_review，4-腾讯原创-qq_create
-        -- 11-腾讯转发-qq_follow，12-腾讯关注-qq_follow，13-腾讯评论-qq_review，4-腾讯原创-qq_create
+        -- 11-腾讯转发-qq_repost，12-腾讯关注-qq_follow，13-腾讯评论-qq_review，4-腾讯原创-qq_create
 	    -- -- task_offer INT UNSIGNED DEFAULT 500,
 	base_price INT UNSIGNED DEFAULT 500,
 	/* 原始佣金 以 厘 为单位 默认为500厘 并非用户的真正佣金 */
@@ -101,11 +99,11 @@ CREATE TABLE `task` (
     expire_in bigint unsigned not null default 864000,
 	PRIMARY KEY (task_id),
 	INDEX (type)
-);
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 -- DESCRIBE `task`;
 
-DROP TABLE IF EXISTS `task_info_sina_forward`;
-CREATE TABLE `task_info_sina_forward` (
+DROP TABLE IF EXISTS `task_info_sina_repost`;
+CREATE TABLE `task_info_sina_repost` (
     info_id INT UNSIGNED NOT NULL AUTO_INCREMENT,
     task_id INT UNSIGNED NOT NULL,
     sina_uid BIGINT UNSIGNED NOT NULL, -- 任务中微博的主人的新浪UID
@@ -122,8 +120,8 @@ CREATE TABLE `task_info_sina_forward` (
     UNIQUE (task_id),
     INDEX (sina_uid),
     INDEX (screen_name)
-);
--- DESCRIBE `task_info_sina_forward`;
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+-- DESCRIBE `task_info_sina_repost`;
 
 DROP TABLE IF EXISTS `task_info_sina_follow`;
 CREATE TABLE `task_info_sina_follow` (
@@ -143,7 +141,7 @@ CREATE TABLE `task_info_sina_follow` (
     UNIQUE (task_id),
     INDEX (screen_name),
     INDEX (sina_uid)
-);
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 -- DESCRIBE `task_info_sina_follow`;
 
 DROP TABLE IF EXISTS `do_task`;
@@ -158,8 +156,8 @@ CREATE TABLE `do_task` (
     -- 21-屏蔽
     -- 31-失败
     task_type TINYINT UNSIGNED NOT NULL,    -- task表中的该字段
-    -- 1-新浪转发-sina_forward，2-新浪关注-sina_follow，3-新浪评论-sina_review，4-新浪原创-sina_create
-    -- 11-腾讯转发-qq_forward，12-腾讯关注-qq_follow，13-腾讯评论-qq_review，4-腾讯原创-qq_create
+    -- 1-新浪转发-sina_repost，2-新浪关注-sina_follow，3-新浪评论-sina_review，4-新浪原创-sina_create
+    -- 11-腾讯转发-qq_repost，12-腾讯关注-qq_follow，13-腾讯评论-qq_review，4-腾讯原创-qq_create
     owner_name varchar(60) NOT NULL,
     income INT UNSIGNED NOT NULL,
     /* repost_mid 仅针对转发任务，为转发产生的微博的mid，十进制 */
@@ -169,5 +167,5 @@ CREATE TABLE `do_task` (
 	PRIMARY KEY(do_id),
 	INDEX (task_id),
 	INDEX (user_id)
-);
+) ENGINE=MyISAM AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
 -- DESCRIBE `do_task`;

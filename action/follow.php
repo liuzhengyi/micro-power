@@ -109,8 +109,9 @@ if(!isset($_GET['id'])) {   // 非正常访问
 	}
 	// 写数据成功，释放数据库连接
 	$dbo->close();
-    $_SESSION['user_realtime_money'] = $_SESSION['user_realtime_money'] + price_db_to_user($db_level_price);
-	$_SESSION['followed_id'][] = $sina_uid;
+    // 写SESSION
+    $_SESSION['user_realtime_money'] = $_SESSION['user_realtime_money'] + price_db_to_user($db_level_money);
+    $_SESSION['followed_id'][] = $sina_uid;
     $msg = '恭喜！您成功完成了XX任务，获利XX元。';
     $to_url = $_SERVER['HTTP_REFERER'];
     $to_name = '任务列表';

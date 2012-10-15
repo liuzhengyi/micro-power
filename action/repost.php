@@ -1,6 +1,6 @@
 <?php
 session_start();
-/* forward.php
+/* repost.php
  * 负责处理用户--做转发任务--的请求
  * 同时可以处理用户--屏蔽转发任务--的请求
  */
@@ -54,7 +54,7 @@ if(!isset($_GET['id'])) {   // 非正常访问
 	}
     // 已经更新了task中的数据，现在做任务
     // 先获取任务信息
-	$sql = "select sina_wid, base_price, screen_name from task join task_info_sina_forward using(task_id) where task_id = $task_id";
+	$sql = "select sina_wid, base_price, screen_name from task join task_info_sina_repost using(task_id) where task_id = $task_id";
 	$sql_res = $dbo->getRow($sql);
     // error control need upgrade
 	if(!$sql_res) {

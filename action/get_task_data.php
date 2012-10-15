@@ -5,6 +5,7 @@ session_start();
  *  
  *  新的测试数据已经比较完整了，所以不许要运行此文件了。
  *  此文件暂不升级了
+ *	此文件欠缺多次升级
  */
 /* get_task_avatar.php */
 include_once('../config.php');
@@ -31,7 +32,7 @@ foreach($sql_res as $user) {
 }
 
 /* 获取转发任务的小图标，微博内容，微博图片大url和小url */
-$sql = "select task_id, task_sina_wid from task where type='forward' and (task_icon_url IS NULL OR task_thumbnail_pic_url IS NULL OR task_bmiddle_pic_url IS NULL OR task_text IS NULL) limit 50";
+$sql = "select task_id, task_sina_wid from task where type='repost' and (task_icon_url IS NULL OR task_thumbnail_pic_url IS NULL OR task_bmiddle_pic_url IS NULL OR task_text IS NULL) limit 50";
 $sql_res = $dbo->getRs($sql);
 foreach($sql_res as $user) {
     $weibo = $c->show_status($user['task_sina_wid']);

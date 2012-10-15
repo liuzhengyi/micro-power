@@ -1,3 +1,7 @@
+/*
+注意！在数据库中执行文件可能损毁收集的新浪用户数据，谨慎执行
+*/
+/*
 drop table if exists `data_sina_user_info`;
 create table `data_sina_user_info` (
     info_id bigint unsigned auto_increment not null,
@@ -21,3 +25,4 @@ create table `data_sina_user_info` (
     get_time datetime,
     primary key(info_id)
 );
+*/
