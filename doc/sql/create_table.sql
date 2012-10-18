@@ -78,7 +78,7 @@ CREATE TABLE `task` (
 	owner_id INT UNSIGNED NOT NULL, /* ader_id */
 	publisher_id INT UNSIGNED NOT NULL DEFAULT 1,
         -- -- task_type TINYINT UNSIGNED, -- 用数字映射任务类型，相当于预留了二百多个任务类型
-    type TINYINT UNSIGNED, -- 用数字映射任务类型，相当于预留了二百多个任务类型
+    `type` TINYINT UNSIGNED, -- 用数字映射任务类型，相当于预留了二百多个任务类型
     -- 目前已有的对应关系：
         -- 1-新浪转发-sina_repost，2-新浪关注-sina_follow，3-新浪评论-sina_review，4-新浪原创-sina_create
         -- 11-腾讯转发-qq_repost，12-腾讯关注-qq_follow，13-腾讯评论-qq_review，4-腾讯原创-qq_create
@@ -155,13 +155,14 @@ CREATE TABLE `do_task` (
     -- 11-完成(一切正常)， 12-完成(有待审核)，13-完成(反悔) <- 此处有待商榷
     -- 21-屏蔽
     -- 31-失败
-    task_type TINYINT UNSIGNED NOT NULL,    -- task表中的该字段
+    task_type TINYINT UNSIGNED NOT NULL,    -- 同task表中的type字段
     -- 1-新浪转发-sina_repost，2-新浪关注-sina_follow，3-新浪评论-sina_review，4-新浪原创-sina_create
     -- 11-腾讯转发-qq_repost，12-腾讯关注-qq_follow，13-腾讯评论-qq_review，4-腾讯原创-qq_create
-    owner_name varchar(60) NOT NULL,
+    owner_name varchar(60) NOT NULL,	-- 任务中的相关用户的屏显名称，这是个冗余字段
     income INT UNSIGNED NOT NULL,
-    /* repost_mid 仅针对转发任务，为转发产生的微博的mid，十进制 */
+    --	repost_mid 仅针对转发任务，为转发产生的微博的mid，十进制
     --  此字段是为爬虫验证转发任务准备的，放在这里并不合适，暂时如此
+    --	倘若此种信息多于两条，则考虑增加一个表，如do_task_info_xxx
     repost_mid BIGINT UNSIGNED DEFAULT NULL,    
     time DATETIME NOT NULL,
 	PRIMARY KEY(do_id),

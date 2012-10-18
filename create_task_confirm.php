@@ -64,7 +64,11 @@ switch ($type_db) {
     case 1: // sina_repost
     case 11:    // qq_repost
         $id_text = $_POST['status_id-text'];
-        $wid = strval(intval($id_text));    // weibo id
+        if( 2147483647 >= PHP_INT_MAX ) {   // 32位系统
+            $wid = substr($id_text,0,16);   // 暂且如此，sina_wid目前长度为16
+        } else {    // 大于32位的系统，
+            $wid = strval(intval($id_text));    // weibo id 注意，32位系统下会出问题。intval($id_text)将破坏该值。
+        }
         $text = substr($id_text, strlen($wid)+1);     // weibo text
         break;
     case 2: // sina_follow
@@ -73,7 +77,11 @@ switch ($type_db) {
             $name = strval($_POST['sina_screen_name']);
         } else {
             $id_name = $_POST['person_id-name'];    // id-name
-            $uid = strval(intval($id_name));        // 要关注的用户在相应平台上的id
+            if( 2147483647 >= PHP_INT_MAX ) {   // 32位系统
+                $uid = substr($id_name,0,10);   // 暂且如此，sina_wid目前长度为16
+            } else {    // 大于32位的系统，
+                $uid = strval(intval($id_name));    // weibo id 注意，32位系统下会出问题。intval($id_text)将破坏该值。
+            }
             $name = substr($id_name, strlen($uid)+1);         // 要关注的用户在相应平台上的用户名
         }
         break;

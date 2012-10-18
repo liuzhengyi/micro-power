@@ -27,68 +27,58 @@ if(is_login()) {    // 已登录
 	require_once($dbConfFile);
 	$dbo = new dbex($dbServs);
 
-	// 确定参数type的值
+    // 确定参数type的值
     if(!isset($_GET['type'])) {
         $type = 'sina_repost';
     } else {
         $type = $_GET['type'];
-        if  ( 'sina_repost' != $type && 'sina_follow' != $type && 'sina_review' != $type && 'sina_create' != $type ) {
+        //if  ( 'sina_repost' != $type && 'sina_follow' != $type && 'sina_review' != $type && 'sina_create' != $type ) {
+        if  ( 'sina_repost' != $type && 'sina_follow' != $type ) {
             $type = 'sina_repost';
         }
     }
 
+    // 根据用户身份获取不同内容
     if( 'ader' == $_SESSION['role'] ) {
+    // 企业用户
         switch($type) {
             case 'sina_repost':
-                $sql = "select * from task_info_sina_repost";
-                $res = $dbo->getRow($sql);
+                $sql = "select * from task_info_sina_repost join task using(task_id) where owner_id = {$_SESSION['uid']} and type = 1";
+                $res = $dbo->getRs($sql);
             break;
             case 'sina_follow':
-                $sql = "select task_taken, task_finished, total_money, realtime_money from user where user_id = '{$_SESSION['uid']}'";
-                $res = $dbo->getRow($sql);
-            break;
-            case 'sina_review':
-                $sql = "select email, pro, con, reg_time from user where user_id = '{$_SESSION['uid']}' limit 1";
-                $res = $dbo->getRow($sql);
+                $sql = "select * from task_info_sina_follow join task using(task_id) where owner_id = {$_SESSION['uid']} and type = 2";
+                $res = $dbo->getRs($sql);
             break;
             default:
             break;
         }
     } else if( 'user' == $_SESSION['role'] ) {
+    // 个人用户
         switch($type) {
             case 'sina_repost':
-                $sql = "select * from task_info_sina_repost";
-                $res = $dbo->getRow($sql);
+                $sql = "select time, screen_name, text from task_info_sina_repost join do_task using(task_id) where user_id = {$_SESSION['uid']} and task_type = 1";
+                $res = $dbo->getRs($sql);
             break;
             case 'sina_follow':
-                $sql = "select task_taken, task_finished, total_money, realtime_money from user where user_id = '{$_SESSION['uid']}'";
-                $res = $dbo->getRow($sql);
-            break;
-            case 'sina_review':
-                $sql = "select email, pro, con, reg_time from user where user_id = '{$_SESSION['uid']}' limit 1";
-                $res = $dbo->getRow($sql);
+                $sql = "select time, screen_name from task_info_sina_follow join do_task using(task_id) where user_id = {$_SESSION['uid']} and task_type = 2";
+                $res = $dbo->getRs($sql);
             break;
             default:
             break;
         }
-    }
-    else if( 'master' == $_SESSION['role'] ) {
+    } else if( 'master' == $_SESSION['role'] ) {
+    // 管理员
         switch($type) {
             case 'sina_repost':
             break;
             case 'sina_follow':
-                $sql = "select task_taken, task_finished, total_money, realtime_money from user where user_id = '{$_SESSION['uid']}'";
-                $res = $dbo->getRow($sql);
-            break;
-            case 'sina_review':
-                $sql = "select email, pro, con, reg_time from user where user_id = '{$_SESSION['uid']}' limit 1";
-                $res = $dbo->getRow($sql);
             break;
             default:
             break;
         }
     } else {
-    // not master && not ader && not user
+    // 未知类型或暂不支持类型用户
     }
 } else {	// 尚未登录
 	header("Location:index.php");
@@ -105,29 +95,82 @@ include("uiparts/docheader.php");
 		<ul>
 			<li><a href="my_task.php?type=sina_repost">新浪转发</a></li>
 			<li><a href="my_task.php?type=sina_follow">新浪关注</a></li>
-			<li><a href="my_task.php?type=sina_review">新浪评论</a></li>
-			<li><a href="my_task.php?type=sina_create">新浪原创</a></li>
+			<li><a href="my_task.php?type=sina_review"onclick="return false;" >新浪评论(invalid for now)</a></li>
+			<li><a href="my_task.php?type=sina_create"onclick="return false;" >新浪原创(invalid for now)</a></li>
 		</ul>
 	</div> <!-- end of DIV func_column -->
 	<div id="main_content">
-    <?php switch ($type) { case 'hello': ?>
-    <?php   case 'sina_repost': ?>
-    <h2>我的新浪转发任务</h2>
-    <?php       break; ?>
-    <?php   case 'sina_follow': ?>
-    <h2>我的新浪关注任务</h2>
-    <?php       break; ?>
-    <?php   case 'sina_review': ?>
-    <h2>我的新浪评论任务</h2>
-    <?php       break; ?>
-    <?php   case 'sina_create': ?>
-    <h2>我的新浪原创任务</h2>
-    <?php       break; ?>
-    <?php   default: ?>
-    <h2>暂不支持此类型任务</h2>
-    <?php } ?>
+    <?php
+    // 根据不同的type和role输出相应的信息
+    if( 'user' == $_SESSION['role'] ) {
+    // 个人用户
+        switch ($type) {
+            case 'sina_repost':
+                echo "<h2>我完成的新浪转发任务</h2>\n";
+                foreach( $res as $row ) {
+                    echo "<p>{$row['time']} <sub>转发了</sub> {$row['screen_name']} <sub>的微博</sub> {$row['text']}</p>";
+                    echo '<hr />';
+                }
+                break;
+            case 'sina_follow':
+                echo "<h2>我的新浪关注任务</h2>\n";
+                foreach($res as $row) {
+                    echo "<p>{$row['time']} <sub>关注了</sub> {$row['screen_name']} <sub>的新浪微博</sub> <p>";
+                    echo '<hr />';
+                }
+                break;
+            case 'sina_review':
+            case 'sina_create':
+            default:
+                echo "<h2>暂不支持此类型任务</h2>\n";
+        }
+    } else if ( 'ader' == $_SESSION['role'] ) {
+    // 企业用户
+        switch ($type) {
+            case 'sina_repost':
+                echo "<h2>我发布的新浪转发任务</h2>\n";
+                foreach( $res as $row ) {
+                    echo "<p><sub>转发</sub> {$row['screen_name']} <sub>的微博</sub> {$row['text']}<br /><sub>创建于：</sub>{$row['create_at']}</p>";
+                    echo '<hr />';
+                }
+                break;
+            case 'sina_follow':
+                echo "<h2>我发布的新浪关注任务</h2>\n";
+                foreach($res as $row) {
+                    echo "<sub>关注</sub> {$row['screen_name']} <sub>的新浪微博</sub> <sub>创建于：<sub>{$row['create_at']}</sub><p>";
+                    echo '<hr />';
+                }
+                break;
+            case 'sina_review':
+            case 'sina_create':
+            default:
+                echo "<h2>暂不支持此类型任务</h2>\n";
+        }
+    } else if ( 'master' == $_SESSION['role'] ){
+    // 管理员
+        switch ($type) {
+            case 'sina_repost':
+                echo "<h2>新浪转发任务</h2>\n";
+                foreach( $res as $row ) {
+                    echo '<hr />';
+                }
+                break;
+            case 'sina_follow':
+                echo "<h2>新浪关注任务</h2>\n";
+                foreach($res as $row) {
+                    echo '<hr />';
+                }
+                break;
+            case 'sina_review':
+            case 'sina_create':
+            default:
+                echo "<h2>暂不支持此类型任务</h2>\n";
+        }
+    } else {
+    // 未知类型用户
+    }
+    ?>
 
-    <?php var_dump($res); ?>
     <?php if( isset($total_page) && 0 < $total_page ) { ?>
 		<div id="page_bar">
 		<ul>

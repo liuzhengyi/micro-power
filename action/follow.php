@@ -28,7 +28,7 @@ if(!isset($_GET['id'])) {   // 非正常访问
 	// 先尝试更新task表中finish_amount值，若更新成功则做任务，若任务失败，再回滚数据。未使用事务。
 	$dbo = new dbex($dbServs);
     if(isset($_GET['type']) && 'hide'==$_GET['type']) { // 屏蔽此任务 status-21
-        $sql = "insert into do_task(task_id, user_id, status, time) values($task_id, {$_SESSION['uid']}, '21', now())";
+        $sql = "insert into do_task(task_id, user_id, status, task_type, time) values($task_id, {$_SESSION['uid']}, '21', '2',now())";
         $sql_res = $dbo->exeUpdate($sql);
         if(1 !== $sql_res) {
             $msg = '屏蔽失败，sql:['.$sql.']</p>';
@@ -75,15 +75,22 @@ if(!isset($_GET['id'])) {   // 非正常访问
 		$sql = "update task set finish_amount = finish_amount - 1 where task_id = $task_id limit 1";
 		$dbo->exeUpdate($sql);
 		$dbo->close();
-        if(21327 === $task_res['error_code']) {
-            if_weiboapi_fail($task_res);  // token expired
-        } else {
-            $msg = 'api调用某处出了错误：'.$task_res['error']
-                ."。您未能完成任务。";
-            $to_url = $_SERVER['HTTP_REFERER'];
-            $to_name = '任务列表';
-            delay_jump(3, $msg, $to_url, $to_name);
+        switch($task['error_code']) {
+            case '20506':	// 用户之前已经关注过该用户/任务不成功，将该任务用户加入当前用户已关注列表
+                $msg = "该用户已经在您的关注列表中了，如果他继续出现在您的任务列表中，请手动屏蔽。";
+                $to_name = '任务列表';
+                $to_url = $siteRoot.'task.php';
+                break;
+            case '21327':
+                if_weiboapi_fail($task_res);  // token expired
+                break;
+            default:
+                $msg = 'api调用某处出了错误：'.$task_res['error']
+                    ."。您未能完成任务。";
+                $to_url = $siteRoot.'task.php';
+                $to_name = '任务列表';
         }
+        delay_jump(3, $msg, $to_url, $to_name);
 	}
 	// 做成功了，写数据库，写SESSION    对应do_task status 11 正常完成
 	// 写do_task表

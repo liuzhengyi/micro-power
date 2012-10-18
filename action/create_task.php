@@ -58,6 +58,7 @@ if(1 > $expire_in || 300 < $expire_in ) {
     $to_name = 'create task page';
     delay_jump(3, $msg, $to_url, $to_name);
 }
+$expire_in_sec = $expire_in * 3600 * 24;
 $config_total_price = $config_base_price*$amount*(1+$ader_normal_rate);
 $db_total_price = price_config_to_db($config_total_price);
 if($db_realtime_money < $db_total_price) {
@@ -75,20 +76,23 @@ if($db_realtime_money < $db_total_price) {
 
 switch ($type_db) {
     case 1: // sina_repost
-        $wid = strval(intval($_POST['id']));
-        $uid = $_SESSION['sid']; $page=1; $count=50; $since_id=0; $max_id=0; $base_app=0; $trime_user = 0;
+        //$wid = strval(floatval($_POST['id']));
+	$wid = substr($_POST['id'], 0, 16);
+        var_dump($wid); // tmp debug
+        var_dump($_POST['id']);
+        $uid = $_SESSION['sid']; $page=1; $count=50; $since_id=0; $max_id=0; $base_app=0; $trim_user = 0;
         $feature = 1;   // 0-全部，1-原创，2-图片，3-视频，4-音乐
-        $statuses = $c->user_timeline_by_id($uid, $page, $count, $since_id, $max_id, $feature, $trim_user, $baes_app);
+        $statuses = $c->user_timeline_by_id($uid, $page, $count, $since_id, $max_id, $feature, $trim_user, $base_app);
         if_weiboapi_fail($statuses);
         foreach($statuses['statuses'] as $status) {
-            if("$wid" == $status['id']) {
+            if("$wid" == $status['idstr']) {
             // wid 是当前用户的原创微博
                 // 扣钱先
                 $sql = "update user set realtime_money = realtime_money - $db_total_price where user_id = '{$_SESSION['uid']}' limit 1";
                 $num = $dbo->exeUpdate($sql);
                 if(1 != $num) {$msg="扣钱失败，跳转。SQL:".$sql; debug($msg, __FILE__, __LINE__);}
                 // 扣钱成功，写task表
-                $sql = "insert into task (owner_id, publisher_id, type, base_price, amount, status, create_at, expire_in) values('{$_SESSION['uid']}', '{$_SESSION['uid']}', 1, '$db_base_price', '$amount', 1, now(), '$expire_in')";
+                $sql = "insert into task (owner_id, publisher_id, type, base_price, amount, status, create_at, expire_in) values('{$_SESSION['uid']}', '{$_SESSION['uid']}', 1, '$db_base_price', '$amount', 1, now(), '$expire_in_sec')";
                 $num = $dbo->exeUpdate($sql);
                 if(1 != $num) {
                     // 写数据表失败，回滚金钱数据
@@ -126,6 +130,7 @@ switch ($type_db) {
             }
         }
         // $wid is not 当前用户的原创微博
+        exit(); // tmp debug
         $msg = 'improper status: need YuanCHuangWeiBo';
         $to_url = $siteRoot.'create_task.php';
         $to_name = 'create task page';
@@ -142,6 +147,8 @@ switch ($type_db) {
                 delay_jump(3, $msg, $to_url, $to_name);
             }
             $person = $c->show_user_by_name($name);
+	    if_weiboapi_fail($person);
+	    $pid = $person['idstr'];
         } else {
             $pid = strval(intval($_POST['id']));    // person_id 任务中要关注的人的新浪uid
             $pid_len = strlen($pid);
@@ -153,7 +160,7 @@ switch ($type_db) {
             }
             $person = $c->show_user_by_id($pid);
         }
-        if('20003' == $person['error_code']) {
+        if(isset($pserson['error_code']) && '20003' == $person['error_code']) {
             $msg = '您指定的用户不存在！';
             $to_url = $siteRoot.'task.php';
             $to_name = '任务列表';
@@ -165,7 +172,7 @@ switch ($type_db) {
         $num = $dbo->exeUpdate($sql);
         if(1 != $num) {$msg="扣钱失败，跳转。SQL:".$sql; debug($msg, __FILE__, __LINE__);}
         // 扣钱成功，写task表
-        $sql = "insert into task (owner_id, publisher_id, type, base_price, amount, status, create_at, expire_in) values('{$_SESSION['uid']}', '{$_SESSION['uid']}', 2, '$db_base_price', '$amount', 1, now(), '$expire_in')";
+        $sql = "insert into task (owner_id, publisher_id, type, base_price, amount, status, create_at, expire_in) values('{$_SESSION['uid']}', '{$_SESSION['uid']}', 2, '$db_base_price', '$amount', 1, now(), '$expire_in_sec')";
         $num = $dbo->exeUpdate($sql);
         if(1 != $num) {
             // 写数据表失败，回滚金钱数据

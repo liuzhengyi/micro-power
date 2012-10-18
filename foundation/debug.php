@@ -45,6 +45,8 @@ function debug($debug_msg, $file=NULL, $line=NULL, $to_user=TRUE, $level="error"
 
 /**
  * 处理api调用失败函数
+ * 此处不应该处理太多情况，因为大部分情况下不需要。
+ * 少数需要的情况下，如几个重要的action，需要处理的错误码又各不一致，可以自行处理之。
  *
  * 使用方式：在调用新浪api后，将返回结果传给此函数，此函数判断调用结果，输出相应信息
  */
@@ -53,11 +55,14 @@ function if_weiboapi_fail($res, $file=NULL, $line=NULL, $append_msg=NULL)
 		$debug_msg = 'weibo服务暂时出了问题，请尝试使用其他方式';
 		debug($debug_msg, $file, $line, true);
 	}else if(isset($res['error_code'])) {   // 此处应该处理：token过期，频率限制，
-        if(21327 === $res['error_code']) {  // expired token, we need refresh the token
-            header("refresh:3;url=https://api.weibo.com/oauth2/authorize?client_id=1520889573&redirect_uri=http%3A%2F%2Fvdl.viivtech.com%2Fcallback.php&response_type=code");
-            echo '您之前对本应用的授权已经过期，请<a href="https://api.weibo.com/oauth2/authorize?client_id=1520889573&redirect_uri=http%3A%2F%2Fvdl.viivtech.com%2Fcallback.php&response_type=code">点此</a>重新授权。或者等待3秒后自动跳转到授权页面。</p>';
-            exit();
-        }
+		switch ($res['error_code']) {
+			case '21327':	// token 过期/引导用户刷新token
+			    header("refresh:3;url=https://api.weibo.com/oauth2/authorize?client_id=1520889573&redirect_uri=http%3A%2F%2Fvdl.viivtech.com%2Fcallback.php&response_type=code");
+			    echo '您上次对本应用的授权已经过期，请<a href="https://api.weibo.com/oauth2/authorize?client_id=1520889573&redirect_uri=http%3A%2F%2Fvdl.viivtech.com%2Fcallback.php&response_type=code">点此</a>重新授权。或者等待3秒后自动跳转到授权页面。</p>';
+			    break;
+			    exit();
+			default:
+		}
 		$debug_msg = ' call api failed, error: '.$res['error'].'<br />error code('.$res['error_code'].')';
 		debug($debug_msg, $file, $line, false);
 	}

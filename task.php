@@ -152,7 +152,7 @@ require_once("uiparts/docheader.php");
 		<ul>
 		<?php	
 		$url = 'http://'.$hostName.$_SERVER['SCRIPT_NAME']."?type=$type&page=";
-		page_bar($url, $total_page, $page, FALSE);
+		page_bar($url, $total_page, $page, TRUE);	// 测试时用 上线时将TRUE改为FALSE
 		?>
 		</ul>
 		</div><!-- end of DIV page_bar -->
